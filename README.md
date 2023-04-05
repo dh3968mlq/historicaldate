@@ -1,2 +1,2 @@
-# hdata
+# hdate
 Treatment of historical dates
