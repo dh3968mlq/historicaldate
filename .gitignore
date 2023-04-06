@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# VS code stuff
+.vscode
+
+# emacs backup files
+*~
+
 # C extensions
 *.so
 
