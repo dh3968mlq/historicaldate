@@ -11,7 +11,7 @@ class HDate():
         self.compiled_pattern = re.compile(self.match_pattern, re.IGNORECASE)
         srch = self.compiled_pattern.search(hdstr)
         if srch is None:
-            raise ValueError("Illegal date format")
+            raise ValueError(f"Illegal date format: {hdstr}")
         else:
             self.re_parsed = {key:srch[key] for key in self.compiled_pattern.groupindex}
 
@@ -34,20 +34,27 @@ class HDate():
                     f"\\s*(?P<{prefix}premon>{month_pattern}))?" \
                     f"\\s*(?P<{prefix}year>{year_pattern})" +  \
                     f"(-(?P<{prefix}postmon>{nmonth_pattern})" + \
-                    f"(-(?P<{prefix}postday>{day_pattern}))?)?"
+                    f"(-(?P<{prefix}postday>{day_pattern}))?)?" + \
+                    f"(\\s+(?P<{prefix}calendar>{calendar_pattern}))?"
             return datepattern
 
         pattern = f"^(?P<circa>{circa_pattern}\\s)?" + \
                 f"\\s*" + makedatepattern() + \
                 f"(\\s+(earliest|after)\\s+" + makedatepattern(prefix="early") + ")?" + \
                 f"(\\s+(latest|before)\\s+" + makedatepattern(prefix="late") + ")?" + \
-                f"(\\s+(?P<calendar>{calendar_pattern}))?" + \
                 "$"  
 
         return pattern
 
     def _convert_re_parsed(self):
-        "Convert re_parsed format to d_parsed format"
+        """
+        Convert re_parsed format to d_parsed format
+        This represents canonical form, so
+           - Represents Y/M/D as integers
+           - Does no calculations
+           - converts calendars to bce or ce
+           - sets main calendar, others are set only if different
+        """
 
         sp = self.re_parsed
 
@@ -82,13 +89,58 @@ class HDate():
                         else None
             hd[prefix+"year"] = int(sp[prefix+"year"]) if sp[prefix+"year"] is not None \
                         else None
+            ctemp = sp[prefix+"calendar"].lower() if sp[prefix+"calendar"] is not None else None
+            hd[prefix+"calendar"] = {'bc':'bce','ad':'ce'}.get(ctemp, ctemp)
 
         set_dmy()
         set_dmy("early")
         set_dmy("late")
-        hd["calendar"] = sp["calendar"].lower() if sp["calendar"] is not None else "ce"
+
+        # resolve calendars
+        # (1) if main is missing, copy from late
+        # (2) if main is still missing, and early is ad/ce, copy from early (else error)
+        # (3) if main is still missing, set to 'ce' ???
+        # (4) if early / late is same as main, set to nones
+        if hd["calendar"] is None: hd["calendar"] = hd["latecalendar"]
+        if hd["calendar"] is None: 
+            if hd["earlycalendar"] is None:
+                pass
+            elif hd["earlycalendar"].lower() in  {'bc', 'bce'}:
+                raise ValueError("If early calendar is BC/BCE, main calendar must be specified")
+            else:
+                hd["calendar"] = hd["earlycalendar"]
+        #if hd["calendar"] is None: hd["calendar"] = 'ce'  # Does canonical form require a calendar specified?
+        if hd["latecalendar"] == hd["calendar"]: hd["latecalendar"] = None
+        if hd["earlycalendar"] == hd["calendar"]: hd["earlycalendar"] = None
+
         return hd
     
+    def max_day_in_month(year, month, proleptic=False, calendar='ce'):
+        '''
+        month has range 1-12
+
+        If proleptic is False: Assumes possible Julian calendar to 1752, Gregorian after that
+        So max_day_in_month(1700, 2) == 29
+        So max_day_in_month(1800, 2) == 28
+
+        If proleptic is True: Assumes Gregorian calendar throughout
+        So max_day_in_month(1700, 2) == 28
+
+        If a Julian calendar is used, a proleptic Julian calendar is used before 8AD, when leap years
+        every four years became standardised. So in both systems the years 4AD, 1BC, 5BC etc. are
+        treated as leap years
+        '''
+        mlengths = [31,28,31,30,31,30,31,31,30,31,30,31]
+        mlength = mlengths[month-1]
+
+        if calendar.lower() in {'ce','ad'}:
+            ...
+        elif calendar.lower() in {'bce','bc'}:
+            ...
+        else:
+            raise ValueError(f"Calendar must me one of 'ce','ad','bce','bc'")
+
+
     def convert_to_python_date_naive(self):
         """
         date.MINYEAR == 1, so this can only be used for ce (AD) dates
