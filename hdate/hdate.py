@@ -30,7 +30,7 @@ class HDate():
         calendar_pattern = "ce|ad|bc|bce"
 
         def makedatepattern(prefix=""):
-            datepattern = f"((?P<{prefix}preday>{day_pattern})?" \
+            datepattern = f"(((?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?)?" \
                     f"\\s*(?P<{prefix}premon>{month_pattern}))?" \
                     f"\\s*(?P<{prefix}year>{year_pattern})" +  \
                     f"(-(?P<{prefix}postmon>{nmonth_pattern})" + \
@@ -79,17 +79,16 @@ class HDate():
 
         def set_dmy(prefix=""):
             """
-            To do: check values are within range
+            To do: check values are within range???
             """
-            hd[prefix+"day"] = int(sp[prefix+"preday"]) if sp[prefix+"preday"] is not None \
-                        else int(sp[prefix+"postday"]) if sp[prefix+"postday"] is not None \
+            hd[prefix+"day"] = int(sp[prefix+"preday"]) if sp[prefix+"preday"]  \
+                        else int(sp[prefix+"postday"]) if sp[prefix+"postday"]  \
                         else None
-            hd[prefix+"mon"] = getmonthnum(sp[prefix+"premon"]) if sp[prefix+"premon"] is not None \
-                        else int(sp[prefix+"postmon"]) if sp[prefix+"postmon"] is not None \
+            hd[prefix+"mon"] = getmonthnum(sp[prefix+"premon"]) if sp[prefix+"premon"]  \
+                        else int(sp[prefix+"postmon"]) if sp[prefix+"postmon"]  \
                         else None
-            hd[prefix+"year"] = int(sp[prefix+"year"]) if sp[prefix+"year"] is not None \
-                        else None
-            ctemp = sp[prefix+"calendar"].lower() if sp[prefix+"calendar"] is not None else None
+            hd[prefix+"year"] = int(sp[prefix+"year"]) if sp[prefix+"year"] else None
+            ctemp = sp[prefix+"calendar"].lower() if sp[prefix+"calendar"] else None
             hd[prefix+"calendar"] = {'bc':'bce','ad':'ce'}.get(ctemp, ctemp)
 
         set_dmy()
@@ -99,8 +98,7 @@ class HDate():
         # resolve calendars
         # (1) if main is missing, copy from late
         # (2) if main is still missing, and early is ad/ce, copy from early (else error)
-        # (3) if main is still missing, set to 'ce' ???
-        # (4) if early / late is same as main, set to nones
+        # (3) if early / late is same as main, set to none
         if hd["calendar"] is None: hd["calendar"] = hd["latecalendar"]
         if hd["calendar"] is None: 
             if hd["earlycalendar"] is None:
@@ -109,13 +107,13 @@ class HDate():
                 raise ValueError("If early calendar is BC/BCE, main calendar must be specified")
             else:
                 hd["calendar"] = hd["earlycalendar"]
-        #if hd["calendar"] is None: hd["calendar"] = 'ce'  # Does canonical form require a calendar specified?
+        
         if hd["latecalendar"] == hd["calendar"]: hd["latecalendar"] = None
         if hd["earlycalendar"] == hd["calendar"]: hd["earlycalendar"] = None
 
         return hd
     
-    def max_day_in_month(year, month, proleptic=False, calendar='ce'):
+    def max_day_in_month(year, month, proleptic_gregorian=False, calendar='ce'):
         '''
         month has range 1-12
 
@@ -133,10 +131,15 @@ class HDate():
         mlengths = [31,28,31,30,31,30,31,31,30,31,30,31]
         mlength = mlengths[month-1]
 
+        if month != 2:
+            pass    # no further adjustment needed
         if calendar.lower() in {'ce','ad'}:
-            ...
-        elif calendar.lower() in {'bce','bc'}:
-            ...
+            grg_nonleap = (year % 100 == 0) and (year % 400 != 0)
+            isleapyear = (year % 4 == 0) and not (grg_nonleap and (year > 1752 or proleptic_gregorian))
+            mlength = 29 if isleapyear else 28
+        elif calendar.lower() in {'bce','bc'}:  # assume proleptic julian calendar. 1BC, 5BC etc are leap years
+            isleapyear = (year % 4 == 0)
+            mlength = 29 if isleapyear else 28
         else:
             raise ValueError(f"Calendar must me one of 'ce','ad','bce','bc'")
 
