@@ -31,3 +31,4 @@ def test1():
     compare("1483 earliest 1428 latest 1486 ce", 
             {'year': '1483', 'earlyyear': '1428', 'lateyear': '1486', 'latecalendar':'ce'})
     compare("1483 after 1428 before 1486", {'year': '1483', 'earlyyear': '1428', 'lateyear': '1486'})
+    compare("after 1428 before 1486", {'earlyyear': '1428', 'lateyear': '1486'})

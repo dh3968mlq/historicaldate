@@ -2,8 +2,8 @@
 
 ## Introduction
 
-Standard computer date formats are generally unsuitable for storing dates of historical events, because:
-   1. Computer date formats often have an earliest date they can represent, sometimes as recent as 1677 (the earliest date a Pandas timestamp cen represent)
+Standard computer date formats are generally unsuitable for storing dates of historical events, since:
+   1. Computer date formats often have an earliest date they can represent, sometimes as recent as 1677 (the earliest date a Pandas timestamp can represent)
    2. Dates of historical events may not be known precisely. Only a month or a year may be known, or a range of possible dates
    3. Dates of historical events are most often quoted in a *calendar* that is itself not fully specified, particularly in distinguishing between the Julian and Gregorian calendars. The usual convention is that a date specified as 'CE' (or, equivalently 'AD') uses the calendar in force at the place of the event at the time, but the switch from the Julian to the Gregorian calendar took place at different times in different countries.
 
@@ -11,7 +11,7 @@ The imprecision in the calendar may be irrelevant for most applications, such as
 
 The Pandas *period* object class goes some way towards meeting these requirements, but does not deal with all of them.
 
-This all leads to the suggestion that dates of historical events should be stored in, for example, databases or spreadsheets as **text**, in a way that accepts imprecision in both the date and the calendar. This approach gives the added benefit that dates can then be stored in a format that is familiar to historians or genealogists such as:
+This all leads to the suggestion that dates of historical events should be stored as **text**, in a way that accepts imprecision in both the date and the calendar. This approach gives the added benefit that dates can then be stored in a format that is familiar to historians or genealogists such as:
    - 25 Dec 1066
    - circa 1483
    - Between 500 BC and 200 AD

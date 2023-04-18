@@ -7,6 +7,7 @@ import datetime
 
 class HDate():
     def __init__(self, hdstr=""):
+        self.circa_interval_days = int(5 * 365.25)
         self.match_pattern = self._create_match_pattern()
         self.compiled_pattern = re.compile(self.match_pattern, re.IGNORECASE)
         srch = self.compiled_pattern.search(hdstr)
@@ -17,6 +18,13 @@ class HDate():
 
         self.d_parsed = self._convert_re_parsed()
 
+        try:
+            self.convert_to_python_date_naive()
+        except:
+            self.naive_python_date = None
+            self.naive_python_earlydate = None
+            self.naive_python_latedate = None
+
     def _create_match_pattern(self):
         circa_pattern = "circa|c|c.|about|estimated"
         day_pattern = "[0-9]{1,2}"
@@ -25,7 +33,7 @@ class HDate():
                 "july","august","september","october","november","december"]
         self.months = [month[0:3] for month in months]   # three-letter abbreviations 
         month_pattern = "|".join(months + self.months)   # allow either full month names or 3-letter abbrevations
-        year_pattern = "[0-9]{3,8}"    # require at least three year digits to avoid confusion with month and day
+        year_pattern = "[0-9]{1,8}"    # should we require at least three year digits to avoid confusion with month and day?
         nmonth_pattern = "[0-9]{1,2}"
         calendar_pattern = "ce|ad|bc|bce"
 
@@ -38,10 +46,10 @@ class HDate():
                     f"(\\s+(?P<{prefix}calendar>{calendar_pattern}))?"
             return datepattern
 
-        pattern = f"^(?P<circa>{circa_pattern}\\s)?" + \
-                f"\\s*" + makedatepattern() + \
-                f"(\\s+(earliest|after)\\s+" + makedatepattern(prefix="early") + ")?" + \
-                f"(\\s+(latest|before)\\s+" + makedatepattern(prefix="late") + ")?" + \
+        pattern = f"^(?P<circa>{circa_pattern})?" + \
+                f"(\\s*" + makedatepattern() + ")?" + \
+                f"(\\s*(earliest|after|between)\\s+" + makedatepattern(prefix="early") + ")?" + \
+                f"(\\s*(latest|before|and)\\s+" + makedatepattern(prefix="late") + ")?" + \
                 "$"  
 
         return pattern
@@ -113,7 +121,7 @@ class HDate():
 
         return hd
     
-    def max_day_in_month(year, month, proleptic_gregorian=False, calendar='ce'):
+    def max_day_in_month(self,year, month, proleptic_gregorian=False, calendar='ce'):
         '''
         month has range 1-12
 
@@ -138,10 +146,12 @@ class HDate():
             isleapyear = (year % 4 == 0) and not (grg_nonleap and (year > 1752 or proleptic_gregorian))
             mlength = 29 if isleapyear else 28
         elif calendar.lower() in {'bce','bc'}:  # assume proleptic julian calendar. 1BC, 5BC etc are leap years
-            isleapyear = (year % 4 == 0)
+            isleapyear = (year % 4 == 1)
             mlength = 29 if isleapyear else 28
         else:
             raise ValueError(f"Calendar must me one of 'ce','ad','bce','bc'")
+
+        return mlength
 
 
     def convert_to_python_date_naive(self):
@@ -165,18 +175,37 @@ class HDate():
         """
         # function to convert a date
         def convert_one_date(prefix=""):
+
             if self.d_parsed[f'{prefix}year'] is None:
                 return None
             else:
-                return datetime.date(self.d_parsed[f'{prefix}year'], 
-                           self.d_parsed[f'{prefix}mon'] if self.d_parsed[f'{prefix}mon'] is not None else 6,
-                           self.d_parsed[f'{prefix}day'] if self.d_parsed[f'{prefix}day'] is not None else 15)
+                year = self.d_parsed[f'{prefix}year']
+                month = self.d_parsed[f'{prefix}mon'] if self.d_parsed[f'{prefix}mon'] \
+                            else 1 if prefix == "early" else 12 if prefix == "late" else 6
+                day = self.d_parsed[f'{prefix}day'] if self.d_parsed[f'{prefix}day'] \
+                            else 1 if prefix=="early" \
+                            else self.max_day_in_month(year, month) if prefix=="late" \
+                            else 15
+                return datetime.date(year, month, day)
         
         # -- convert the core date, if it exists
-        #self.naive_python_date = datetime.date(self.d_parsed['year'], 
-        #                   self.d_parsed['mon'] if self.d_parsed['mon'] is not None else 6,
-        #                   self.d_parsed['day'] if self.d_parsed['day'] is not None else 15)
         self.naive_python_date = convert_one_date()
         self.naive_python_latedate = convert_one_date("late")
         self.naive_python_earlydate = convert_one_date("early")
+
+        # -- Fill early and late dates if missing from (a) circa (b) main date
+        if self.naive_python_date:
+            if not self.naive_python_earlydate:
+                self.naive_python_earlydate = self.naive_python_date - \
+                    int(self.d_parsed["circa"]) * datetime.timedelta(days=self.circa_interval_days)
+            if not self.naive_python_latedate:
+                self.naive_python_latedate = self.naive_python_date + \
+                    int(self.d_parsed["circa"]) * datetime.timedelta(days=self.circa_interval_days)
+
+        # -- Fill in midpoint date if it is missing and both early and late dates are present
+        if (self.naive_python_earlydate and self.naive_python_latedate) and not self.naive_python_date:
+            self.naive_python_date = self.naive_python_earlydate + \
+                (self.naive_python_latedate - self.naive_python_earlydate)/2
+
+        # >> to do: deal with dates out of range, 29th feb 1100 etc.
         ...
