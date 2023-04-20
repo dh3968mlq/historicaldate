@@ -10,13 +10,17 @@ class HDate():
         self.circa_interval_days = int(5 * 365.25)
         self.match_pattern = self._create_match_pattern()
         self.compiled_pattern = re.compile(self.match_pattern, re.IGNORECASE)
-        srch = self.compiled_pattern.search(hdstr)
-        if srch is None:
-            raise ValueError(f"Illegal date format: {hdstr}")
-        else:
-            self.re_parsed = {key:srch[key] for key in self.compiled_pattern.groupindex}
 
-        self.d_parsed = self._convert_re_parsed()
+        if hdstr:
+            srch = self.compiled_pattern.search(hdstr)
+            if srch is None:
+                raise ValueError(f"Illegal date format: {hdstr}")
+            else:
+                self.re_parsed = {key:srch[key] for key in self.compiled_pattern.groupindex}
+
+            self.d_parsed = self._convert_re_parsed()
+        else:
+            self.d_parsed = None
 
         try:
             self.convert_to_python_date_naive()
