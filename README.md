@@ -58,10 +58,10 @@ A date has the following parts, each one optional, in this order if they appear
 
    - Starts with a keyword: one of 'circa', 'c','c.', 'about' or 'estimated'
    - Optionally followed *immediately* (no spaces) with an inication of uncertainty, which can be
-      - a number of years (y): e.g. circa2y to indicate 2 years' uncertainty
-      - a number of months (m): e.g. circa6m to indicate 6 months' uncertainty
-      - a number of days (d): e.g. circa10d to indicate 10 days' uncertainty
-   - If no circa specification is given, it default to 5 years
+      - a number of years (y): e.g. *circa2y* to indicate 2 years' uncertainty
+      - a number of months (m): e.g. *circa6m* to indicate 6 months' uncertainty
+      - a number of days (d): e.g. *circa10d* to indicate 10 days' uncertainty
+   - If no circa specification is given, it defaults to 5 years
 
 The circa specification is used in (only) the following ways:
    1. To estimate earliest date if none is given, from the 
@@ -73,6 +73,29 @@ The circa specification is used in (only) the following ways:
 
 ### Date specifications
 
-... to be continued
+Day and month are optional, year is required
+
+Each date may be written in either prefix or suffix form:
+
+**Prefix form date examples**
+
+The month must be indicated by its name (or the first three
+letters), not by a number
+
+   - 25th December 1066
+   - 25 dec 1066
+   - December 1066 ad
+   - 1066 ce
+
+**Suffix form date examples**
+
+The month must be indicated by its number, and the hyphens are required
+
+   - 1066-12-25
+   - 1066-12 ad
+   - 1066 ce
+
+
+
    
    

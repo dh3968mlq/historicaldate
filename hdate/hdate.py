@@ -203,40 +203,72 @@ class HDate():
         exist in the proleptic Gregorian calendar, turns up then it is converted to
         28th Feb in the same year
         """
-        # function to convert a date
+        # function to convert a date. Also returns indicator of y/m/d specification
         def convert_one_date(prefix=""):
+            default_month = 1 if prefix == "early" else 12 if prefix == "late" else 6
+            def default_day(year, month):
+                return 1 if prefix=="early" \
+                         else self.max_day_in_month(year, month) if prefix=="late" \
+                         else 15
 
             if self.d_parsed[f'{prefix}year'] is None:
-                return None
-            else:
+                if self.d_parsed["circa"] or (prefix == "") or (self.d_parsed[f'year'] is None): # Cannot copy from core year
+                    return None, ""
+                else:                # Copy from core year
+                    speclevel = self.naive_python_date_slevel
+                    year = self.d_parsed[f'year']
+                    month = self.d_parsed[f'mon'] if speclevel in {"m","d"} else default_month
+                    day = self.d_parsed[f'day'] if speclevel == "d" else default_day(year, month)
+                    return datetime.date(year, month, day), speclevel
+            else:    # The date has been specified
+                speclevel = "y"
                 year = self.d_parsed[f'{prefix}year']
-                month = self.d_parsed[f'{prefix}mon'] if self.d_parsed[f'{prefix}mon'] \
-                            else 1 if prefix == "early" else 12 if prefix == "late" else 6
-                day = self.d_parsed[f'{prefix}day'] if self.d_parsed[f'{prefix}day'] \
-                            else 1 if prefix=="early" \
-                            else self.max_day_in_month(year, month) if prefix=="late" \
-                            else 15
-                return datetime.date(year, month, day)
-        
-        # -- convert the core date, if it exists
-        self.naive_python_date = convert_one_date()
-        self.naive_python_latedate = convert_one_date("late")
-        self.naive_python_earlydate = convert_one_date("early")
+
+                if self.d_parsed[f'{prefix}mon']: speclevel = "m"
+                month = self.d_parsed[f'{prefix}mon'] if speclevel == "m" else default_month
+                
+                if self.d_parsed[f'{prefix}day']: speclevel = "d"
+                day = self.d_parsed[f'{prefix}day'] if speclevel == "d" else default_day(year, month)
+                return datetime.date(year, month, day), speclevel
+            
+        # -- convert the three dates
+        self.naive_python_date, self.naive_python_date_slevel = convert_one_date()
+        self.naive_python_latedate, self.naive_python_latedate_slevel = convert_one_date("late")
+        self.naive_python_earlydate, self.naive_python_earlydate_slevel = convert_one_date("early")
 
         # -- Fill early and late dates if missing from (a) circa (b) main date
         circa_interval_days = self.calc_clen_days()
-        if self.naive_python_date:
-            if not self.naive_python_earlydate:
-                self.naive_python_earlydate = self.naive_python_date - \
-                    int(self.d_parsed["circa"]) * datetime.timedelta(days=circa_interval_days)
-            if not self.naive_python_latedate:
-                self.naive_python_latedate = self.naive_python_date + \
-                    int(self.d_parsed["circa"]) * datetime.timedelta(days=circa_interval_days)
+        if self.naive_python_date_slevel and not self.naive_python_earlydate_slevel:
+            self.naive_python_earlydate = self.naive_python_date - datetime.timedelta(days=circa_interval_days)
 
+        if self.naive_python_date_slevel and not self.naive_python_latedate_slevel:
+            self.naive_python_latedate = self.naive_python_date + datetime.timedelta(days=circa_interval_days)
+                
         # -- Fill in midpoint date if it is missing and both early and late dates are present
-        if (self.naive_python_earlydate and self.naive_python_latedate) and not self.naive_python_date:
+        if self.naive_python_earlydate_slevel and \
+                    self.naive_python_latedate_slevel and \
+                    not self.naive_python_date_slevel:
             self.naive_python_date = self.naive_python_earlydate + \
                 (self.naive_python_latedate - self.naive_python_earlydate)/2
+            
+        # -- Fill in mid and late dates from circa if early is the only date specified
+        if self.naive_python_earlydate_slevel and \
+                    not self.naive_python_latedate_slevel and \
+                    not self.naive_python_date_slevel:
+            self.naive_python_date = self.naive_python_earlydate + \
+                        datetime.timedelta(days=circa_interval_days)
+            self.naive_python_latedate = self.naive_python_earlydate + \
+                        2 * datetime.timedelta(days=circa_interval_days)
+
+        # -- Fill in mid and early dates from circa if late is the only date specified
+        if not self.naive_python_earlydate_slevel and \
+                    self.naive_python_latedate_slevel and \
+                    not self.naive_python_date_slevel:
+            self.naive_python_date = self.naive_python_latedate - \
+                        datetime.timedelta(days=circa_interval_days)
+            self.naive_python_earlydate = self.naive_python_latedate - \
+                        2 * datetime.timedelta(days=circa_interval_days)
+
 
         # >> to do: deal with dates out of range, 29th feb 1100 etc.
         ...
