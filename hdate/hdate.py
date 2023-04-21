@@ -29,6 +29,8 @@ class HDate():
             self.naive_python_earlydate = None
             self.naive_python_latedate = None
 
+    # ------------------------------------------------------------------------------------------------------
+
     def _create_match_pattern(self):
         circa_pattern = "circa|c|c.|about|estimated"
         day_pattern = "[0-9]{1,2}"
@@ -50,13 +52,15 @@ class HDate():
                     f"(\\s+(?P<{prefix}calendar>{calendar_pattern}))?"
             return datepattern
 
-        pattern = f"^(?P<circa>{circa_pattern})?" + \
+        pattern = f"^((?P<circa>{circa_pattern})((?P<clen>{year_pattern})(?P<clentype>y|m|d))?)?" + \
                 f"(\\s*" + makedatepattern() + ")?" + \
                 f"(\\s*(earliest|after|between)\\s+" + makedatepattern(prefix="early") + ")?" + \
                 f"(\\s*(latest|before|and)\\s+" + makedatepattern(prefix="late") + ")?" + \
                 "$"  
 
         return pattern
+
+    # ------------------------------------------------------------------------------------------------------
 
     def _convert_re_parsed(self):
         """
@@ -85,10 +89,12 @@ class HDate():
 
         hd = {}
         hd["circa"] = sp["circa"] is not None  # 'circa':bool
+        hd["clen"] = sp["clen"]
+        hd["clentype"] = sp["clentype"]
 
         def getmonthnum(month):
             return self.months.index(month[0:3].lower()) + 1
-
+                            
         def set_dmy(prefix=""):
             """
             To do: check values are within range???
@@ -125,6 +131,8 @@ class HDate():
 
         return hd
     
+    # ------------------------------------------------------------------------------------------------------
+
     def max_day_in_month(self,year, month, proleptic_gregorian=False, calendar='ce'):
         '''
         month has range 1-12
@@ -157,6 +165,24 @@ class HDate():
 
         return mlength
 
+    # ------------------------------------------------------------------------------------------------------
+
+    def calc_clen_days(self):
+        if not self.d_parsed["clen"]:
+            return self.circa_interval_days
+        else:
+            days = int(self.d_parsed["clen"])
+            if self.d_parsed["clentype"] == "d":
+                pass
+            elif self.d_parsed["clentype"] == "m":
+                days = int(days * 365.25/12)
+            elif self.d_parsed["clentype"] == "y":
+                days = int(days * 365.25)
+            else:
+                raise ValueError
+
+
+    # ------------------------------------------------------------------------------------------------------
 
     def convert_to_python_date_naive(self):
         """
@@ -198,13 +224,14 @@ class HDate():
         self.naive_python_earlydate = convert_one_date("early")
 
         # -- Fill early and late dates if missing from (a) circa (b) main date
+        circa_interval_days = self.calc_clen_days()
         if self.naive_python_date:
             if not self.naive_python_earlydate:
                 self.naive_python_earlydate = self.naive_python_date - \
-                    int(self.d_parsed["circa"]) * datetime.timedelta(days=self.circa_interval_days)
+                    int(self.d_parsed["circa"]) * datetime.timedelta(days=circa_interval_days)
             if not self.naive_python_latedate:
                 self.naive_python_latedate = self.naive_python_date + \
-                    int(self.d_parsed["circa"]) * datetime.timedelta(days=self.circa_interval_days)
+                    int(self.d_parsed["circa"]) * datetime.timedelta(days=circa_interval_days)
 
         # -- Fill in midpoint date if it is missing and both early and late dates are present
         if (self.naive_python_earlydate and self.naive_python_latedate) and not self.naive_python_date:

@@ -16,7 +16,14 @@ This all leads to the suggestion that dates of historical events should be store
    - circa 1483
    - Between 500 BC and 200 AD
 
-The approach here is to specify allowed formats that includes the examples above, and can also be interpreted as indicating a range of dates.
+## General approach
+
+   1. Historical dates are stored as text, in an intuitive format that allows imprecision (e.g. year only or 'circa') and ranges
+   1. A historical date (if CE/AD) is converted to three Python date values (for CE dates): 
+   earliest, midpoint and latest, together with indications of
+   whether these are *stated*, as opposed to being estimated from 'circa' or as the midpoint of a range
+   1. A 'naive' approach to Python dates. 25th December 1066 becomes the Python date 1066-12-25, even though the former, by normal convention,
+   is Julian calendar and Python dates represent, strictly speaking, a proleptic (extended backwards in time) Gregorian calendar
 
 ## Requirements
 
@@ -38,3 +45,34 @@ The general approach:
    2. A calendar is always specified, but will most often be CE or BCE, and these do not completely specify everything about the calendar
    3. This lack of complete specification still allows many approximate operations, such as display on a timeline, or approximate event ordering
    4. In the minority of cases where this lack of precision matters, there can be options to convert dates to a completely specified calendar
+
+## Specification
+
+A date has the following parts, each one optional, in this order if they appear
+   1. A **circa specification**
+   1. A **central date**
+   1. An **earliest date**
+   1. A **latest date**
+
+### circa specification
+
+   - Starts with a keyword: one of 'circa', 'c','c.', 'about' or 'estimated'
+   - Optionally followed *immediately* (no spaces) with an inication of uncertainty, which can be
+      - a number of years (y): e.g. circa2y to indicate 2 years' uncertainty
+      - a number of months (m): e.g. circa6m to indicate 6 months' uncertainty
+      - a number of days (d): e.g. circa10d to indicate 10 days' uncertainty
+   - If no circa specification is given, it default to 5 years
+
+The circa specification is used in (only) the following ways:
+   1. To estimate earliest date if none is given, from the 
+   central date
+   1. To estimate latest date if none is given, from the 
+   central date
+   1. To estimate central and latest dates from earliest date, if earliest date is the only date given
+   1. To estimate central and earliest dates from latest date, if latest date is the only date given
+
+### Date specifications
+
+... to be continued
+   
+   

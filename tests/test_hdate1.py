@@ -32,3 +32,6 @@ def test1():
             {'year': '1483', 'earlyyear': '1428', 'lateyear': '1486', 'latecalendar':'ce'})
     compare("1483 after 1428 before 1486", {'year': '1483', 'earlyyear': '1428', 'lateyear': '1486'})
     compare("after 1428 before 1486", {'earlyyear': '1428', 'lateyear': '1486'})
+    compare("circa2y 25 Dec 1066",
+            {'circa': 'circa', 'clen': '2', 'clentype': 'y', 
+             'preday': '25', 'premon': 'Dec', 'year': '1066'})
