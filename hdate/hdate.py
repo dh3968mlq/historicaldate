@@ -28,9 +28,7 @@ class HDate():
             self.naive_python_date = None
             self.naive_python_earlydate = None
             self.naive_python_latedate = None
-
     # ------------------------------------------------------------------------------------------------------
-
     def _create_match_pattern(self):
         circa_pattern = "circa|c|c.|about|estimated"
         day_pattern = "[0-9]{1,2}"
@@ -59,9 +57,7 @@ class HDate():
                 "$"  
 
         return pattern
-
     # ------------------------------------------------------------------------------------------------------
-
     def _convert_re_parsed(self):
         """
         Convert re_parsed format to d_parsed format
@@ -130,9 +126,7 @@ class HDate():
         if hd["earlycalendar"] == hd["calendar"]: hd["earlycalendar"] = None
 
         return hd
-    
     # ------------------------------------------------------------------------------------------------------
-
     def max_day_in_month(self,year, month, proleptic_gregorian=False, calendar='ce'):
         '''
         month has range 1-12
@@ -164,9 +158,7 @@ class HDate():
             raise ValueError(f"Calendar must me one of 'ce','ad','bce','bc'")
 
         return mlength
-
     # ------------------------------------------------------------------------------------------------------
-
     def calc_clen_days(self):
         if not self.d_parsed["clen"]:
             return self.circa_interval_days
@@ -180,10 +172,7 @@ class HDate():
                 days = int(days * 365.25)
             else:
                 raise ValueError
-
-
     # ------------------------------------------------------------------------------------------------------
-
     def convert_to_python_date_naive(self):
         """
         date.MINYEAR == 1, so this can only be used for ce (AD) dates
@@ -268,6 +257,10 @@ class HDate():
                         datetime.timedelta(days=circa_interval_days)
             self.naive_python_earlydate = self.naive_python_latedate - \
                         2 * datetime.timedelta(days=circa_interval_days)
+
+        self.pdates = {'core':self.naive_python_date, 'slcore':self.naive_python_date_slevel,
+                    'late':self.naive_python_latedate, 'sllate':self.naive_python_latedate_slevel,
+                    'early':self.naive_python_earlydate, 'slearly':self.naive_python_earlydate_slevel}
 
 
         # >> to do: deal with dates out of range, 29th feb 1100 etc.
