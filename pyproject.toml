@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "historydate"
+version = "0.0.1"
+authors = [
+  { name="David Harris", email="dharris3968@hotmail.co.uk" },
+]
+description = "Handling dates of historical events and timelines"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/dh3968mlq/historydate"
+"Bug Tracker" = "https://github.com/dh3968mlq/historydate/issues"

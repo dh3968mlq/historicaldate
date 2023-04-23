@@ -1,11 +1,28 @@
 '''
-Object class to deal with historical dates, stored as strings
+    Handling dates of historical events and timelines
+    Copyright (C) 2023  David Harris
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    License at https://github.com/dh3968mlq/historydate/blob/main/LICENSE
 '''
 
 import re
 import datetime
 
 class HDate():
+    """
+    Object class to deal with historical dates, stored as strings
+    See README.md at https://github.com/dh3968mlq/historydate
+    """
     def __init__(self, hdstr=""):
         self.circa_interval_days = int(5 * 365.25)
         self.match_pattern = self._create_match_pattern()
