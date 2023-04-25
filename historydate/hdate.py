@@ -45,6 +45,8 @@ class HDate():
             self.naive_python_date = None
             self.naive_python_earlydate = None
             self.naive_python_latedate = None
+            self.pdates = None
+            
     # ------------------------------------------------------------------------------------------------------
     def _create_match_pattern(self):
         circa_pattern = "circa|c|c.|about|estimated"
