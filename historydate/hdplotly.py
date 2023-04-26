@@ -23,9 +23,12 @@ class plTimeLine():
         """
         ...
 
+# ------------------------------------------------------------------------------------------------
+
 def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0, color=None, 
                    width=4, dash=None, showlegend=False, showlabel=False,
-                   hovertext=None, tdelta=5*365.25):
+                   hovertext=None, tdelta=5*365.25,
+                   hyperlink=None):
     pdate_end_local = pdate_end if pdate_end else pdate_start + datetime.timedelta(days=tdelta)
     dash_local = dash if pdate_end else 'dot'
     if (pdate_start < pdate_end_local) or showlegend:
@@ -39,26 +42,31 @@ def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0, color
                             hovertext=hovertext if hovertext else label,
                             hoverlabel={'namelength':-1}, showlegend=showlegend))
         
-        if pdate_end is None:
-            fig.add_trace(go.Scatter(x = [pdate_end_local + datetime.timedelta(days=100)], y=[y], 
+        if pdate_end is None:     # -- Add 'ongoing' arrow
+            fig.add_trace(go.Scatter(x = [pdate_end_local + datetime.timedelta(days=300)], y=[y], 
                             name=label, legendgroup=label,
                             mode="markers", marker={'color':color,'symbol':'arrow-right','size':12}, 
                             hoverinfo='skip', showlegend=False))
 
         # Show the label if required
         if showlabel:
+            hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
             fig.add_trace(go.Scatter(x = [pdate_start + (pdate_end_local - pdate_start)/2.0], y=[y-0.04], 
                                      name=label, legendgroup=label,
-                            mode="text", text=label, textposition='bottom center',
+                            mode="text", text=hlinkedtext, 
+                            textposition='bottom center',
                             hoverinfo='skip', hoverlabel={'namelength':-1}, showlegend=False))
 
+# ------------------------------------------------------------------------------------------------
 def calc_pdates(ahdate):
     hd = hdate.HDate(ahdate)
     return hd.pdates
-
+# ------------------------------------------------------------------------------------------------
 def calc_yeartext(pdates):
     return str(pdates['core'].year) + \
                 ("" if pdates['early'].year == pdates['late'].year else "?")
+
+# ------------------------------------------------------------------------------------------------
 
 def add_timeline_trace(fig, row, y=0.0, showbirthanddeath=False, showlegend=True, color=None):
     '''
@@ -78,7 +86,7 @@ def add_timeline_trace(fig, row, y=0.0, showbirthanddeath=False, showlegend=True
     add_trace_part(fig, pdate_start=pdates_start['late'], 
                    pdate_end=pdates_end['early'] if pdates_end else None, 
                    label=text, y=y, color=color, showlegend=showlegend, showlabel=True,
-                   hovertext=hovertext)
+                   hovertext=hovertext, hyperlink=row['wikipedia_url'])
     add_trace_part(fig, pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
                    label=text, y=y, color=color, width=1, hovertext=hovertext)
     if pdates_end:
