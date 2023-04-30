@@ -69,7 +69,7 @@ class HDate():
                     f"(\\s+(?P<{prefix}calendar>{calendar_pattern}))?"
             return datepattern
 
-        pattern = f"^((?P<circa>{circa_pattern})((?P<clen>{year_pattern})(?P<clentype>y|m|d))?)?" + \
+        pattern = f"^(?P<ongoing>ongoing)|((?P<circa>{circa_pattern})((?P<clen>{year_pattern})(?P<clentype>y|m|d))?)?" + \
                 f"(\\s*" + makedatepattern() + ")?" + \
                 f"(\\s*(earliest|after|between)\\s+" + makedatepattern(prefix="early") + ")?" + \
                 f"(\\s*(latest|before|and)\\s+" + makedatepattern(prefix="late") + ")?" + \
@@ -104,6 +104,7 @@ class HDate():
 
         hd = {}
         hd["circa"] = sp["circa"] is not None  # 'circa':bool
+        hd["ongoing"] = sp["ongoing"] is not None  # 'circa':bool
         hd["clen"] = sp["clen"]
         hd["clentype"] = sp["clentype"]
 
@@ -279,7 +280,8 @@ class HDate():
 
         self.pdates = {'core':self.naive_python_date, 'slcore':self.naive_python_date_slevel,
                     'late':self.naive_python_latedate, 'sllate':self.naive_python_latedate_slevel,
-                    'early':self.naive_python_earlydate, 'slearly':self.naive_python_earlydate_slevel}
+                    'early':self.naive_python_earlydate, 'slearly':self.naive_python_earlydate_slevel,
+                    'ongoing':self.d_parsed['ongoing']}
 
 
         # >> to do: deal with dates out of range, 29th feb 1100 etc.

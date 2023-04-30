@@ -51,7 +51,7 @@ def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0, color
         # Show the label if required
         if showlabel:
             hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
-            fig.add_trace(go.Scatter(x = [pdate_start + (pdate_end_local - pdate_start)/2.0], y=[y-0.04], 
+            fig.add_trace(go.Scatter(x = [pdate_start + (pdate_end_local - pdate_start)/2.0], y=[y+0.04], # -0.04], 
                                      name=label, legendgroup=label,
                             mode="text", text=hlinkedtext, 
                             textposition='bottom center',

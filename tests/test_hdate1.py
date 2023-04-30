@@ -18,9 +18,9 @@ def compare(s,re_check=None, dcheck=None):
 
 def test1():
     compare("25 Dec 1066", {'preday':'25','premon':'Dec','year':'1066'}, 
-                        {'circa':False,'day':25,'mon':12,'year':1066})
+                        {'circa':False,'ongoing':False,'day':25,'mon':12,'year':1066})
     compare("25th Dec 1066", {'preday':'25','premon':'Dec','year':'1066'}, 
-                        {'circa':False,'day':25,'mon':12,'year':1066})
+                        {'circa':False,'ongoing':False,'day':25,'mon':12,'year':1066})
     compare("166",{'year': '166'})
     compare("1066",{'year': '1066'})
     compare("june 1066",{'premon': 'june', 'year': '1066'})
@@ -35,3 +35,4 @@ def test1():
     compare("circa2y 25 Dec 1066",
             {'circa': 'circa', 'clen': '2', 'clentype': 'y', 
              'preday': '25', 'premon': 'Dec', 'year': '1066'})
+    compare("ongoing",{"ongoing":"ongoing"})
