@@ -6,23 +6,58 @@ sys.path.append("..")
 
 import datetime
 import plotly.graph_objects as go
+from plotly import colors as pc
 from historydate import hdate
 
 class plTimeLine():
-    def __init__(self):
+    def __init__(self, mindate=None, maxdate=None):
         self.figure = go.Figure()
+        self.maxdate = datetime.date.today() + datetime.timedelta(days=int(10*365.25)) \
+                            if maxdate is None else maxdate
+        self.mindate = self.maxdate - datetime.timedelta(days=int(200*365.25)) \
+                            if mindate is None else mindate
 
-    def add_hdate_traces(df):
-        """
-        df must have column 'hdate'
-        Optional columns:
-            label: String label or identifier
-            hdate_end: end of persistent event. hdate is interpreted as the start date.
-                If hdate_end is absent, events are treated as single-date events, not persistent events.
-            hdate_birth, hdate_death: Birth and death dates
-        """
-        ...
+        self.fig_config = {'scrollZoom': True, 'displayModeBar':None}
 
+        self.figure.update_layout(dragmode="pan", showlegend=False)
+        self.figure.update_xaxes(
+                            tickangle = 90,
+                            title_text = "Date",
+                            title_font = {"size": 20},
+                            title_standoff = 25,
+                            range=[self.mindate, self.maxdate])
+
+    def add_event_set(self, df, ystart=0.0, nrows=8, rowspacing=0.3,
+                    title="", showbirthanddeath=False):
+        colgen = ColorGen()
+        self.figure.add_annotation(text=f"<b>{title}</b>", x=0.02, xref='paper', y=0.0, 
+                    showarrow=False, font={'size':16})
+        for irow, row in df.iterrows():
+            color = colgen.get()
+            add_timeline_trace(self.figure, row, 
+                            y=ystart + (irow % nrows + 1) * rowspacing, 
+                            showbirthanddeath=showbirthanddeath, color=color)
+
+
+#    def add_hdate_traces(df):
+#        """
+#        df must have column 'hdate'
+#        Optional columns:
+#            label: String label or identifier
+#            hdate_end: end of persistent event. hdate is interpreted as the start date.
+#            If hdate_end is absent, events are treated as single-date events, not persistent events.
+#            hdate_birth, hdate_death: Birth and death dates
+#        """
+#        ...
+# ------------------------------------------------------------------------------------------------
+class ColorGen():
+    def __init__(self):
+        self.index = -1
+        self.colors = pc.DEFAULT_PLOTLY_COLORS
+        self.len = len(self.colors)
+    def get(self):
+        self.index += 1
+        return self.colors[self.index % self.len]
 # ------------------------------------------------------------------------------------------------
 def add_trace_marker(fig, pdate=None, label="", y=0.0, 
                    color=None, size=10, symbol='diamond', showlegend=False, showlabel=False,
@@ -173,5 +208,3 @@ def add_timeline_trace_event(fig, row, y=0.0, showlegend=True, color=None):
                    label=text, y=y, color=color, showlegend=showlegend, showlabel=True,
                    hovertext=hovertext, hyperlink=row['wikipedia_url'])
 # ------------------------------------------------------------------------------------------------
-def add_event_set(fig, df, ystart=0.0):
-    raise NotImplementedError
