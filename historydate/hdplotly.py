@@ -24,9 +24,29 @@ class plTimeLine():
         ...
 
 # ------------------------------------------------------------------------------------------------
+def add_trace_marker(fig, pdate=None, label="", y=0.0, 
+                   color=None, size=10, symbol='diamond', showlegend=False, showlabel=False,
+                   hovertext=None, hyperlink=None):
+    fig.add_trace(go.Scatter(x = [pdate], y=[y], name=label, legendgroup=label,
+                        mode="markers", marker={'color':color, 'size':size,'symbol':symbol}, 
+                        hoverinfo='text',
+                        hovertext=hovertext if hovertext else label,
+                        hoverlabel={'namelength':-1}, showlegend=showlegend))
+
+    # Show the label if required
+    if showlabel:
+        hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
+        fig.add_trace(go.Scatter(x = [pdate], 
+                                 y=[y+0.04], 
+                                    name=label, legendgroup=label,
+                        mode="text", text=hlinkedtext, 
+                        textposition='bottom center',
+                        hoverinfo='skip', hoverlabel={'namelength':-1}, showlegend=False))
+    
+# ------------------------------------------------------------------------------------------------
 
 def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0, 
-                   ongoing=False, eventful=False, color=None, 
+                   ongoing=False, color=None, 
                    width=4, dash=None, showlegend=False, showlabel=False,
                    hovertext=None, tdelta=5*365.25,
                    hyperlink=None):
@@ -37,15 +57,7 @@ def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0,
         pdate_end_local = pdate_end 
         dash_local = dash 
 
-    if eventful and ((pdate_end_local is None) or (pdate_start == pdate_end_local)):
-        xs = [pdate_start]
-        ys = [y]
-        fig.add_trace(go.Scatter(x = xs, y=ys, name=label, legendgroup=label,
-                            mode="markers", marker={'color':color}, 
-                            hoverinfo='text',
-                            hovertext=hovertext if hovertext else label,
-                            hoverlabel={'namelength':-1}, showlegend=showlegend))
-    elif (pdate_start < pdate_end_local): #or showlegend: # showlegend may be irrelevant
+    if (pdate_start < pdate_end_local): 
         xs = [pdate_start] + \
              [datetime.date(year, 1, 1) for year in 
                     range(pdate_start.year + 1, pdate_end_local.year + 1)] + [pdate_end_local]
@@ -54,7 +66,7 @@ def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0,
                             mode="lines", line={'color':color,'width':width,'dash':dash_local}, 
                             hoverinfo='text',
                             hovertext=hovertext if hovertext else label,
-                            hoverlabel={'namelength':-1}, showlegend=showlegend))
+                            hoverlabel={'namelength':-1}, showlegend=False))
         
         if ongoing:     # -- Add 'ongoing' arrow
             fig.add_trace(go.Scatter(x = [pdate_end_local + datetime.timedelta(days=300)], y=[y], 
@@ -116,12 +128,17 @@ def add_timeline_trace_persistent(fig, row, y=0.0,
                    label=text, y=y, color=color, width=1, hovertext=hovertext)
     add_trace_part(fig, pdate_start=pdates_start['late'], 
                    pdate_end=pdates_end['early'], 
-                   ongoing=ongoing, eventful=True,
-                   label=text, y=y, color=color, showlegend=showlegend, showlabel=True,
+                   ongoing=ongoing, 
+                   label=text, y=y, color=color, showlabel=True,
                    hovertext=hovertext, hyperlink=row['wikipedia_url'])
+    add_trace_marker(fig, pdate=pdates_start['core'], y=y, color=color,
+                     showlegend=showlegend, 
+                    hovertext=hovertext, hyperlink=row['wikipedia_url'])
     if not ongoing:
         add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
                        label=text, y=y, color=color, width=1, hovertext=hovertext)
+        add_trace_marker(fig, pdate=pdates_end['core'], y=y, color=color,
+                    hovertext=hovertext, hyperlink=row['wikipedia_url'])
     
     if showbirthanddeath:
         if pdates_birth := calc_pdates(row["hdate_birth"]):
@@ -152,7 +169,9 @@ def add_timeline_trace_event(fig, row, y=0.0, showlegend=True, color=None):
 
     add_trace_part(fig, pdate_start=pdates['early'], pdate_end=pdates['late'], 
                    label=text, y=y, color=color, width=1, hovertext=hovertext)
-    add_trace_part(fig, pdate_start=pdates['core'], eventful=True,
+    add_trace_marker(fig, pdate=pdates['core'], 
                    label=text, y=y, color=color, showlegend=showlegend, showlabel=True,
                    hovertext=hovertext, hyperlink=row['wikipedia_url'])
-    
+# ------------------------------------------------------------------------------------------------
+def add_event_set(fig, df, ystart=0.0):
+    raise NotImplementedError
