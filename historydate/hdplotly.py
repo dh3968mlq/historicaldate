@@ -26,29 +26,36 @@ class plTimeLine():
                             title_font = {"size": 20},
                             title_standoff = 25,
                             range=[self.mindate, self.maxdate])
+        self.max_y_used = 0.0
 
-    def add_event_set(self, df, ystart=0.0, nrows=8, rowspacing=0.3,
+    def add_event_set(self, df, nrows=8, rowspacing=0.3,
                     title="", showbirthanddeath=False):
+        """
+        df must have column 'hdate'
+        Optional columns:
+            label: String label or identifier
+            hdate_end: end of persistent event. hdate is interpreted as the start date.
+            If hdate_end is absent, events are treated as single-date events, not persistent events.
+            hdate_birth, hdate_death: Birth and death dates
+        """
         colgen = ColorGen()
-        self.figure.add_annotation(text=f"<b>{title}</b>", x=0.02, xref='paper', y=0.0, 
+        if title:
+            self.figure.add_annotation(text=f"<b>{title}</b>", 
+                    x=0.02, xref='paper', y=self.max_y_used, 
                     showarrow=False, font={'size':16})
-        for irow, row in df.iterrows():
+        for irow, row in df.sort_values('hdate').iterrows():  # >> Get the sortation right!
             color = colgen.get()
             add_timeline_trace(self.figure, row, 
-                            y=ystart + (irow % nrows + 1) * rowspacing, 
+                            y=self.max_y_used + (irow % nrows + 1) * rowspacing, 
                             showbirthanddeath=showbirthanddeath, color=color)
+        self.max_y_used += (nrows + 1) * rowspacing
+    
+    def show(self):
+        self.figure.show(config=self.fig_config)
 
+    def write_html(self, filename):
+        self.figure.write_html(filename,include_plotlyjs='cdn', config=self.fig_config)
 
-#    def add_hdate_traces(df):
-#        """
-#        df must have column 'hdate'
-#        Optional columns:
-#            label: String label or identifier
-#            hdate_end: end of persistent event. hdate is interpreted as the start date.
-#            If hdate_end is absent, events are treated as single-date events, not persistent events.
-#            hdate_birth, hdate_death: Birth and death dates
-#        """
-#        ...
 # ------------------------------------------------------------------------------------------------
 class ColorGen():
     def __init__(self):
@@ -130,7 +137,11 @@ def calc_yeartext(pdates):
 # ------------------------------------------------------------------------------------------------
 
 def add_timeline_trace(fig, row, y=0.0, showbirthanddeath=False, showlegend=True, color=None):
-    pdates_end = calc_pdates(row["hdate_end"])
+    try:
+        pdates_end = calc_pdates(row["hdate_end"])
+    except TypeError:
+        pdates_end = None
+
     if pdates_end:
        add_timeline_trace_persistent(fig, row, y=y, 
                 showbirthanddeath=showbirthanddeath, 
