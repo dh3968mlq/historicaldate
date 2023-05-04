@@ -19,17 +19,17 @@ class plTimeLine():
                             if mindate is None else mindate
 
         self.fig_config = {'scrollZoom': True, 'displayModeBar':None}
-
         self.figure.update_layout(dragmode="pan", showlegend=False)
         self.figure.update_xaxes(
-                            tickangle = 90,
+                            #tickangle = 90,
                             title_text = "Date",
-                            title_font = {"size": 20},
-                            title_standoff = 25,
+                            title_font = {"size": 14},
+                            #title_standoff = 10,
                             range=[self.mindate, self.maxdate])
         self.max_y_used = 0.0
+        self.ongoing_tdelta=5*365.25   # time an 'ongoing' event is extended into future
 # -------------
-    def add_event_set(self, df, nrows=8, rowspacing=0.3,
+    def add_event_set(self, df, rowspacing=0.3,
                     title="", showbirthanddeath=False):
         """
         df must have column 'hdate'
@@ -43,18 +43,17 @@ class plTimeLine():
         if title:
             self.figure.add_annotation(text=f"<b>{title}</b>", 
                     x=0.02, xref='paper', y=self.max_y_used, 
-                    showarrow=False, font={'size':16})
+                    showarrow=False, font={'size':14})
 
         lo = lineorganiser.LineOrganiser()
-        for irow, row in df.sort_values('hdate').iterrows():  # >> Get the sortation right!
+        for _, row in df.iterrows():  
             color = colgen.get()
             self.add_timeline_trace(row, 
-                            y=self.max_y_used + (irow % nrows + 1) * rowspacing, 
                             showbirthanddeath=showbirthanddeath, color=color, lo=lo)
-        self.max_y_used += (len(lo.linerecord) + 1) * rowspacing    
+        self.max_y_used += (len(lo.linerecord) + 2) * rowspacing    
 # -------------
-    def add_timeline_trace(self, row, y=0.0, showbirthanddeath=False, 
-                        showlegend=True, color=None, lo=None):
+    def add_timeline_trace(self, row, showbirthanddeath=False, 
+                        showlegend=False, color=None, lo=None):
         try:
             pdates_end = calc_pdates(row["hdate_end"])
         except TypeError:
@@ -65,11 +64,11 @@ class plTimeLine():
                     showbirthanddeath=showbirthanddeath, 
                     showlegend=showlegend, color=color, lo=lo)
         else:
-            self.add_timeline_trace_event(row, y=y, 
+            self.add_timeline_trace_event(row,  
                     showlegend=showlegend, color=color, lo=lo)
 # -------------
     def add_timeline_trace_persistent(self, row, showbirthanddeath=False, 
-                                    showlegend=True, color=None, lo=None, tdelta=5*365.25,
+                                    showlegend=True, color=None, lo=None, 
                                     rowspacing=0.3):
         '''
         Add a persistent timeline trace for a given row
@@ -83,7 +82,7 @@ class plTimeLine():
 
         if ongoing:
             hovertext = f"{text} ({calc_yeartext(pdates_start)}...)"
-            pdates_end['early'] = datetime.date.today() + datetime.timedelta(days=tdelta)
+            pdates_end['early'] = datetime.date.today() + datetime.timedelta(days=self.ongoing_tdelta)
             pdates_end['core'] = pdates_end['early']
             pdates_end['late'] = pdates_end['early']
         else:
@@ -135,7 +134,7 @@ class plTimeLine():
                 add_trace_part(fig, pdate_start=pdates_death['early'], pdate_end=pdates_death['late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 # -------------
-    def add_timeline_trace_event(self, row, y=0.0, showlegend=True, color=None, lo=None,
+    def add_timeline_trace_event(self, row, showlegend=True, color=None, lo=None,
                                     rowspacing=0.3):
         '''
         Add timeline trace for an event
@@ -196,8 +195,8 @@ def add_trace_marker(fig, pdate=None, label="", y=0.0,
 # ------------------------------------------------------------------------------------------------
 def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0, 
                    ongoing=False, color=None, 
-                   width=4, dash=None, showlegend=False, showlabel=False,
-                   hovertext=None, tdelta=5*365.25,
+                   width=4, dash=None, showlabel=False,
+                   hovertext=None, 
                    hyperlink=None):
 
     if (pdate_start < pdate_end): 
