@@ -27,7 +27,6 @@ class plTimeLine():
                             #title_standoff = 10,
                             range=[self.mindate, self.maxdate])
         self.max_y_used = 0.0
-        self.ongoing_tdelta=5*365.25   # time an 'ongoing' event is extended into future
 # -------------
     def add_event_set(self, df, rowspacing=0.3,
                     title="", showbirthanddeath=False):
@@ -78,13 +77,10 @@ class plTimeLine():
         text = row["label"]
         pdates_start = calc_pdates(row["hdate"])
         pdates_end = calc_pdates(row["hdate_end"])
-        ongoing = pdates_end["ongoing"]
+        ongoing = pdates_end['slcore'] == 'o'
 
         if ongoing:
             hovertext = f"{text} ({calc_yeartext(pdates_start)}...)"
-            pdates_end['early'] = datetime.date.today() + datetime.timedelta(days=self.ongoing_tdelta)
-            pdates_end['core'] = pdates_end['early']
-            pdates_end['late'] = pdates_end['early']
         else:
             hovertext = f"{text} ({calc_yeartext(pdates_start)}-{calc_yeartext(pdates_end)})"
 
@@ -106,15 +102,18 @@ class plTimeLine():
                     label=text, y=y, color=color, width=1, hovertext=hovertext)
         add_trace_part(fig, pdate_start=pdates_start['late'], 
                     pdate_end=pdates_end['early'], 
-                    ongoing=ongoing, dash='dot' if ongoing else None,
                     label=text, y=y, color=color, showlabel=True,
                     hovertext=hovertext, hyperlink=row['wikipedia_url'])
         add_trace_marker(fig, pdate=pdates_start['core'], y=y, color=color,
                         showlegend=showlegend, 
                         hovertext=hovertext, hyperlink=row['wikipedia_url'])
-        if not ongoing:
-            add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
+        add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
                         label=text, y=y, color=color, width=1, hovertext=hovertext)
+        if ongoing:   # Right arrow at end of 'ongoing' period
+            add_trace_marker(fig, pdate=pdates_end['late'], y=y, color=color,
+                        symbol='arrow-right',
+                        hovertext=hovertext, hyperlink=row['wikipedia_url'])
+        else:
             add_trace_marker(fig, pdate=pdates_end['core'], y=y, color=color,
                         hovertext=hovertext, hyperlink=row['wikipedia_url'])
         
@@ -154,14 +153,14 @@ class plTimeLine():
                     hovertext=hovertext, hyperlink=row['wikipedia_url'])
     
 # -------------
-    def show(self,fix_y_range=False):
+    def show(self,fix_y_range=True):
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
                                  visible=False, fixedrange=fix_y_range)
         self.figure.show(config=self.fig_config)
 # -------------
-    def write_html(self, filename):
+    def write_html(self, filename, fix_y_range=True):
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
-                                 visible=False, fixedrange=True)
+                                 visible=False, fixedrange=fix_y_range)
         self.figure.write_html(filename,include_plotlyjs='cdn', config=self.fig_config)
 # ------------------------------------------------------------------------------------------------
 class ColorGen():
@@ -194,7 +193,7 @@ def add_trace_marker(fig, pdate=None, label="", y=0.0,
 
 # ------------------------------------------------------------------------------------------------
 def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0, 
-                   ongoing=False, color=None, 
+                   color=None, 
                    width=4, dash=None, showlabel=False,
                    hovertext=None, 
                    hyperlink=None):
@@ -219,12 +218,6 @@ def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0,
                             hoverinfo='text',
                             hovertext=hovertext if hovertext else label,
                             hoverlabel={'namelength':-1}, showlegend=False))
-        
-        if ongoing:     # -- Add 'ongoing' arrow
-            fig.add_trace(go.Scatter(x = [pdate_end + datetime.timedelta(days=300)], y=[y], 
-                            name=label, legendgroup=label,
-                            mode="markers", marker={'color':color,'symbol':'arrow-right','size':12}, 
-                            hoverinfo='skip', showlegend=False))
 # ------------------------------------------------------------------------------------------------
 def calc_pdates(ahdate):
     hd = hdate.HDate(ahdate)
