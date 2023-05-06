@@ -13,17 +13,18 @@ from historydate import lineorganiser
 class plTimeLine():
     def __init__(self, mindate=None, maxdate=None):
         self.figure = go.Figure()
+        self.figure.update_layout(xaxis_title=None, title=None, margin={'l':0,'r':0,'t':0,'b':0})
         self.maxdate = datetime.date.today() + datetime.timedelta(days=int(10*365.25)) \
                             if maxdate is None else maxdate
         self.mindate = self.maxdate - datetime.timedelta(days=int(200*365.25)) \
                             if mindate is None else mindate
 
-        self.fig_config = {'scrollZoom': True, 'displayModeBar':None}
+        self.fig_config = {'scrollZoom': True} #, 'displayModeBar':None}
         self.figure.update_layout(dragmode="pan", showlegend=False)
         self.figure.update_xaxes(
                             #tickangle = 90,
-                            title_text = "Date",
-                            title_font = {"size": 14},
+                            #title_text = "Date",
+                            #title_font = {"size": 14},
                             #title_standoff = 10,
                             range=[self.mindate, self.maxdate])
         self.max_y_used = 0.0
@@ -109,11 +110,12 @@ class plTimeLine():
                         hovertext=hovertext, hyperlink=row['wikipedia_url'])
         add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
                         label=text, y=y, color=color, width=1, hovertext=hovertext)
+
         if ongoing:   # Right arrow at end of 'ongoing' period
             add_trace_marker(fig, pdate=pdates_end['late'], y=y, color=color,
                         symbol='arrow-right',
                         hovertext=hovertext, hyperlink=row['wikipedia_url'])
-        else:
+        else:        # Normal marker at end of period
             add_trace_marker(fig, pdate=pdates_end['core'], y=y, color=color,
                         hovertext=hovertext, hyperlink=row['wikipedia_url'])
         
@@ -153,12 +155,12 @@ class plTimeLine():
                     hovertext=hovertext, hyperlink=row['wikipedia_url'])
     
 # -------------
-    def show(self,fix_y_range=True):
+    def show(self,fix_y_range=False):
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
                                  visible=False, fixedrange=fix_y_range)
         self.figure.show(config=self.fig_config)
 # -------------
-    def write_html(self, filename, fix_y_range=True):
+    def write_html(self, filename, fix_y_range=False):
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
                                  visible=False, fixedrange=fix_y_range)
         self.figure.write_html(filename,include_plotlyjs='cdn', config=self.fig_config)
