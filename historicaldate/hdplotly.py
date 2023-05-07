@@ -29,8 +29,9 @@ class plTimeLine():
                             range=[self.mindate, self.maxdate])
         self.max_y_used = 0.0
 # -------------
-    def add_event_set(self, df, rowspacing=0.3,
-                    title="", showbirthanddeath=False):
+    def add_event_set(self, df, 
+                    title="", showbirthanddeath=False, showlabel=True,
+                      rowspacing=0.3):
         """
         df must have column 'hdate'
         Optional columns:
@@ -49,11 +50,13 @@ class plTimeLine():
         for _, row in df.iterrows():  
             color = colgen.get()
             self.add_timeline_trace(row, 
-                            showbirthanddeath=showbirthanddeath, color=color, lo=lo)
+                            showbirthanddeath=showbirthanddeath, showlabel=showlabel,
+                            color=color, lo=lo)
         self.max_y_used += (len(lo.linerecord) + 2) * rowspacing    
 # -------------
     def add_timeline_trace(self, row, showbirthanddeath=False, 
-                        showlegend=False, color=None, lo=None):
+                        showlegend=False, showlabel=True,
+                        color=None, lo=None):
         try:
             pdates_end = calc_pdates(row["hdate_end"])
         except TypeError:
@@ -61,15 +64,16 @@ class plTimeLine():
 
         if pdates_end:
             self.add_timeline_trace_persistent(row,
-                    showbirthanddeath=showbirthanddeath, 
+                    showbirthanddeath=showbirthanddeath, showlabel=showlabel,
                     showlegend=showlegend, color=color, lo=lo)
         else:
             self.add_timeline_trace_event(row,  
-                    showlegend=showlegend, color=color, lo=lo)
+                    showlegend=showlegend, showlabel=showlabel,
+                    color=color, lo=lo)
 # -------------
     def add_timeline_trace_persistent(self, row, showbirthanddeath=False, 
-                                    showlegend=True, color=None, lo=None, 
-                                    rowspacing=0.3):
+                                    showlegend=True, showlabel=True,
+                                    color=None, lo=None, rowspacing=0.3):
         '''
         Add a persistent timeline trace for a given row
         'persistent' is defined by hdate_end is not None
@@ -95,7 +99,7 @@ class plTimeLine():
                 latest = max(latest, pdates_death['late'])
 
         labeldate = pdates_start['core'] + (pdates_end['core'] - pdates_start['core'])/2.0
-        iline = lo.add_trace(earliest, latest, labeldate, text)
+        iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
         y = self.max_y_used + (iline + 1) * rowspacing
         
         # Main part, from hdate to hdate_end
@@ -103,7 +107,7 @@ class plTimeLine():
                     label=text, y=y, color=color, width=1, hovertext=hovertext)
         add_trace_part(fig, pdate_start=pdates_start['late'], 
                     pdate_end=pdates_end['early'], 
-                    label=text, y=y, color=color, showlabel=True,
+                    label=text, y=y, color=color, showlabel=showlabel,
                     hovertext=hovertext, hyperlink=row['wikipedia_url'])
         add_trace_marker(fig, pdate=pdates_start['core'], y=y, color=color,
                         showlegend=showlegend, 
@@ -135,8 +139,9 @@ class plTimeLine():
                 add_trace_part(fig, pdate_start=pdates_death['early'], pdate_end=pdates_death['late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 # -------------
-    def add_timeline_trace_event(self, row, showlegend=True, color=None, lo=None,
-                                    rowspacing=0.3):
+    def add_timeline_trace_event(self, row, 
+                                 showlegend=True, showlabel=False,
+                                 color=None, lo=None, rowspacing=0.3):
         '''
         Add timeline trace for an event
         Initial implementation: no births and deaths
@@ -145,13 +150,13 @@ class plTimeLine():
         pdates = calc_pdates(row["hdate"])
 
         hovertext = f"{text} ({calc_yeartext(pdates)})"
-        iline = lo.add_trace(pdates["early"], pdates["late"], pdates["core"], text)
+        iline = lo.add_trace(pdates["early"], pdates["late"], pdates["core"], text if showlabel else "")
         y = self.max_y_used + (iline + 1) * rowspacing
 
         add_trace_part(self.figure, pdate_start=pdates['early'], pdate_end=pdates['late'], 
                     label=text, y=y, color=color, width=1, hovertext=hovertext)
         add_trace_marker(self.figure, pdate=pdates['core'], 
-                    label=text, y=y, color=color, showlegend=showlegend, showlabel=True,
+                    label=text, y=y, color=color, showlegend=showlegend, showlabel=showlabel,
                     hovertext=hovertext, hyperlink=row['wikipedia_url'])
     
 # -------------

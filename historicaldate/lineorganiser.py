@@ -4,15 +4,17 @@ Class to find a line to place a trace on
 import datetime
 
 class LineOrganiser():
-    def __init__(self, daysperlabelchar=500):
+    def __init__(self, daysperlabelchar=500, daysminspacing = 200):
         self.linerecord = []
         self.daysperlabelchar = daysperlabelchar
+        self.daysminspacing = daysminspacing
         self.previoustraceindex = 0
 
     def add_trace(self, earliest, latest, labeldate, text):
         textdelta = datetime.timedelta(days=int(len(text) * self.daysperlabelchar/2.0))
-        t_earliest = min(earliest, labeldate - textdelta)
-        t_latest = max(latest, labeldate + textdelta)
+        spacingdelta = datetime.timedelta(days=int(self.daysminspacing/2.0))
+        t_earliest = min(earliest, labeldate - textdelta) - spacingdelta
+        t_latest = max(latest, labeldate + textdelta) + spacingdelta
         lpd = {"earliest":t_earliest, "latest":t_latest}
 
         #for iline, line in enumerate(self.linerecord):
