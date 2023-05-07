@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.getcwd())
 
-from historydate import hdate
+from historicaldate import hdate
 
 def compare(s,re_check=None, dcheck=None):
     hd = hdate.HDate(s)

@@ -1,5 +1,5 @@
 """
-Plotly timelines for historydate package
+Plotly timelines for historicaldate package
 """
 import sys
 sys.path.append("..")
@@ -7,8 +7,8 @@ sys.path.append("..")
 import datetime
 import plotly.graph_objects as go
 from plotly import colors as pc
-from historydate import hdate
-from historydate import lineorganiser
+from historicaldate import hdate
+from historicaldate import lineorganiser
 
 class plTimeLine():
     def __init__(self, mindate=None, maxdate=None):

@@ -12,7 +12,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    License at https://github.com/dh3968mlq/historydate/blob/main/LICENSE
+    License at https://github.com/dh3968mlq/historicaldate/blob/main/LICENSE
 '''
 
 import re
@@ -21,7 +21,7 @@ import datetime
 class HDate():
     """
     Object class to deal with historical dates, stored as strings
-    See README.md at https://github.com/dh3968mlq/historydate
+    See README.md at https://github.com/dh3968mlq/historicaldate
     """
     def __init__(self, hdstr=""):
         self.circa_interval_days = int(5 * 365.25)

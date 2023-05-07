@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "historydate"
+name = "historicaldate"
 version = "0.0.1"
 authors = [
   { name="David Harris", email="dharris3968@hotmail.co.uk" },
@@ -18,5 +18,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/dh3968mlq/historydate"
-"Bug Tracker" = "https://github.com/dh3968mlq/historydate/issues"
+"Homepage" = "https://github.com/dh3968mlq/historicaldate"
+"Bug Tracker" = "https://github.com/dh3968mlq/historicaldate/issues"
