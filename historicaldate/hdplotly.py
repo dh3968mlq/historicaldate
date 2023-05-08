@@ -79,15 +79,18 @@ class plTimeLine():
         'persistent' is defined by hdate_end is not None
         '''        
         fig = self.figure
+        cols = list(row.index)
         text = row["label"]
+        htext = row["description"] if "description" in cols else text
         pdates_start = calc_pdates(row["hdate"])
-        pdates_end = calc_pdates(row["hdate_end"])
-        ongoing = pdates_end['slcore'] == 'o'
+
+        pdates_end = calc_pdates(row["hdate_end"]) if "hdate_end" in cols else None
+        ongoing = pdates_end['slcore'] == 'o' if pdates_end else False
 
         if ongoing:
-            hovertext = f"{text} ({calc_yeartext(pdates_start)}...)"
+            hovertext = f"{htext} ({calc_yeartext(pdates_start)}...)"
         else:
-            hovertext = f"{text} ({calc_yeartext(pdates_start)}-{calc_yeartext(pdates_end)})"
+            hovertext = f"{htext} ({calc_yeartext(pdates_start)}-{calc_yeartext(pdates_end)})"
 
         earliest = pdates_start['early']
         latest = pdates_end['late']

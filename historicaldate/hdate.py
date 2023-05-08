@@ -191,15 +191,17 @@ class HDate():
         if not self.d_parsed["clen"]:
             return self.circa_interval_days
         else:
-            days = int(self.d_parsed["clen"])
+            clen = int(self.d_parsed["clen"])
             if self.d_parsed["clentype"] == "d":
-                pass
+                days = clen
             elif self.d_parsed["clentype"] == "m":
-                days = int(days * 365.25/12)
+                days = int(clen * 365.25/12)
             elif self.d_parsed["clentype"] == "y":
-                days = int(days * 365.25)
+                days = int(clen * 365.25)
             else:
                 raise ValueError
+            
+            return days
     # ------------------------------------------------------------------------------------------------------
     def convert_to_python_date_naive(self):
         """
