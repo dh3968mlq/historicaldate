@@ -40,7 +40,10 @@ class plTimeLine():
             If hdate_end is absent, events are treated as single-date events, not persistent events.
             hdate_birth, hdate_death: Birth and death dates
         """
-        colgen = ColorGen()
+        colorgen = ColorGen()
+        colorcol = "color" if "color" in df.columns \
+                    else "colour" if "colour" in df.columns \
+                    else ""
         if title:
             self.figure.add_annotation(text=f"<b>{title}</b>", 
                     x=0.02, xref='paper', y=self.max_y_used, 
@@ -48,7 +51,7 @@ class plTimeLine():
         df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_core_date)
         lo = lineorganiser.LineOrganiser()
         for _, row in df.sort_values("_hdplsortorder").iterrows():  
-            color = colgen.get()
+            color = row[colorcol] if colorcol else colorgen.get()
             self.add_timeline_trace(row, 
                             showbirthanddeath=showbirthanddeath, showlabel=showlabel,
                             color=color, lo=lo)
@@ -242,6 +245,3 @@ def calc_yeartext(pdates):
         return pdates['core'].strftime("%b %Y")
     else:
         return pdates['core'].strftime("%d %b %Y")
-
-    #return str(pdates['core'].year) + \
-    #            ("" if pdates['early'].year == pdates['late'].year else "?")
