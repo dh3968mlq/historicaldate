@@ -234,5 +234,14 @@ def calc_pdates(ahdate):
     return hd.pdates
 # ------------------------------------------------------------------------------------------------
 def calc_yeartext(pdates):
-    return str(pdates['core'].year) + \
-                ("" if pdates['early'].year == pdates['late'].year else "?")
+    if pdates['early'].year != pdates['late'].year:
+        return f"{pdates['core'].year}?"
+    elif pdates['early'].month != pdates['late'].month:
+        return f"{pdates['core'].year}"
+    elif pdates['early'].day != pdates['late'].day:
+        return pdates['core'].strftime("%b %Y")
+    else:
+        return pdates['core'].strftime("%d %b %Y")
+
+    #return str(pdates['core'].year) + \
+    #            ("" if pdates['early'].year == pdates['late'].year else "?")
