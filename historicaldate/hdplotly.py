@@ -45,9 +45,9 @@ class plTimeLine():
             self.figure.add_annotation(text=f"<b>{title}</b>", 
                     x=0.02, xref='paper', y=self.max_y_used, 
                     showarrow=False, font={'size':14})
-
+        df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_core_date)
         lo = lineorganiser.LineOrganiser()
-        for _, row in df.iterrows():  
+        for _, row in df.sort_values("_hdplsortorder").iterrows():  
             color = colgen.get()
             self.add_timeline_trace(row, 
                             showbirthanddeath=showbirthanddeath, showlabel=showlabel,

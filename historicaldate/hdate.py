@@ -18,6 +18,14 @@
 import re
 import datetime
 
+def calc_core_date(hdstring):
+    "Return the core date from an hdate string"
+    try:
+        hd = HDate(hdstring)
+        return hd.naive_python_date
+    except:
+        return None
+
 class HDate():
     """
     Object class to deal with historical dates, stored as strings
