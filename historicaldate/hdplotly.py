@@ -109,25 +109,26 @@ class plTimeLine():
         y = self.max_y_used + (iline + 1) * rowspacing
         
         # Main part, from hdate to hdate_end
+        hlink = row['url'] if 'url' in cols else None
         add_trace_part(fig, pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
                     label=text, y=y, color=color, width=1, hovertext=hovertext)
         add_trace_part(fig, pdate_start=pdates_start['late'], 
                     pdate_end=pdates_end['early'], 
                     label=text, y=y, color=color, showlabel=showlabel,
-                    hovertext=hovertext, hyperlink=row['wikipedia_url'])
+                    hovertext=hovertext, hyperlink=hlink)
         add_trace_marker(fig, pdate=pdates_start['core'], y=y, color=color,
                         showlegend=showlegend, 
-                        hovertext=hovertext, hyperlink=row['wikipedia_url'])
+                        hovertext=hovertext, hyperlink=hlink)
         add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
                         label=text, y=y, color=color, width=1, hovertext=hovertext)
 
         if ongoing:   # Right arrow at end of 'ongoing' period
             add_trace_marker(fig, pdate=pdates_end['late'], y=y, color=color,
                         symbol='arrow-right',
-                        hovertext=hovertext, hyperlink=row['wikipedia_url'])
+                        hovertext=hovertext, hyperlink=hlink)
         else:        # Normal marker at end of period
             add_trace_marker(fig, pdate=pdates_end['core'], y=y, color=color,
-                        hovertext=hovertext, hyperlink=row['wikipedia_url'])
+                        hovertext=hovertext, hyperlink=hlink)
         
         if showbirthanddeath:
             if pdates_birth := calc_pdates(row["hdate_birth"]):
@@ -154,6 +155,7 @@ class plTimeLine():
         '''
         text = row["label"]
         pdates = calc_pdates(row["hdate"])
+        hlink = row['url'] if 'url' in row.index else None
 
         hovertext = f"{text} ({calc_yeartext(pdates)})"
         iline = lo.add_trace(pdates["early"], pdates["late"], pdates["core"], text if showlabel else "")
@@ -163,7 +165,7 @@ class plTimeLine():
                     label=text, y=y, color=color, width=1, hovertext=hovertext)
         add_trace_marker(self.figure, pdate=pdates['core'], 
                     label=text, y=y, color=color, showlegend=showlegend, showlabel=showlabel,
-                    hovertext=hovertext, hyperlink=row['wikipedia_url'])
+                    hovertext=hovertext, hyperlink=hlink)
     
 # -------------
     def show(self,fix_y_range=False):

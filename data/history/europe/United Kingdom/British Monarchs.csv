@@ -1,47 +1,47 @@
-label,hdate,hdate_end,hdate_birth,hdate_death,region_id,category_id,wikipedia_url,id
-William I,1066-12-25,1087-09-09,c. 1028,1087-09-09,1,1,https://en.wikipedia.org/wiki/William_the_Conqueror,48
-William II,1087-09-26,1100-08-02,c. 1056,1100-08-02,1,1,https://en.wikipedia.org/wiki/William_II_of_England,47
-Henry I,1100-08-05,1135-12-01,1068-09,1135-12-01,1,1,https://en.wikipedia.org/wiki/Henry_I_of_England,46
-Stephen,1135-12-22,1154-10-25,c. 1096,1154-10-25,1,1,"https://en.wikipedia.org/wiki/Stephen,_King_of_England",45
-Henry II,1154-12-19,1189-07-06,1133-03-05,1189-07-06,1,1,https://en.wikipedia.org/wiki/Henry_II_of_England,44
-Richard I,1189-09-03,1199-04-06,1157-09-08,1199-04-06,1,1,https://en.wikipedia.org/wiki/Richard_I_of_England,43
-John,1199-05-27,1216-10-19,1166-12-24,1216-10-19,1,1,"https://en.wikipedia.org/wiki/John,_King_of_England",42
-Henry III,1216-10-28,1272-11-16,1207-10-01,1272-11-16,1,1,https://en.wikipedia.org/wiki/Henry_III_of_England,41
-Edward I,1272-11-20,1307-07-07,1239-06-17,1307-07-07,1,1,https://en.wikipedia.org/wiki/Edward_I_of_England,40
-Edward II,1307-07-08,1327-01-20,1284-04-25,1327-01-21,1,1,https://en.wikipedia.org/wiki/Edward_II_of_England,39
-Edward III,1327-01-25,1377-06-21,1312-11-13,1377-06-21,1,1,https://en.wikipedia.org/wiki/Edward_III_of_England,38
-Richard II,1377-06-22,1399-09-29,1367-01-06,1400-02-14,1,1,https://en.wikipedia.org/wiki/Richard_II_of_England,37
-Henry IV,1399-09-30,1413-03-20,circa 1367-04,1413-03-20,1,1,https://en.wikipedia.org/wiki/Henry_IV_of_England,36
-Henry V,1413-03-21,1422-08-31,1386-09-16,1422-08-31,1,1,https://en.wikipedia.org/wiki/Henry_V_of_England,34
-Henry VI (1st reign),1422-09-01,1461-03-04,1421-12-06,1471-05-21,1,1,https://en.wikipedia.org/wiki/Henry_VI_of_England,33
-Edward IV (1st reign),1461-03-04,1470-10-03,1442-04-28,1483-04-09,1,1,https://en.wikipedia.org/wiki/Edward_IV_of_England,32
-Henry VI (2nd reign),1470-10-03,1471-04-11,1421-12-06,1471-05-21,1,1,https://en.wikipedia.org/wiki/Henry_VI_of_England,31
-Edward IV (2nd reign),1471-04-11,1483-04-09,1442-04-28,1483-04-09,1,1,https://en.wikipedia.org/wiki/Edward_IV_of_England,30
-Edward V,1483-04-09,1483-06-25,1470-11-02,circa 1483 earliest 1483,1,1,https://en.wikipedia.org/wiki/Edward_V_of_England,29
-Richard III,1483-06-26,1485-08-22,1452-10-02,1485-08-22,1,1,https://en.wikipedia.org/wiki/Richard_III_of_England,28
-Henry VII,1485-08-22,1509-04-21,1457-01-28,1509-04-21,1,1,https://en.wikipedia.org/wiki/Henry_VII_of_England,27
-Henry VIII,1509-04-22,1547-01-28,1491-06-28,1547-01-28,1,1,https://en.wikipedia.org/wiki/Henry_VIII,25
-Edward VI,1547-01-28,1553-07-06,1537-10-12,1553-07-06,1,1,https://en.wikipedia.org/wiki/Edward_VI,24
-Mary I,1553-07-19,1558-11-17,1516-02-18,1558-11-17,1,1,https://en.wikipedia.org/wiki/Mary_I_of_England,23
-Elizabeth I,1558-11-17,1603-03-24,1533-09-07,1603-03-24,1,1,https://en.wikipedia.org/wiki/Elizabeth_I,22
-James I,1603-03-24,1625-03-27,1566-06-19,1625-03-27,1,1,https://en.wikipedia.org/wiki/James_VI_and_I,21
-Charles I,1625-03-27,1649-01-30,1600-11-19,1649-01-30,1,1,https://en.wikipedia.org/wiki/Charles_I_of_England,20
-Oliver Cromwell,1653-12-16,1658-09-03,1599-04-25,1658-09-03,1,1,https://en.wikipedia.org/wiki/Oliver_Cromwell,19
-Richard Cromwell,1658-09-03,1659-05-07,1626-10-04,1712-07-12,1,1,https://en.wikipedia.org/wiki/Richard_Cromwell,18
-Charles II,1660-05-29,1685-02-06,1630-05-29,1685-02-06,1,1,https://en.wikipedia.org/wiki/Charles_II_of_England,17
-James II,1685-02-06,1688-12-23,1633-10-14,1701-09-16,1,1,https://en.wikipedia.org/wiki/James_II_of_England,16
-Mary II,1689-02-13,1694-12-28,1662-04-30,1694-12-28,1,1,https://en.wikipedia.org/wiki/Mary_II_of_England,15
-William III,1689-02-13,1702-03-08,1650-11-04,1702-03-08,1,1,https://en.wikipedia.org/wiki/William_III_of_England,14
-Anne,1702-03-08,1714-08-01,1665-02-06,1714-08-01,1,1,"https://en.wikipedia.org/wiki/Anne,_Queen_of_Great_Britain",1
-George I,1714-08-01,1727-06-11,1660-05-28,1727-06-11,1,1,https://en.wikipedia.org/wiki/George_I_of_Great_Britain,2
-George II,1727-06-11,1760-10-25,1683-10-30,1760-10-25,1,1,https://en.wikipedia.org/wiki/George_II_of_Great_Britain,3
-George III,1760-10-25,1820-01-29,1738-05-24,1820-01-29,1,1,https://en.wikipedia.org/wiki/George_III,4
-George IV,1820-01-29,1830-06-26,1762-08-12,1830-06-26,1,1,https://en.wikipedia.org/wiki/George_IV,5
-William IV,1830-06-26,1837-06-20,1765-08-21,1837-06-20,1,1,https://en.wikipedia.org/wiki/William_IV,6
-Victoria,1837-06-20,1901-01-22,1819-05-24,1901-01-22,1,1,https://en.wikipedia.org/wiki/Queen_Victoria,7
-Edward VII,1901-01-22,1910-05-06,1841-11-09,1910-05-06,1,1,https://en.wikipedia.org/wiki/Edward_VII,8
-George V,1910-05-06,1936-01-20,1865-06-03,1936-01-20,1,1,https://en.wikipedia.org/wiki/George_V,9
-Edward VIII,1936-01-20,1936-12-11,1894-06-23,1972-05-28,1,1,https://en.wikipedia.org/wiki/Edward_VIII,10
-George VI,1936-12-11,1952-02-06,1895-12-14,1952-02-06,1,1,https://en.wikipedia.org/wiki/George_VI,11
-Elizabeth II,1952-02-06,2022-09-08,1926-04-21,2022-09-08,1,1,https://en.wikipedia.org/wiki/Elizabeth_II,12
-Charles III,2022-09-08,ongoing,1948-11-14,,1,1,https://en.wikipedia.org/wiki/Charles_III,13
+label,hdate,hdate_end,hdate_birth,hdate_death,url
+William I,1066-12-25,1087-09-09,c. 1028,1087-09-09,https://en.wikipedia.org/wiki/William_the_Conqueror
+William II,1087-09-26,1100-08-02,c. 1056,1100-08-02,https://en.wikipedia.org/wiki/William_II_of_England
+Henry I,1100-08-05,1135-12-01,1068-09,1135-12-01,https://en.wikipedia.org/wiki/Henry_I_of_England
+Stephen,1135-12-22,1154-10-25,c. 1096,1154-10-25,"https://en.wikipedia.org/wiki/Stephen,_King_of_England"
+Henry II,1154-12-19,1189-07-06,1133-03-05,1189-07-06,https://en.wikipedia.org/wiki/Henry_II_of_England
+Richard I,1189-09-03,1199-04-06,1157-09-08,1199-04-06,https://en.wikipedia.org/wiki/Richard_I_of_England
+John,1199-05-27,1216-10-19,1166-12-24,1216-10-19,"https://en.wikipedia.org/wiki/John,_King_of_England"
+Henry III,1216-10-28,1272-11-16,1207-10-01,1272-11-16,https://en.wikipedia.org/wiki/Henry_III_of_England
+Edward I,1272-11-20,1307-07-07,1239-06-17,1307-07-07,https://en.wikipedia.org/wiki/Edward_I_of_England
+Edward II,1307-07-08,1327-01-20,1284-04-25,1327-01-21,https://en.wikipedia.org/wiki/Edward_II_of_England
+Edward III,1327-01-25,1377-06-21,1312-11-13,1377-06-21,https://en.wikipedia.org/wiki/Edward_III_of_England
+Richard II,1377-06-22,1399-09-29,1367-01-06,1400-02-14,https://en.wikipedia.org/wiki/Richard_II_of_England
+Henry IV,1399-09-30,1413-03-20,circa 1367-04,1413-03-20,https://en.wikipedia.org/wiki/Henry_IV_of_England
+Henry V,1413-03-21,1422-08-31,1386-09-16,1422-08-31,https://en.wikipedia.org/wiki/Henry_V_of_England
+Henry VI (1st reign),1422-09-01,1461-03-04,1421-12-06,1471-05-21,https://en.wikipedia.org/wiki/Henry_VI_of_England
+Edward IV (1st reign),1461-03-04,1470-10-03,1442-04-28,1483-04-09,https://en.wikipedia.org/wiki/Edward_IV_of_England
+Henry VI (2nd reign),1470-10-03,1471-04-11,1421-12-06,1471-05-21,https://en.wikipedia.org/wiki/Henry_VI_of_England
+Edward IV (2nd reign),1471-04-11,1483-04-09,1442-04-28,1483-04-09,https://en.wikipedia.org/wiki/Edward_IV_of_England
+Edward V,1483-04-09,1483-06-25,1470-11-02,circa 1483 earliest 1483,https://en.wikipedia.org/wiki/Edward_V_of_England
+Richard III,1483-06-26,1485-08-22,1452-10-02,1485-08-22,https://en.wikipedia.org/wiki/Richard_III_of_England
+Henry VII,1485-08-22,1509-04-21,1457-01-28,1509-04-21,https://en.wikipedia.org/wiki/Henry_VII_of_England
+Henry VIII,1509-04-22,1547-01-28,1491-06-28,1547-01-28,https://en.wikipedia.org/wiki/Henry_VIII
+Edward VI,1547-01-28,1553-07-06,1537-10-12,1553-07-06,https://en.wikipedia.org/wiki/Edward_VI
+Mary I,1553-07-19,1558-11-17,1516-02-18,1558-11-17,https://en.wikipedia.org/wiki/Mary_I_of_England
+Elizabeth I,1558-11-17,1603-03-24,1533-09-07,1603-03-24,https://en.wikipedia.org/wiki/Elizabeth_I
+James I,1603-03-24,1625-03-27,1566-06-19,1625-03-27,https://en.wikipedia.org/wiki/James_VI_and_I
+Charles I,1625-03-27,1649-01-30,1600-11-19,1649-01-30,https://en.wikipedia.org/wiki/Charles_I_of_England
+Oliver Cromwell,1653-12-16,1658-09-03,1599-04-25,1658-09-03,https://en.wikipedia.org/wiki/Oliver_Cromwell
+Richard Cromwell,1658-09-03,1659-05-07,1626-10-04,1712-07-12,https://en.wikipedia.org/wiki/Richard_Cromwell
+Charles II,1660-05-29,1685-02-06,1630-05-29,1685-02-06,https://en.wikipedia.org/wiki/Charles_II_of_England
+James II,1685-02-06,1688-12-23,1633-10-14,1701-09-16,https://en.wikipedia.org/wiki/James_II_of_England
+Mary II,1689-02-13,1694-12-28,1662-04-30,1694-12-28,https://en.wikipedia.org/wiki/Mary_II_of_England
+William III,1689-02-13,1702-03-08,1650-11-04,1702-03-08,https://en.wikipedia.org/wiki/William_III_of_England
+Anne,1702-03-08,1714-08-01,1665-02-06,1714-08-01,"https://en.wikipedia.org/wiki/Anne,_Queen_of_Great_Britain"
+George I,1714-08-01,1727-06-11,1660-05-28,1727-06-11,https://en.wikipedia.org/wiki/George_I_of_Great_Britain
+George II,1727-06-11,1760-10-25,1683-10-30,1760-10-25,https://en.wikipedia.org/wiki/George_II_of_Great_Britain
+George III,1760-10-25,1820-01-29,1738-05-24,1820-01-29,https://en.wikipedia.org/wiki/George_III
+George IV,1820-01-29,1830-06-26,1762-08-12,1830-06-26,https://en.wikipedia.org/wiki/George_IV
+William IV,1830-06-26,1837-06-20,1765-08-21,1837-06-20,https://en.wikipedia.org/wiki/William_IV
+Victoria,1837-06-20,1901-01-22,1819-05-24,1901-01-22,https://en.wikipedia.org/wiki/Queen_Victoria
+Edward VII,1901-01-22,1910-05-06,1841-11-09,1910-05-06,https://en.wikipedia.org/wiki/Edward_VII
+George V,1910-05-06,1936-01-20,1865-06-03,1936-01-20,https://en.wikipedia.org/wiki/George_V
+Edward VIII,1936-01-20,1936-12-11,1894-06-23,1972-05-28,https://en.wikipedia.org/wiki/Edward_VIII
+George VI,1936-12-11,1952-02-06,1895-12-14,1952-02-06,https://en.wikipedia.org/wiki/George_VI
+Elizabeth II,1952-02-06,2022-09-08,1926-04-21,2022-09-08,https://en.wikipedia.org/wiki/Elizabeth_II
+Charles III,2022-09-08,ongoing,1948-11-14,,https://en.wikipedia.org/wiki/Charles_III
