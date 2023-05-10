@@ -19,14 +19,9 @@ class plTimeLine():
         self.mindate = self.maxdate - datetime.timedelta(days=int(200*365.25)) \
                             if mindate is None else mindate
 
-        self.fig_config = {'scrollZoom': True} #, 'displayModeBar':None}
+        self.fig_config = {'scrollZoom': True}
         self.figure.update_layout(dragmode="pan", showlegend=False)
-        self.figure.update_xaxes(
-                            #tickangle = 90,
-                            #title_text = "Date",
-                            #title_font = {"size": 14},
-                            #title_standoff = 10,
-                            range=[self.mindate, self.maxdate])
+        self.figure.update_xaxes(range=[self.mindate, self.maxdate])
         self.max_y_used = 0.0
 # -------------
     def add_event_set(self, df, 
@@ -48,9 +43,14 @@ class plTimeLine():
             self.figure.add_annotation(text=f"<b>{title}</b>", 
                     x=0.02, xref='paper', y=self.max_y_used, 
                     showarrow=False, font={'size':14})
-        df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_core_date)
+        if "hdate" in df.columns:
+            df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_core_date)
+            dfs = df.sort_values("_hdplsortorder")
+        else:
+            dfs = df
+
         lo = lineorganiser.LineOrganiser()
-        for _, row in df.sort_values("_hdplsortorder").iterrows():  
+        for _, row in dfs.iterrows():  
             color = row[colorcol] if colorcol else colorgen.get()
             self.add_timeline_trace(row, 
                             showbirthanddeath=showbirthanddeath, showlabel=showlabel,
@@ -61,13 +61,13 @@ class plTimeLine():
                                     showlegend=True, showlabel=True,
                                     color=None, lo=None, rowspacing=0.3):
         '''
-        Add a persistent timeline trace for a given row
-        'persistent' is defined by hdate_end is not None
+        Add a timeline trace for a given row
         '''        
         fig = self.figure
         cols = list(row.index)
         text = row["label"]
         htext = row["description"] if "description" in cols else text
+        hlink = row['url'] if 'url' in cols else None
 
         earliest, latest = None, None
 
@@ -90,7 +90,6 @@ class plTimeLine():
         ongoing = pdates_end['slcore'] == 'o' if pdates_end else False
         alive = pdates_death['slcore'] == 'o' if pdates_death else False
 
-        # Main part, from hdate to hdate_end
         if pdates_start:
             if pdates_end:
                 labeldate = pdates_start['core'] + (pdates_end['core'] - pdates_start['core'])/2.0
@@ -101,11 +100,17 @@ class plTimeLine():
             else:
                 labeldate = pdates_start['core']
                 hovertext = f"{htext} ({calc_yeartext(pdates_start)})"
+        else:
+            if pdates_death:
+                labeldate = pdates_birth['core'] + (pdates_death['core'] - pdates_birth['core'])/2.0
+            else:
+                labeldate = pdates_birth['core']
 
-            iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
-            y = self.max_y_used + (iline + 1) * rowspacing
+        iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
+        y = self.max_y_used + (iline + 1) * rowspacing
             
-            hlink = row['url'] if 'url' in cols else None
+        # Main part, from hdate to hdate_end
+        if pdates_start:
             add_trace_part(fig, pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
                         label=text, y=y, color=color, width=1, hovertext=hovertext)
             add_trace_marker(fig, pdate=pdates_start['core'], y=y, color=color,
@@ -131,16 +136,23 @@ class plTimeLine():
         if showbirthanddeath:
             if pdates_birth:
                 hovertext = f"{text} (b. {calc_yeartext(pdates_birth)})"
+                endpoint = pdates_start['early'] if pdates_start else \
+                            pdates_birth['core'] + (pdates_death['core'] - pdates_birth['core']) / 2.0
                 add_trace_part(fig, pdate_start=pdates_birth['late'], 
-                                    pdate_end=pdates_start['early'], 
+                                    pdate_end=endpoint, 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
                 add_trace_part(fig, pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
-                        label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
+                        label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext,
+                        showlabel=showlabel and not pdates_start and not pdates_death)
 
             if pdates_death:
                 hovertext = f"{text} (d. {calc_yeartext(pdates_death)})"
-                add_trace_part(fig, pdate_start=pdates_end['late'], pdate_end=pdates_death['early'], 
-                    label=text, y=y, color=color, dash='dot', hovertext=hovertext)
+                startpoint = pdates_end['late'] if pdates_end else \
+                            pdates_start['late'] if pdates_start else \
+                            pdates_birth['core'] + (pdates_death['core'] - pdates_birth['core']) / 2.0
+                add_trace_part(fig, pdate_start=startpoint, pdate_end=pdates_death['early'], 
+                    label=text, y=y, color=color, dash='dot', hovertext=hovertext,
+                        showlabel=showlabel and not pdates_start)
                 add_trace_part(fig, pdate_start=pdates_death['early'], pdate_end=pdates_death['late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 # -------------
