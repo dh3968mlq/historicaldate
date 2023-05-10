@@ -58,26 +58,6 @@ class plTimeLine():
         self.max_y_used += (len(lo.linerecord) + 2) * rowspacing    
 # -------------
     def add_timeline_trace(self, row, showbirthanddeath=False, 
-                        showlegend=False, showlabel=True,
-                        color=None, lo=None):
-        try:
-            pdates_end = calc_pdates(row["hdate_end"])
-        except TypeError:
-            pdates_end = None
-
-        if pdates_end:
-            self.add_timeline_trace_persistent(row,
-                    showbirthanddeath=showbirthanddeath, showlabel=showlabel,
-                    showlegend=showlegend, color=color, lo=lo)
-        else:
-            self.add_timeline_trace_persistent(row,
-                    showbirthanddeath=showbirthanddeath, showlabel=showlabel,
-                    showlegend=showlegend, color=color, lo=lo)
-            #self.add_timeline_trace_event(row,  
-            #        showlegend=showlegend, showlabel=showlabel,
-            #        color=color, lo=lo)
-# -------------
-    def add_timeline_trace_persistent(self, row, showbirthanddeath=False, 
                                     showlegend=True, showlabel=True,
                                     color=None, lo=None, rowspacing=0.3):
         '''
@@ -149,8 +129,7 @@ class plTimeLine():
                                 hovertext=hovertext, hyperlink=hlink)
         
         if showbirthanddeath:
-            if "hdate_birth" in cols and \
-                    (pdates_birth := calc_pdates(row["hdate_birth"])):
+            if pdates_birth:
                 hovertext = f"{text} (b. {calc_yeartext(pdates_birth)})"
                 add_trace_part(fig, pdate_start=pdates_birth['late'], 
                                     pdate_end=pdates_start['early'], 
@@ -158,35 +137,12 @@ class plTimeLine():
                 add_trace_part(fig, pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
-            if "hdate_death" in cols and \
-                    (pdates_death := calc_pdates(row["hdate_death"])):
+            if pdates_death:
                 hovertext = f"{text} (d. {calc_yeartext(pdates_death)})"
                 add_trace_part(fig, pdate_start=pdates_end['late'], pdate_end=pdates_death['early'], 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
                 add_trace_part(fig, pdate_start=pdates_death['early'], pdate_end=pdates_death['late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
-# -------------
-    def add_timeline_trace_event(self, row, 
-                                 showlegend=True, showlabel=False,
-                                 color=None, lo=None, rowspacing=0.3):
-        '''
-        Add timeline trace for an event
-        Initial implementation: no births and deaths
-        '''
-        text = row["label"]
-        pdates = calc_pdates(row["hdate"])
-        hlink = row['url'] if 'url' in row.index else None
-
-        hovertext = f"{text} ({calc_yeartext(pdates)})"
-        iline = lo.add_trace(pdates["early"], pdates["late"], pdates["core"], text if showlabel else "")
-        y = self.max_y_used + (iline + 1) * rowspacing
-
-        add_trace_part(self.figure, pdate_start=pdates['early'], pdate_end=pdates['late'], 
-                    label=text, y=y, color=color, width=1, hovertext=hovertext)
-        add_trace_marker(self.figure, pdate=pdates['core'], 
-                    label=text, y=y, color=color, showlegend=showlegend, showlabel=showlabel,
-                    hovertext=hovertext, hyperlink=hlink)
-    
 # -------------
     def show(self,fix_y_range=False):
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
@@ -253,10 +209,6 @@ def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0,
                             hoverinfo='text',
                             hovertext=hovertext if hovertext else label,
                             hoverlabel={'namelength':-1}, showlegend=False))
-# ------------------------------------------------------------------------------------------------
-def calc_pdates(ahdate):
-    hd = hdate.HDate(ahdate)
-    return hd.pdates
 # ------------------------------------------------------------------------------------------------
 def calc_yeartext(pdates):
     if pdates['early'].year != pdates['late'].year:
