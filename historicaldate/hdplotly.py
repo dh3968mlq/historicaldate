@@ -70,9 +70,12 @@ class plTimeLine():
                     showbirthanddeath=showbirthanddeath, showlabel=showlabel,
                     showlegend=showlegend, color=color, lo=lo)
         else:
-            self.add_timeline_trace_event(row,  
-                    showlegend=showlegend, showlabel=showlabel,
-                    color=color, lo=lo)
+            self.add_timeline_trace_persistent(row,
+                    showbirthanddeath=showbirthanddeath, showlabel=showlabel,
+                    showlegend=showlegend, color=color, lo=lo)
+            #self.add_timeline_trace_event(row,  
+            #        showlegend=showlegend, showlabel=showlabel,
+            #        color=color, lo=lo)
 # -------------
     def add_timeline_trace_persistent(self, row, showbirthanddeath=False, 
                                     showlegend=True, showlabel=True,
@@ -85,52 +88,65 @@ class plTimeLine():
         cols = list(row.index)
         text = row["label"]
         htext = row["description"] if "description" in cols else text
-        pdates_start = calc_pdates(row["hdate"])
 
-        pdates_end = calc_pdates(row["hdate_end"]) if "hdate_end" in cols else None
-        ongoing = pdates_end['slcore'] == 'o' if pdates_end else False
+        earliest, latest = None, None
 
-        if ongoing:
-            hovertext = f"{htext} ({calc_yeartext(pdates_start)}...)"
-        else:
-            hovertext = f"{htext} ({calc_yeartext(pdates_start)}-{calc_yeartext(pdates_end)})"
+        # Function to get a date
+        def get_pdates(col, earliest, latest):
+            if col not in cols:
+                return None, earliest, latest
+            else:
+                if pd := hdate.HDate(row[col]).pdates:
+                    earliest = min(pd['early'], earliest) if earliest else pd['early']
+                    latest = max(pd['late'], latest) if latest else pd['late']
+                return pd, earliest, latest
 
-        earliest = pdates_start['early']
-        latest = pdates_end['late']
-
+        pdates_start, earliest, latest = get_pdates("hdate", earliest, latest)
+        pdates_end, earliest, latest = get_pdates("hdate_end", earliest, latest)
         if showbirthanddeath:
-            if  "hdate_birth" in cols and \
-                    (pdates_birth := calc_pdates(row["hdate_birth"])):
-                earliest = min(earliest, pdates_birth['early'])
-            if "hdate_death" in cols and \
-                    (pdates_death := calc_pdates(row["hdate_death"])):
-                latest = max(latest, pdates_death['late'])
+            pdates_birth, earliest, latest = get_pdates("hdate_birth", earliest, latest)
+            pdates_death, earliest, latest = get_pdates("hdate_death", earliest, latest)
 
-        labeldate = pdates_start['core'] + (pdates_end['core'] - pdates_start['core'])/2.0
-        iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
-        y = self.max_y_used + (iline + 1) * rowspacing
-        
+        ongoing = pdates_end['slcore'] == 'o' if pdates_end else False
+        alive = pdates_death['slcore'] == 'o' if pdates_death else False
+
         # Main part, from hdate to hdate_end
-        hlink = row['url'] if 'url' in cols else None
-        add_trace_part(fig, pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
-                    label=text, y=y, color=color, width=1, hovertext=hovertext)
-        add_trace_part(fig, pdate_start=pdates_start['late'], 
-                    pdate_end=pdates_end['early'], 
-                    label=text, y=y, color=color, showlabel=showlabel,
-                    hovertext=hovertext, hyperlink=hlink)
-        add_trace_marker(fig, pdate=pdates_start['core'], y=y, color=color,
-                        showlegend=showlegend, 
-                        hovertext=hovertext, hyperlink=hlink)
-        add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
-                        label=text, y=y, color=color, width=1, hovertext=hovertext)
+        if pdates_start:
+            if pdates_end:
+                labeldate = pdates_start['core'] + (pdates_end['core'] - pdates_start['core'])/2.0
+                if ongoing:
+                    hovertext = f"{htext} ({calc_yeartext(pdates_start)}...)"
+                else:
+                    hovertext = f"{htext} ({calc_yeartext(pdates_start)}-{calc_yeartext(pdates_end)})"
+            else:
+                labeldate = pdates_start['core']
+                hovertext = f"{htext} ({calc_yeartext(pdates_start)})"
 
-        if ongoing:   # Right arrow at end of 'ongoing' period
-            add_trace_marker(fig, pdate=pdates_end['late'], y=y, color=color,
-                        symbol='arrow-right',
-                        hovertext=hovertext, hyperlink=hlink)
-        else:        # Normal marker at end of period
-            add_trace_marker(fig, pdate=pdates_end['core'], y=y, color=color,
-                        hovertext=hovertext, hyperlink=hlink)
+            iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
+            y = self.max_y_used + (iline + 1) * rowspacing
+            
+            hlink = row['url'] if 'url' in cols else None
+            add_trace_part(fig, pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
+                        label=text, y=y, color=color, width=1, hovertext=hovertext)
+            add_trace_marker(fig, pdate=pdates_start['core'], y=y, color=color,
+                            showlegend=showlegend, 
+                            label=text, showlabel=showlabel and not pdates_end,
+                            hovertext=hovertext, hyperlink=hlink)
+            if pdates_end:
+                add_trace_part(fig, pdate_start=pdates_start['late'], 
+                            pdate_end=pdates_end['early'], 
+                            label=text, y=y, color=color, showlabel=showlabel,
+                            hovertext=hovertext, hyperlink=hlink)
+                add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
+                                label=text, y=y, color=color, width=1, hovertext=hovertext)
+
+                if ongoing:   # Right arrow at end of 'ongoing' period
+                    add_trace_marker(fig, pdate=pdates_end['late'], y=y, color=color,
+                                symbol='arrow-right',
+                                hovertext=hovertext, hyperlink=hlink)
+                else:        # Normal marker at end of period
+                    add_trace_marker(fig, pdate=pdates_end['core'], y=y, color=color,
+                                hovertext=hovertext, hyperlink=hlink)
         
         if showbirthanddeath:
             if "hdate_birth" in cols and \
