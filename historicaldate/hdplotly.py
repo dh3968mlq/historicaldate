@@ -30,7 +30,7 @@ class plTimeLine():
         self.max_y_used = 0.0
 # -------------
     def add_event_set(self, df, 
-                    title="", showbirthanddeath=False, showlabel=True,
+                    title="", showbirthanddeath=True, showlabel=True,
                       rowspacing=0.3):
         """
         df must have column 'hdate'
@@ -99,9 +99,11 @@ class plTimeLine():
         latest = pdates_end['late']
 
         if showbirthanddeath:
-            if pdates_birth := calc_pdates(row["hdate_birth"]):
+            if  "hdate_birth" in cols and \
+                    (pdates_birth := calc_pdates(row["hdate_birth"])):
                 earliest = min(earliest, pdates_birth['early'])
-            if pdates_death := calc_pdates(row["hdate_death"]):
+            if "hdate_death" in cols and \
+                    (pdates_death := calc_pdates(row["hdate_death"])):
                 latest = max(latest, pdates_death['late'])
 
         labeldate = pdates_start['core'] + (pdates_end['core'] - pdates_start['core'])/2.0
@@ -131,7 +133,8 @@ class plTimeLine():
                         hovertext=hovertext, hyperlink=hlink)
         
         if showbirthanddeath:
-            if pdates_birth := calc_pdates(row["hdate_birth"]):
+            if "hdate_birth" in cols and \
+                    (pdates_birth := calc_pdates(row["hdate_birth"])):
                 hovertext = f"{text} (b. {calc_yeartext(pdates_birth)})"
                 add_trace_part(fig, pdate_start=pdates_birth['late'], 
                                     pdate_end=pdates_start['early'], 
@@ -139,7 +142,8 @@ class plTimeLine():
                 add_trace_part(fig, pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
-            if pdates_death := calc_pdates(row["hdate_death"]):
+            if "hdate_death" in cols and \
+                    (pdates_death := calc_pdates(row["hdate_death"])):
                 hovertext = f"{text} (d. {calc_yeartext(pdates_death)})"
                 add_trace_part(fig, pdate_start=pdates_end['late'], pdate_end=pdates_death['early'], 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
