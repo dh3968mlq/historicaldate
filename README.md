@@ -1,6 +1,39 @@
 # historicaldate
 
+An open source package for creating timelines
+of historical data
 
+Download the *historicaldate* package from 
+https://github.com/dh3968mlq/historicaldate
+
+Sample code:
+
+```python
+# The folder historicaldate has been downloaded to
+hdroot = "/svol1/pishare/users/pi/repos/historicaldate" 
+import sys
+sys.path.append(hdroot)
+from historicaldate import hdplotly as hdp
+import pandas as pd
+
+df = pd.read_csv(f"{hdroot}/data/history/europe/United Kingdom/British Monarchs.csv", na_filter=False)
+df2 = pd.read_csv(f"{hdroot}/data/history/europe/United Kingdom/British Prime Ministers.csv", na_filter=False)
+
+pltl = hdp.plTimeLine()
+pltl.add_event_set(df, title="British Monarchs from 1066")
+pltl.add_event_set(df2, title="British Prime Ministers") 
+pltl.show() 
+```
+
+The basic ideas here are:
+   * Dates specified in natural formats, allowing for uncertainty, usually in .csv files
+   * Can specify start and end of persistent events, such as a US presidency or a British monarch's reign...
+   * ... Or a single date for an event
+   * Can specify birth and death dates of persons
+   * Support for easily displaying timelines of events using *Plotly*...
+   * ... which gives basic interactivity: zoom, pan, hovertext and hyperlinks
+   * Some useful data files held in the repository
+   
 
 ## (Old version) Introduction
 
