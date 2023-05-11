@@ -31,13 +31,13 @@ class HDate():
     Object class to deal with historical dates, stored as strings
     See README.md at https://github.com/dh3968mlq/historicaldate
     """
-    def __init__(self, hdstr=""):
+    def __init__(self, hdstr="", missingasongoing=False):
         self.circa_interval_days = int(5 * 365.25)
         self.match_pattern = self._create_match_pattern()
         self.compiled_pattern = re.compile(self.match_pattern, re.IGNORECASE)
 
-        if hdstr:
-            srch = self.compiled_pattern.search(hdstr)
+        if s := hdstr if (hdstr or not missingasongoing) else "ongoing":
+            srch = self.compiled_pattern.search(s)
             if srch is None:
                 raise ValueError(f"Illegal date format: {hdstr}")
             else:
