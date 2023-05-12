@@ -1,9 +1,9 @@
 # historicaldate
 
 An open source package for creating timelines
-of historical data
+of historical data.
 
-Download the *historicaldate* package from 
+Download from 
 https://github.com/dh3968mlq/historicaldate
 
 Sample code:
@@ -26,7 +26,7 @@ pltl.show()
 ```
 
 The basic ideas here are:
-   * Dates specified in natural formats, allowing for uncertainty, usually in .csv files
+   * Dates are specified in natural text formats, allowing for uncertainty, usually in .csv files
    * Can specify start and end of persistent events, such as a US presidency or a British monarch's reign...
    * ... Or a single date for an event
    * Can specify birth and death dates of persons
@@ -34,6 +34,7 @@ The basic ideas here are:
    * ... which gives basic interactivity: zoom, pan, hovertext and hyperlinks
    * Some useful data files held in the repository
    
+
 
 ## (Old version) Introduction
 
