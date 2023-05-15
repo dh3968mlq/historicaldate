@@ -175,7 +175,7 @@ class HDate():
 
         if month != 2:
             pass    # no further adjustment needed
-        if calendar.lower() in {'ce','ad'}:
+        elif calendar.lower() in {'ce','ad'}:
             grg_nonleap = (year % 100 == 0) and (year % 400 != 0)
             isleapyear = (year % 4 == 0) and not (grg_nonleap and (year > 1752 or proleptic_gregorian))
             mlength = 29 if isleapyear else 28

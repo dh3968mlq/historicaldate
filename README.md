@@ -6,6 +6,8 @@ of historical data.
 Download from 
 https://github.com/dh3968mlq/historicaldate
 
+The repo also includes a few example datasets in CSV format
+
 Sample code:
 
 ```python
@@ -34,7 +36,7 @@ The basic ideas here are:
    * Can specify birth and death dates of persons
    * Support for easily displaying timelines of events using *Plotly*...
    * ... which gives basic interactivity: zoom, pan, hovertext and hyperlinks
-   * Some useful data files held in the repository
+   * A few example data files are held in the repository
    
 ## Input file format
 
@@ -56,7 +58,7 @@ Dataframes passed to *add_event_set* have one row per event and specific column 
 The basics are:
 
 **Two core formats are supported**
-   * 25 Dec 1066 (or 25th Dec 1066 or 25 December 1066 etc.)
+   * 25 Dec 1066 (or variants such as 25th Dec 1066 or 25 December 1066 etc.)
    * 1066-12-25
 
 **The exact date is not required**
@@ -65,9 +67,19 @@ These are all allowed:
    * Dec 1066
    * 1066
    * 1066-12
-   * circa 1066 (or c. 1066)
+   * circa 1066
+   * c. 1066
    * between 1066 and 1068
-   * circa 1483 earliest 1483 (the death of Edward V of England)
+   * circa 1483 earliest 1483
+
+**Ongoing events, or lives, are supported**
+
+A missing value of *hdeath_death*, or a value of 'ongoing'
+in *hdate_end* leads to an indication on a timeline that an event is ongoing, or that a person is still alive.
+
+**Imprecise dates are treated properly**
+
+A date such as *circa 1066* leads to undertainty, of a few years, being shown on the timeline.
 
 **Python dates are used in a naive sort of way**
 
@@ -78,8 +90,43 @@ Stricly speaking this isn't quite right, since in usual
 convention *25 Dec 1066* (the coronation of King William I of England) is a Julian Calendar date, while Python dates
 are supposed to be in the Gregorian calendar, or at least
 a 'proleptic' version of it - that is, extended backwards
-in time before the date it was introduced.
+in time before the date it was introduced. 
 
 This hardly ever matters, however, and it's 
-generally less confusing to take the naive route.
+much, much less confusing to take the naive route rather than
+converting the (Julian) date *25 Dec 1066* to the equivalent
+proleptic Gregorian date (*31 Dec 1066*) when using Python dates.
+
+## Dealing with dates - the HDate() object class
+
+The underlying date processing uses the object class *historicaldate.hdate.HDate()*
+
+The constructor takes a string as input, and the object has a property *pdates*, a dictionary that indicates a range of python dates (represented as *datetime.date* objects)
+
+```python
+from historicaldate import hdate
+hd = hdate.HDate('Dec 1066')
+print(hd.pdates)
+```
+
+...produces:
+
+```text
+{'core': datetime.date(1066, 12, 15),
+  'slcore': 'm',
+  'late': datetime.date(1066, 12, 31),
+  'sllate': 'm',
+  'early': datetime.date(1066, 12, 1),
+  'slearly': 'm'}
+  ```
+
+The basic idea here is that the dict entries *early*, *core* and *late* give the earliest possible, midpoint and latest possible Python dates corresonding to the date specified. These are then used by the timeline utility to indicate the range of uncertainty on the timeline.
+
+## Limitations
+
+This is a very early (0.0.1) release, an indication of the direction of travel.
+
+At present dates BC (BCE) are not supported, since date representation depends on Python *datetime.date* dates, which have this same limitation.
+
+Support for date formats DD/MM/YYYY or MM/DD/YYYY is also planned.
 
