@@ -26,7 +26,8 @@ df2 = pd.read_csv(f"{hdroot}/data/history/europe/United Kingdom/British Prime Mi
 pltl = hdpl.plTimeLine()
 pltl.add_event_set(df1, title="British Monarchs from 1066")
 pltl.add_event_set(df2, title="British Prime Ministers") 
-pltl.show() 
+pltl.show()  # Show in a browser, or...
+pltl.write_html("/home/pi/example_timeline.html")
 ```
 
 The basic ideas here are:
