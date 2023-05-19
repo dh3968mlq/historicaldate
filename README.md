@@ -6,21 +6,22 @@ of historical data.
 Download from 
 https://github.com/dh3968mlq/historicaldate
 
-The repo also includes a few example datasets in CSV format
+The partner repo https://github.com/dh3968mlq/historicaldate-data has some example datasets in CSV format
 
 Sample code:
 
 ```python
-# The folder historicaldate has been downloaded to...
+# The folders historicaldate and historicaldate-data have been downloaded to...
 hdroot = "/svol1/pishare/users/pi/repos/historicaldate" 
+dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data" 
 import sys
 sys.path.append(hdroot)
 from historicaldate import hdpl  # Timelines using Plotly
 import pandas as pd
 
-df1 = pd.read_csv(f"{hdroot}/data/history/europe/United Kingdom/British Monarchs.csv",
+df1 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Monarchs.csv",
                  na_filter=False)
-df2 = pd.read_csv(f"{hdroot}/data/history/europe/United Kingdom/British Prime Ministers.csv",
+df2 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Prime Ministers.csv",
                  na_filter=False)
 
 pltl = hdpl.plTimeLine()
