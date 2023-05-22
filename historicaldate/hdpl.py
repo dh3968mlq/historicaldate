@@ -157,9 +157,10 @@ class plTimeLine():
                             pdates_birth['core'] + (pdates_death['core'] - pdates_birth['core']) / 2.0
                 add_trace_part(fig, pdate_start=startpoint, pdate_end=pdates_death['early'], 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
-                add_trace_part(fig, pdate_start=pdates_death['early'], pdate_end=pdates_death['late'], 
+                add_trace_part(fig, pdate_start=max(startpoint,pdates_death['early']), 
+                               pdate_end=pdates_death['late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
-                if alive:   # Right arrow 
+                if alive and (pdates_death['late'] > startpoint):   # Right arrow 
                     add_trace_marker(fig, pdate=pdates_death['late'], y=y, color=color,
                                 symbol='arrow-right',
                                 hovertext=hovertext)
