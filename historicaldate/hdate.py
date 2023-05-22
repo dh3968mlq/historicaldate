@@ -252,7 +252,11 @@ class HDate():
                 if (self.d_parsed['circa']) and (prefix == ""): speclevel = 'c'
                 return datetime.date(year, month, day), speclevel
             
-        if self.d_parsed['ongoing']:
+        if self.d_parsed['calendar'] == 'bce':
+            self.naive_python_earlydate, self.naive_python_earlydate_slevel = None, None
+            self.naive_python_date, self.naive_python_date_slevel = None, None
+            self.naive_python_latedate, self.naive_python_latedate_slevel = None, None
+        elif self.d_parsed['ongoing']:
             self.naive_python_earlydate, self.naive_python_earlydate_slevel = datetime.date.today(), 'o'
             self.naive_python_date, self.naive_python_date_slevel = self.naive_python_earlydate, 'o'
             self.naive_python_latedate, self.naive_python_latedate_slevel = \

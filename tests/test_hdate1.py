@@ -66,3 +66,6 @@ def test2():
             pdcheck={'core': datetime.date(1066, 12, 25), 'slcore': 'c', 
                      'late': datetime.date(1068, 12, 24), 'sllate': 'c', 
                      'early': datetime.date(1064, 12, 25), 'slearly': 'c'})
+    compare("487 bc", 
+            dcheck={'circa': False, 'ongoing': False, 'year': 487, 'calendar': 'bce'},
+            pdcheck={})

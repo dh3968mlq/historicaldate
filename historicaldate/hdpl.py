@@ -91,7 +91,7 @@ class plTimeLine():
         ongoing = pdates_end['slcore'] == 'o' if pdates_end else False
         alive = pdates_death['slcore'] == 'o' if pdates_death else False
 
-        if pdates_start:
+        if pdates_start and pdates_start['core']:
             if pdates_end:
                 labeldate = pdates_start['core'] + (pdates_end['core'] - pdates_start['core'])/2.0
                 if ongoing:
@@ -101,11 +101,13 @@ class plTimeLine():
             else:
                 labeldate = pdates_start['core']
                 hovertext = f"{htext} ({calc_yeartext(pdates_start)})"
-        else:
+        elif pdates_birth and pdates_birth['core']:
             if pdates_death:
                 labeldate = pdates_birth['core'] + (pdates_death['core'] - pdates_birth['core'])/2.0
             else:
                 labeldate = pdates_birth['core']
+        else:
+            return False # If we cannot calculate a labeldate the trace cannot be shown
 
         iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
         y = self.max_y_used + (iline + 1) * rowspacing
@@ -161,6 +163,7 @@ class plTimeLine():
                     add_trace_marker(fig, pdate=pdates_death['late'], y=y, color=color,
                                 symbol='arrow-right',
                                 hovertext=hovertext)
+        return True
 
 # -------------
     def show(self,fix_y_range=False):
