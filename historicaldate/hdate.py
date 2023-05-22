@@ -248,6 +248,8 @@ class HDate():
                 
                 if self.d_parsed[f'{prefix}day']: speclevel = "d"
                 day = self.d_parsed[f'{prefix}day'] if speclevel == "d" else default_day(year, month)
+
+                if (self.d_parsed['circa']) and (prefix == ""): speclevel = 'c'
                 return datetime.date(year, month, day), speclevel
             
         if self.d_parsed['ongoing']:
@@ -264,10 +266,14 @@ class HDate():
             # -- Fill early and late dates if missing from (a) circa (b) main date
             circa_interval_days = self.calc_clen_days()
             if self.naive_python_date_slevel and not self.naive_python_earlydate_slevel:
-                self.naive_python_earlydate = self.naive_python_date - datetime.timedelta(days=circa_interval_days)
-
+                self.naive_python_earlydate = self.naive_python_date - \
+                                                datetime.timedelta(days=circa_interval_days)
+                self.naive_python_earlydate_slevel = 'c'
+                
             if self.naive_python_date_slevel and not self.naive_python_latedate_slevel:
-                self.naive_python_latedate = self.naive_python_date + datetime.timedelta(days=circa_interval_days)
+                self.naive_python_latedate = self.naive_python_date + \
+                                                datetime.timedelta(days=circa_interval_days)
+                self.naive_python_latedate_slevel = 'c'
                     
             # -- Fill in midpoint date if it is missing and both early and late dates are present
             if self.naive_python_earlydate_slevel and \
@@ -275,6 +281,7 @@ class HDate():
                         not self.naive_python_date_slevel:
                 self.naive_python_date = self.naive_python_earlydate + \
                     (self.naive_python_latedate - self.naive_python_earlydate)/2
+                self.naive_python_date_slevel = 'c'
                 
             # -- Fill in mid and late dates from circa if early is the only date specified
             if self.naive_python_earlydate_slevel and \
