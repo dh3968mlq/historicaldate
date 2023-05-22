@@ -184,9 +184,9 @@ class HDate():
 
         return mlength
     # ------------------------------------------------------------------------------------------------------
-    def calc_clen_days(self):
+    def calc_clen_interval(self):
         if not self.d_parsed["clen"]:
-            return self.circa_interval_days
+            return datetime.timedelta(days=self.circa_interval_days)
         else:
             clen = int(self.d_parsed["clen"])
             if self.d_parsed["clentype"] == "d":
@@ -198,7 +198,7 @@ class HDate():
             else:
                 raise ValueError
             
-            return days
+            return datetime.timedelta(days=days)
     # ------------------------------------------------------------------------------------------------------
     def convert_to_python_date_naive(self):
         """
@@ -264,15 +264,13 @@ class HDate():
             self.pdates.update(dict(zip(['early','slearly'],convert_one_date("early"))))
 
             # -- Fill early and late dates if missing from (a) circa (b) main date
-            circa_interval_days = self.calc_clen_days()
+            circa_interval = self.calc_clen_interval()
             if self.pdates['slcore'] and not self.pdates['slearly']:
-                self.pdates.update({'early':self.pdates['core'] - 
-                                                datetime.timedelta(days=circa_interval_days),
+                self.pdates.update({'early':self.pdates['core'] - circa_interval,
                                     'slearly':'c'})
                 
             if self.pdates['slcore'] and not self.pdates['sllate']:
-                self.pdates.update({'late':self.pdates['core'] + 
-                                                datetime.timedelta(days=circa_interval_days),
+                self.pdates.update({'late':self.pdates['core'] + circa_interval,
                                     'sllate':'c'})
                     
             # -- Fill in midpoint date if it is missing and both early and late dates are present
@@ -283,17 +281,17 @@ class HDate():
 
             # -- Fill in mid and late dates from circa if early is the only date specified
             if self.pdates['slearly'] and not self.pdates['sllate'] and not self.pdates['slcore']:
-                self.pdates.update({'core':self.pdates['early'] + \
-                            datetime.timedelta(days=circa_interval_days), 'slcore':'c',
-                            'late':self.pdates['early'] + \
-                            2*datetime.timedelta(days=circa_interval_days),'sllate':'c'})
+                self.pdates.update({'core':self.pdates['early'] + circa_interval,
+                                    'slcore':'c',
+                            'late':self.pdates['early'] + 2 * circa_interval,
+                            'sllate':'c'})
 
             # -- Fill in mid and early dates from circa if late is the only date specified
             if not self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slcore']:
-                self.pdates.update({'core':self.pdates['late'] - \
-                            datetime.timedelta(days=circa_interval_days), 'slcore':'c',
-                            'early':self.pdates['late'] - \
-                            2*datetime.timedelta(days=circa_interval_days),'slearly':'c'})
+                self.pdates.update({'core':self.pdates['late'] - circa_interval,
+                                'slcore':'c',
+                                'early':self.pdates['late'] - 2 * circa_interval,
+                                'slearly':'c'})
 
         # >> to do: deal with dates out of range, 29th feb 1100 etc.
         ...
