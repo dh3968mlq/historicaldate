@@ -22,7 +22,7 @@ def calc_core_date(hdstring):
     "Return the core date from an hdate string"
     try:
         hd = HDate(hdstring)
-        return hd.naive_python_date
+        return hd.pdates['core']
     except:
         return None
 
@@ -50,9 +50,6 @@ class HDate():
         try:
             self.convert_to_python_date_naive()
         except:
-            self.naive_python_date = None
-            self.naive_python_earlydate = None
-            self.naive_python_latedate = None
             self.pdates = None
             
     # ------------------------------------------------------------------------------------------------------
@@ -234,7 +231,7 @@ class HDate():
                 if self.d_parsed["circa"] or (prefix == "") or (self.d_parsed[f'year'] is None): # Cannot copy from core year
                     return None, ""
                 else:                # Copy from core year
-                    speclevel = self.naive_python_date_slevel
+                    speclevel = self.pdates['slcore']
                     year = self.d_parsed[f'year']
                     month = self.d_parsed[f'mon'] if speclevel in {"m","d"} else default_month
                     day = self.d_parsed[f'day'] if speclevel == "d" else default_day(year, month)
@@ -253,64 +250,50 @@ class HDate():
                 return datetime.date(year, month, day), speclevel
             
         if self.d_parsed['calendar'] == 'bce':
-            self.naive_python_earlydate, self.naive_python_earlydate_slevel = None, None
-            self.naive_python_date, self.naive_python_date_slevel = None, None
-            self.naive_python_latedate, self.naive_python_latedate_slevel = None, None
+            self.pdates = {'core': None, 'slcore': None, 
+                     'late': None, 'sllate': None, 'early': None, 'slearly': None}
         elif self.d_parsed['ongoing']:
-            self.naive_python_earlydate, self.naive_python_earlydate_slevel = datetime.date.today(), 'o'
-            self.naive_python_date, self.naive_python_date_slevel = self.naive_python_earlydate, 'o'
-            self.naive_python_latedate, self.naive_python_latedate_slevel = \
-                self.naive_python_earlydate + datetime.timedelta(days=self.circa_interval_days), 'o'            
+            self.pdates = {'core': datetime.date.today(), 'slcore': 'o', 'slearly': 'o', 'sllate': 'o'}
+            self.pdates.update(
+                {'late': self.pdates['core'] + datetime.timedelta(days=self.circa_interval_days),
+                 'early': self.pdates['core']})
         else:     # Normal treatment, not ongoing
             # -- convert the three dates
-            self.naive_python_date, self.naive_python_date_slevel = convert_one_date()
-            self.naive_python_latedate, self.naive_python_latedate_slevel = convert_one_date("late")
-            self.naive_python_earlydate, self.naive_python_earlydate_slevel = convert_one_date("early")
+            self.pdates = dict(zip(['core','slcore'],convert_one_date()))
+            self.pdates.update(dict(zip(['late','sllate'],convert_one_date("late"))))
+            self.pdates.update(dict(zip(['early','slearly'],convert_one_date("early"))))
 
             # -- Fill early and late dates if missing from (a) circa (b) main date
             circa_interval_days = self.calc_clen_days()
-            if self.naive_python_date_slevel and not self.naive_python_earlydate_slevel:
-                self.naive_python_earlydate = self.naive_python_date - \
-                                                datetime.timedelta(days=circa_interval_days)
-                self.naive_python_earlydate_slevel = 'c'
+            if self.pdates['slcore'] and not self.pdates['slearly']:
+                self.pdates.update({'early':self.pdates['core'] - 
+                                                datetime.timedelta(days=circa_interval_days),
+                                    'slearly':'c'})
                 
-            if self.naive_python_date_slevel and not self.naive_python_latedate_slevel:
-                self.naive_python_latedate = self.naive_python_date + \
-                                                datetime.timedelta(days=circa_interval_days)
-                self.naive_python_latedate_slevel = 'c'
+            if self.pdates['slcore'] and not self.pdates['sllate']:
+                self.pdates.update({'late':self.pdates['core'] + 
+                                                datetime.timedelta(days=circa_interval_days),
+                                    'sllate':'c'})
                     
             # -- Fill in midpoint date if it is missing and both early and late dates are present
-            if self.naive_python_earlydate_slevel and \
-                        self.naive_python_latedate_slevel and \
-                        not self.naive_python_date_slevel:
-                self.naive_python_date = self.naive_python_earlydate + \
-                    (self.naive_python_latedate - self.naive_python_earlydate)/2
-                self.naive_python_date_slevel = 'c'
-                
+            if self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slcore']:
+                self.pdates.update({'core':self.pdates['early'] + 
+                                                (self.pdates['late'] - self.pdates['early'])/2.0,
+                                    'slcore':'c'})
+
             # -- Fill in mid and late dates from circa if early is the only date specified
-            if self.naive_python_earlydate_slevel and \
-                        not self.naive_python_latedate_slevel and \
-                        not self.naive_python_date_slevel:
-                self.naive_python_date = self.naive_python_earlydate + \
-                            datetime.timedelta(days=circa_interval_days)
-                self.naive_python_latedate = self.naive_python_earlydate + \
-                            2 * datetime.timedelta(days=circa_interval_days)
+            if self.pdates['slearly'] and not self.pdates['sllate'] and not self.pdates['slcore']:
+                self.pdates.update({'core':self.pdates['early'] + \
+                            datetime.timedelta(days=circa_interval_days), 'slcore':'c',
+                            'late':self.pdates['early'] + \
+                            2*datetime.timedelta(days=circa_interval_days),'sllate':'c'})
 
             # -- Fill in mid and early dates from circa if late is the only date specified
-            if not self.naive_python_earlydate_slevel and \
-                        self.naive_python_latedate_slevel and \
-                        not self.naive_python_date_slevel:
-                self.naive_python_date = self.naive_python_latedate - \
-                            datetime.timedelta(days=circa_interval_days)
-                self.naive_python_earlydate = self.naive_python_latedate - \
-                            2 * datetime.timedelta(days=circa_interval_days)
-
-        self.pdates = {'core':self.naive_python_date, 'slcore':self.naive_python_date_slevel,
-                    'late':self.naive_python_latedate, 'sllate':self.naive_python_latedate_slevel,
-                    'early':self.naive_python_earlydate, 'slearly':self.naive_python_earlydate_slevel
-                    #,'ongoing':self.d_parsed['ongoing']
-                    }
-
+            if not self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slcore']:
+                self.pdates.update({'core':self.pdates['late'] - \
+                            datetime.timedelta(days=circa_interval_days), 'slcore':'c',
+                            'early':self.pdates['late'] - \
+                            2*datetime.timedelta(days=circa_interval_days),'slearly':'c'})
 
         # >> to do: deal with dates out of range, 29th feb 1100 etc.
         ...

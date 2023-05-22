@@ -69,3 +69,7 @@ def test2():
     compare("487 bc", 
             dcheck={'circa': False, 'ongoing': False, 'year': 487, 'calendar': 'bce'},
             pdcheck={})
+    compare("ongoing",
+            pdcheck={'core':datetime.date.today(), 'slcore': 'o', 'slearly': 'o', 'sllate': 'o', 
+                     'late': datetime.date.today() + datetime.timedelta(days=int(5 * 365.25)), 
+                     'early': datetime.date.today()})

@@ -139,7 +139,7 @@ class plTimeLine():
                                 hovertext=hovertext, hyperlink=hlink)
         
         if showbirthanddeath:
-            if pdates_birth:
+            if pdates_birth and pdates_birth['core']:
                 hovertext = f"{text} (b. {calc_yeartext(pdates_birth)})"
                 endpoint = pdates_start['early'] if pdates_start else \
                             pdates_birth['core'] + (pdates_death['core'] - pdates_birth['core']) / 2.0
@@ -149,7 +149,7 @@ class plTimeLine():
                 add_trace_part(fig, pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
-            if pdates_death:
+            if pdates_death and pdates_death['core']:
                 hovertext = f"{text} (b. {calc_yeartext(pdates_birth)})" if alive \
                             else f"{text} (d. {calc_yeartext(pdates_death)})"
                 startpoint = pdates_end['late'] if pdates_end else \
