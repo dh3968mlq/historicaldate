@@ -95,17 +95,15 @@ class HDate():
         sp = self.re_parsed
 
         # preday and postday cannot both be set, ditto premon and postmon
-        if sp["midpremon"] is not None and sp["midpostmon"] is not None:
-            raise ValueError("Prefix month and postfix month cannot both be set")
-        if sp["earlypremon"] is not None and sp["earlypostmon"] is not None:
-            raise ValueError("Earliest ('after') prefix month and postfix month cannot both be set")
-        if sp["latepremon"] is not None and sp["latepostmon"] is not None:
-            raise ValueError("Latest ('before') prefix month and postfix month cannot both be set")
-        
-        # Failing here should be impossible if tests above are passed
-        assert sp["midpreday"] is None or sp["midpostday"] is None
-        assert sp["earlypreday"] is None or sp["earlypostday"] is None
-        assert sp["latepreday"] is None or sp["latepostday"] is None
+        def check_prepost_dup(prefix):
+            if sp[f"{prefix}premon"] is not None and sp[f"{prefix}postmon"] is not None:
+                raise ValueError(f"Prefix month and postfix month ({prefix}) cannot both be set")
+            # Failing here should be impossible if test above is passed
+            assert sp[f"{prefix}preday"] is None or sp[f"{prefix}postday"] is None
+
+        check_prepost_dup("mid")
+        check_prepost_dup("early")
+        check_prepost_dup("late")
 
         hd = {}
         hd["circa"] = sp["circa"] is not None  # 'circa':bool
@@ -231,13 +229,13 @@ class HDate():
             if self.d_parsed[f'{prefix}year'] is None:
                 if self.d_parsed["circa"] or (prefix == "mid") or \
                             (self.d_parsed[f'midyear'] is None): # Cannot copy from mid year
-                    return None, ""
+                    return {prefix:None, f"sl{prefix}":""} 
                 else:                # Copy from mid year
                     speclevel = self.pdates['slmid']
                     year = self.d_parsed[f'midyear']
                     month = self.d_parsed[f'midmon'] if speclevel in {"m","d"} else default_month
                     day = self.d_parsed[f'midday'] if speclevel == "d" else default_day(year, month)
-                    return datetime.date(year, month, day), speclevel
+                    return  {prefix:datetime.date(year, month, day), f"sl{prefix}":speclevel}
             else:    # The date has been specified
                 speclevel = "y"
                 year = self.d_parsed[f'{prefix}year']
@@ -249,7 +247,7 @@ class HDate():
                 day = self.d_parsed[f'{prefix}day'] if speclevel == "d" else default_day(year, month)
 
                 if (self.d_parsed['circa']) and (prefix == "mid"): speclevel = 'c'
-                return datetime.date(year, month, day), speclevel
+                return {prefix:datetime.date(year, month, day), f"sl{prefix}":speclevel}
             
         if self.d_parsed['midcalendar'] == 'bce':
             self.pdates = {'mid': None, 'slmid': None, 
@@ -261,9 +259,9 @@ class HDate():
                  'early': self.pdates['mid']})
         else:     # Normal treatment, not ongoing
             # -- convert the three dates
-            self.pdates = dict(zip(['mid','slmid'],convert_one_date("mid")))
-            self.pdates.update(dict(zip(['late','sllate'],convert_one_date("late"))))
-            self.pdates.update(dict(zip(['early','slearly'],convert_one_date("early"))))
+            self.pdates = convert_one_date("mid") 
+            self.pdates.update(convert_one_date("late"))
+            self.pdates.update(convert_one_date("early"))
 
             # -- Fill early and late dates if missing from (a) circa (b) main date
             circa_interval = self.calc_clen_interval()
