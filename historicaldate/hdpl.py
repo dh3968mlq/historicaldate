@@ -52,7 +52,7 @@ class plTimeLine():
 
         lo = lineorganiser.LineOrganiser()
         for _, row in dfs.iterrows():  
-            color = row[colorcol] if colorcol else colorgen.get()
+            color = row[colorcol] if colorcol and row[colorcol] else colorgen.get()
             self.add_timeline_trace(row, 
                             showbirthanddeath=showbirthanddeath, showlabel=showlabel,
                             color=color, lo=lo)
@@ -140,7 +140,7 @@ class plTimeLine():
         
         if showbirthanddeath:
             if pdates_birth and pdates_birth['mid']:
-                hovertext = f"{text} (b. {calc_yeartext(pdates_birth)})"
+                hovertext = f"{htext} (b. {calc_yeartext(pdates_birth)})"
                 endpoint = pdates_start['early'] if pdates_start else \
                             pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
                 add_trace_part(fig, pdate_start=pdates_birth['late'], 
@@ -150,8 +150,8 @@ class plTimeLine():
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
             if pdates_death and pdates_death['mid']:
-                hovertext = f"{text} (b. {calc_yeartext(pdates_birth)})" if alive \
-                            else f"{text} (d. {calc_yeartext(pdates_death)})"
+                hovertext = f"{htext} (b. {calc_yeartext(pdates_birth)})" if alive \
+                            else f"{htext} (d. {calc_yeartext(pdates_death)})"
                 startpoint = pdates_end['late'] if pdates_end else \
                             pdates_start['late'] if pdates_start else \
                             pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
