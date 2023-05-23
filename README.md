@@ -114,15 +114,15 @@ print(hd.pdates)
 ...produces:
 
 ```text
-{'core': datetime.date(1066, 12, 15),
-  'slcore': 'm',
+{'mid': datetime.date(1066, 12, 15),
+  'slmid': 'm',
   'late': datetime.date(1066, 12, 31),
   'sllate': 'm',
   'early': datetime.date(1066, 12, 1),
   'slearly': 'm'}
   ```
 
-The basic idea here is that the dict entries *early*, *core* and *late* give the earliest possible, midpoint and latest possible Python dates corresonding to the date specified. These are then used by the timeline utility to indicate the range of uncertainty on the timeline.
+The basic idea here is that the dict entries *early*, *mid* and *late* give the earliest possible, midpoint and latest possible Python dates corresonding to the date specified. These are then used by the timeline utility to indicate the range of uncertainty on the timeline.
 
 ## Limitations
 

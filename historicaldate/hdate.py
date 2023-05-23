@@ -18,11 +18,11 @@
 import re
 import datetime
 
-def calc_core_date(hdstring):
-    "Return the core date from an hdate string"
+def calc_mid_date(hdstring):
+    "Return the mid date from an hdate string"
     try:
         hd = HDate(hdstring)
-        return hd.pdates['core']
+        return hd.pdates['mid']
     except:
         return None
 
@@ -75,7 +75,7 @@ class HDate():
             return datepattern
 
         pattern = f"^(?P<ongoing>ongoing)|((?P<circa>{circa_pattern})((?P<clen>{year_pattern})(?P<clentype>y|m|d))?)?" + \
-                f"(\\s*" + makedatepattern() + ")?" + \
+                f"(\\s*" + makedatepattern(prefix="mid") + ")?" + \
                 f"(\\s*(earliest|after|between)\\s+" + makedatepattern(prefix="early") + ")?" + \
                 f"(\\s*(latest|before|and)\\s+" + makedatepattern(prefix="late") + ")?" + \
                 "$"  
@@ -95,7 +95,7 @@ class HDate():
         sp = self.re_parsed
 
         # preday and postday cannot both be set, ditto premon and postmon
-        if sp["premon"] is not None and sp["postmon"] is not None:
+        if sp["midpremon"] is not None and sp["midpostmon"] is not None:
             raise ValueError("Prefix month and postfix month cannot both be set")
         if sp["earlypremon"] is not None and sp["earlypostmon"] is not None:
             raise ValueError("Earliest ('after') prefix month and postfix month cannot both be set")
@@ -103,7 +103,7 @@ class HDate():
             raise ValueError("Latest ('before') prefix month and postfix month cannot both be set")
         
         # Failing here should be impossible if tests above are passed
-        assert sp["preday"] is None or sp["postday"] is None
+        assert sp["midpreday"] is None or sp["midpostday"] is None
         assert sp["earlypreday"] is None or sp["earlypostday"] is None
         assert sp["latepreday"] is None or sp["latepostday"] is None
 
@@ -130,7 +130,7 @@ class HDate():
             ctemp = sp[prefix+"calendar"].lower() if sp[prefix+"calendar"] else None
             hd[prefix+"calendar"] = {'bc':'bce','ad':'ce'}.get(ctemp, ctemp)
 
-        set_dmy()
+        set_dmy("mid")
         set_dmy("early")
         set_dmy("late")
 
@@ -138,17 +138,17 @@ class HDate():
         # (1) if main is missing, copy from late
         # (2) if main is still missing, and early is ad/ce, copy from early (else error)
         # (3) if early / late is same as main, set to none
-        if hd["calendar"] is None: hd["calendar"] = hd["latecalendar"]
-        if hd["calendar"] is None: 
+        if hd["midcalendar"] is None: hd["midcalendar"] = hd["latecalendar"]
+        if hd["midcalendar"] is None: 
             if hd["earlycalendar"] is None:
                 pass
             elif hd["earlycalendar"].lower() in  {'bc', 'bce'}:
                 raise ValueError("If early calendar is BC/BCE, main calendar must be specified")
             else:
-                hd["calendar"] = hd["earlycalendar"]
+                hd["midcalendar"] = hd["earlycalendar"]
         
-        if hd["latecalendar"] == hd["calendar"]: hd["latecalendar"] = None
-        if hd["earlycalendar"] == hd["calendar"]: hd["earlycalendar"] = None
+        if hd["latecalendar"] == hd["midcalendar"]: hd["latecalendar"] = None
+        if hd["earlycalendar"] == hd["midcalendar"]: hd["earlycalendar"] = None
 
         return hd
     # ------------------------------------------------------------------------------------------------------
@@ -221,6 +221,7 @@ class HDate():
         """
         # function to convert a date. Also returns indicator of y/m/d specification
         def convert_one_date(prefix=""):
+            assert prefix in {"early","mid","late"}
             default_month = 1 if prefix == "early" else 12 if prefix == "late" else 6
             def default_day(year, month):
                 return 1 if prefix=="early" \
@@ -228,13 +229,14 @@ class HDate():
                          else 15
 
             if self.d_parsed[f'{prefix}year'] is None:
-                if self.d_parsed["circa"] or (prefix == "") or (self.d_parsed[f'year'] is None): # Cannot copy from core year
+                if self.d_parsed["circa"] or (prefix == "mid") or \
+                            (self.d_parsed[f'midyear'] is None): # Cannot copy from mid year
                     return None, ""
-                else:                # Copy from core year
-                    speclevel = self.pdates['slcore']
-                    year = self.d_parsed[f'year']
-                    month = self.d_parsed[f'mon'] if speclevel in {"m","d"} else default_month
-                    day = self.d_parsed[f'day'] if speclevel == "d" else default_day(year, month)
+                else:                # Copy from mid year
+                    speclevel = self.pdates['slmid']
+                    year = self.d_parsed[f'midyear']
+                    month = self.d_parsed[f'midmon'] if speclevel in {"m","d"} else default_month
+                    day = self.d_parsed[f'midday'] if speclevel == "d" else default_day(year, month)
                     return datetime.date(year, month, day), speclevel
             else:    # The date has been specified
                 speclevel = "y"
@@ -246,50 +248,50 @@ class HDate():
                 if self.d_parsed[f'{prefix}day']: speclevel = "d"
                 day = self.d_parsed[f'{prefix}day'] if speclevel == "d" else default_day(year, month)
 
-                if (self.d_parsed['circa']) and (prefix == ""): speclevel = 'c'
+                if (self.d_parsed['circa']) and (prefix == "mid"): speclevel = 'c'
                 return datetime.date(year, month, day), speclevel
             
-        if self.d_parsed['calendar'] == 'bce':
-            self.pdates = {'core': None, 'slcore': None, 
+        if self.d_parsed['midcalendar'] == 'bce':
+            self.pdates = {'mid': None, 'slmid': None, 
                      'late': None, 'sllate': None, 'early': None, 'slearly': None}
         elif self.d_parsed['ongoing']:
-            self.pdates = {'core': datetime.date.today(), 'slcore': 'o', 'slearly': 'o', 'sllate': 'o'}
+            self.pdates = {'mid': datetime.date.today(), 'slmid': 'o', 'slearly': 'o', 'sllate': 'o'}
             self.pdates.update(
-                {'late': self.pdates['core'] + datetime.timedelta(days=self.circa_interval_days),
-                 'early': self.pdates['core']})
+                {'late': self.pdates['mid'] + datetime.timedelta(days=self.circa_interval_days),
+                 'early': self.pdates['mid']})
         else:     # Normal treatment, not ongoing
             # -- convert the three dates
-            self.pdates = dict(zip(['core','slcore'],convert_one_date()))
+            self.pdates = dict(zip(['mid','slmid'],convert_one_date("mid")))
             self.pdates.update(dict(zip(['late','sllate'],convert_one_date("late"))))
             self.pdates.update(dict(zip(['early','slearly'],convert_one_date("early"))))
 
             # -- Fill early and late dates if missing from (a) circa (b) main date
             circa_interval = self.calc_clen_interval()
-            if self.pdates['slcore'] and not self.pdates['slearly']:
-                self.pdates.update({'early':self.pdates['core'] - circa_interval,
+            if self.pdates['slmid'] and not self.pdates['slearly']:
+                self.pdates.update({'early':self.pdates['mid'] - circa_interval,
                                     'slearly':'c'})
                 
-            if self.pdates['slcore'] and not self.pdates['sllate']:
-                self.pdates.update({'late':self.pdates['core'] + circa_interval,
+            if self.pdates['slmid'] and not self.pdates['sllate']:
+                self.pdates.update({'late':self.pdates['mid'] + circa_interval,
                                     'sllate':'c'})
                     
             # -- Fill in midpoint date if it is missing and both early and late dates are present
-            if self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slcore']:
-                self.pdates.update({'core':self.pdates['early'] + 
-                                                (self.pdates['late'] - self.pdates['early'])/2.0,
-                                    'slcore':'c'})
+            if self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slmid']:
+                self.pdates.update({'mid':self.pdates['early'] + 
+                                            (self.pdates['late'] - self.pdates['early'])/2.0,
+                                    'slmid':'c'})
 
             # -- Fill in mid and late dates from circa if early is the only date specified
-            if self.pdates['slearly'] and not self.pdates['sllate'] and not self.pdates['slcore']:
-                self.pdates.update({'core':self.pdates['early'] + circa_interval,
-                                    'slcore':'c',
+            if self.pdates['slearly'] and not self.pdates['sllate'] and not self.pdates['slmid']:
+                self.pdates.update({'mid':self.pdates['early'] + circa_interval,
+                                    'slmid':'c',
                             'late':self.pdates['early'] + 2 * circa_interval,
                             'sllate':'c'})
 
             # -- Fill in mid and early dates from circa if late is the only date specified
-            if not self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slcore']:
-                self.pdates.update({'core':self.pdates['late'] - circa_interval,
-                                'slcore':'c',
+            if not self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slmid']:
+                self.pdates.update({'mid':self.pdates['late'] - circa_interval,
+                                'slmid':'c',
                                 'early':self.pdates['late'] - 2 * circa_interval,
                                 'slearly':'c'})
 
