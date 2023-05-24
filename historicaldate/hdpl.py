@@ -9,9 +9,11 @@ import plotly.graph_objects as go
 from plotly import colors as pc
 from historicaldate import hdate
 from historicaldate import lineorganiser
+from dateutil.relativedelta import relativedelta
 
 class plTimeLine():
-    def __init__(self, mindate=None, maxdate=None):
+    def __init__(self, mindate=None, maxdate=None, 
+                hovermode='closest', hoverdistance=5):
         self.figure = go.Figure()
         self.figure.update_layout(xaxis_title=None, title=None, margin={'l':0,'r':0,'t':0,'b':0})
         self.maxdate = datetime.date.today() + datetime.timedelta(days=int(10*365.25)) \
@@ -20,7 +22,8 @@ class plTimeLine():
                             if mindate is None else mindate
 
         self.fig_config = {'scrollZoom': True}
-        self.figure.update_layout(dragmode="pan", showlegend=False)
+        self.figure.update_layout(dragmode="pan", showlegend=False, 
+                    hovermode=hovermode, hoverdistance=hoverdistance)
         self.figure.update_xaxes(range=[self.mindate, self.maxdate])
         self.max_y_used = 0.0
 # -------------
@@ -67,7 +70,7 @@ class plTimeLine():
         fig = self.figure
         cols = list(row.index)
         text = row["label"]
-        htext = row["description"] if "description" in cols else text
+        htext = row["description"] if "description" in cols and row["description"] else text
         hlink = row['url'] if 'url' in cols else None
 
         earliest, latest = None, None
@@ -146,18 +149,21 @@ class plTimeLine():
                 add_trace_part(fig, pdate_start=pdates_birth['late'], 
                                     pdate_end=endpoint, 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
-                add_trace_part(fig, pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
+                if pdates_birth['early'] < pdates_birth['late']:
+                    add_trace_part(fig, pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
             if pdates_death and pdates_death['mid']:
                 hovertext = f"{htext} (b. {calc_yeartext(pdates_birth)})" if alive \
-                            else f"{htext} (d. {calc_yeartext(pdates_death)})"
+                            else f"{htext} (d. {calc_yeartext(pdates_death)}" +\
+                                    f" aged {calc_agetext(pdates_birth, pdates_death)})"
                 startpoint = pdates_end['late'] if pdates_end else \
                             pdates_start['late'] if pdates_start else \
                             pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
                 add_trace_part(fig, pdate_start=startpoint, pdate_end=pdates_death['early'], 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
-                add_trace_part(fig, pdate_start=max(startpoint,pdates_death['early']), 
+                if pdates_death['early'] < pdates_death['late']:
+                    add_trace_part(fig, pdate_start=max(startpoint,pdates_death['early']), 
                                pdate_end=pdates_death['late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
                 if alive and (pdates_death['late'] > startpoint):   # Right arrow 
@@ -219,7 +225,7 @@ def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None):
                                 name=label, legendgroup=label,
                                 mode="text", text=hlinkedtext, 
                                 textposition='bottom center',
-                                hoverinfo='text', hoverlabel={'namelength':-1}, showlegend=False))
+                                hoverinfo='skip', hoverlabel={'namelength':-1}, showlegend=False))
 # ------------------------------------------------------------------------------------------------
 def calc_yeartext(pdates):
     if pdates['early'].year != pdates['late'].year:
@@ -230,3 +236,12 @@ def calc_yeartext(pdates):
         return pdates['mid'].strftime("%b %Y")
     else:
         return pdates['mid'].strftime("%d %b %Y")
+# ------------------------------------------------------------------------------------------------    
+def calc_agetext(pdates_birth, pdates_ref):
+    "Calculate age text, including ? to indicate uncertainty"
+    years_largest = relativedelta(pdates_ref['late'],pdates_birth['early']).years
+    years_smallest = relativedelta(pdates_ref['early'],pdates_birth['late']).years
+    uncertain = '?' if years_largest > years_smallest else ""
+
+    years = relativedelta(pdates_ref['mid'],pdates_birth['mid']).years
+    return f"{years}{uncertain}"
