@@ -10,6 +10,7 @@ from plotly import colors as pc
 from historicaldate import hdate
 from historicaldate import lineorganiser
 from dateutil.relativedelta import relativedelta
+from math import ceil
 
 class plTimeLine():
     def __init__(self, mindate=None, maxdate=None, 
@@ -20,6 +21,7 @@ class plTimeLine():
                             if maxdate is None else maxdate
         self.mindate = self.maxdate - datetime.timedelta(days=int(200*365.25)) \
                             if mindate is None else mindate
+        self.pointinterval = (self.maxdate - self.mindate) / 200.0
 
         self.fig_config = {'scrollZoom': True}
         self.figure.update_layout(dragmode="pan", showlegend=False, 
@@ -89,7 +91,8 @@ class plTimeLine():
         pdates_end, earliest, latest = get_pdates("hdate_end", earliest, latest)
         if showbirthanddeath:
             pdates_birth, earliest, latest = get_pdates("hdate_birth", earliest, latest)
-            pdates_death, earliest, latest = get_pdates("hdate_death", earliest, latest, missingasongoing=True)
+            pdates_death, earliest, latest = get_pdates("hdate_death", earliest, latest, 
+                        missingasongoing=pdates_birth and pdates_birth['mid'])
 
         ongoing = pdates_end['slmid'] == 'o' if pdates_end else False
         alive = pdates_death['slmid'] == 'o' if pdates_death else False
@@ -120,17 +123,17 @@ class plTimeLine():
 
         # Main part, from hdate to hdate_end
         if pdates_start:
-            add_trace_part(fig, pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
+            self.add_trace_part(pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
                         label=text, y=y, color=color, width=1, hovertext=hovertext)
             add_trace_marker(fig, pdate=pdates_start['mid'], y=y, color=color,
                             showlegend=showlegend, label=text, 
                             hovertext=hovertext, hyperlink=hlink)
             if pdates_end:
-                add_trace_part(fig, pdate_start=pdates_start['late'], 
+                self.add_trace_part(pdate_start=pdates_start['late'], 
                             pdate_end=pdates_end['early'], 
                             label=text, y=y, color=color, 
-                            hovertext=hovertext, hyperlink=hlink)
-                add_trace_part(fig, pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
+                            hovertext=hovertext)
+                self.add_trace_part(pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
                                 label=text, y=y, color=color, width=1, hovertext=hovertext)
 
                 if ongoing:   # Right arrow at end of 'ongoing' period
@@ -146,11 +149,11 @@ class plTimeLine():
                 hovertext = f"{htext} (b. {calc_yeartext(pdates_birth)})"
                 endpoint = pdates_start['early'] if pdates_start else \
                             pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
-                add_trace_part(fig, pdate_start=pdates_birth['late'], 
+                self.add_trace_part(pdate_start=pdates_birth['late'], 
                                     pdate_end=endpoint, 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
                 if pdates_birth['early'] < pdates_birth['late']:
-                    add_trace_part(fig, pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
+                    self.add_trace_part(pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
             if pdates_death and pdates_death['mid']:
@@ -160,10 +163,10 @@ class plTimeLine():
                 startpoint = pdates_end['late'] if pdates_end else \
                             pdates_start['late'] if pdates_start else \
                             pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
-                add_trace_part(fig, pdate_start=startpoint, pdate_end=pdates_death['early'], 
+                self.add_trace_part(pdate_start=startpoint, pdate_end=pdates_death['early'], 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
                 if pdates_death['early'] < pdates_death['late']:
-                    add_trace_part(fig, pdate_start=max(startpoint,pdates_death['early']), 
+                    self.add_trace_part(pdate_start=max(startpoint,pdates_death['early']), 
                                pdate_end=pdates_death['late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
                 if alive and (pdates_death['late'] > startpoint):   # Right arrow 
@@ -171,6 +174,24 @@ class plTimeLine():
                                 symbol='arrow-right',
                                 hovertext=hovertext)
         return True
+# -------------
+    def add_trace_part(self, pdate_start=None, pdate_end=None, label="", y=0.0, 
+                    color=None, width=4, dash=None, 
+                    hovertext=None):
+
+        if (pdate_start <= pdate_end): 
+            #xs = [pdate_start] + \
+            #     [datetime.date(year, 1, 1) for year in 
+            #            range(pdate_start.year + 1, pdate_end.year + 1)] + [pdate_end]
+            xs = [pdate_start + n * self.pointinterval for n in 
+                        range(ceil((pdate_end - pdate_start).total_seconds()/
+                                    self.pointinterval.total_seconds()))] + [pdate_end]
+            ys = [y for _ in xs]
+            self.figure.add_trace(go.Scatter(x = xs, y=ys, name=label, legendgroup=label,
+                                mode="lines", line={'color':color,'width':width,'dash':dash}, 
+                                hoverinfo='text',
+                                hovertext=hovertext if hovertext else label,
+                                hoverlabel={'namelength':-1}, showlegend=False))
 
 # -------------
     def show(self,fix_y_range=False):
@@ -200,24 +221,6 @@ def add_trace_marker(fig, pdate=None, label="", y=0.0,
                         hoverinfo='text',
                         hovertext=hovertext if hovertext else label,
                         hoverlabel={'namelength':-1}, showlegend=showlegend))
-
-# ------------------------------------------------------------------------------------------------
-def add_trace_part(fig, pdate_start=None, pdate_end=None, label="", y=0.0, 
-                   color=None, 
-                   width=4, dash=None, 
-                   hovertext=None, 
-                   hyperlink=None):
-
-    if (pdate_start <= pdate_end): 
-        xs = [pdate_start] + \
-             [datetime.date(year, 1, 1) for year in 
-                    range(pdate_start.year + 1, pdate_end.year + 1)] + [pdate_end]
-        ys = [y for _ in xs]
-        fig.add_trace(go.Scatter(x = xs, y=ys, name=label, legendgroup=label,
-                            mode="lines", line={'color':color,'width':width,'dash':dash}, 
-                            hoverinfo='text',
-                            hovertext=hovertext if hovertext else label,
-                            hoverlabel={'namelength':-1}, showlegend=False))
 # ------------------------------------------------------------------------------------------------
 def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None):
     hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
