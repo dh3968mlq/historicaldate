@@ -9,6 +9,10 @@ class LineOrganiser():
         self.daysperlabelchar = daysperlabelchar
         self.daysminspacing = daysminspacing
         self.previoustraceindex = 0
+        self.startline = 0
+
+    def reset_startline(self):
+        self.startline = len(self.linerecord)
 
     def add_trace(self, earliest, latest, labeldate, text):
         textdelta = datetime.timedelta(days=int(len(text) * self.daysperlabelchar/2.0))
@@ -17,8 +21,7 @@ class LineOrganiser():
         t_latest = max(latest, labeldate + textdelta) + spacingdelta
         lpd = {"earliest":t_earliest, "latest":t_latest}
 
-        #for iline, line in enumerate(self.linerecord):
-        for i in range(nlines := len(self.linerecord)):
+        for i in range(self.startline, nlines := len(self.linerecord)):
             line = self.linerecord[(iline := (self.previoustraceindex + i + 1) % nlines)]
             if self.is_available(line, lpd):
                 self.linerecord[iline] += [lpd]

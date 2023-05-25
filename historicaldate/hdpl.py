@@ -31,7 +31,7 @@ class plTimeLine():
 # -------------
     def add_event_set(self, df, 
                     title="", showbirthanddeath=True, showlabel=True,
-                      rowspacing=0.3):
+                    lives_first=True,  rowspacing=0.3):
         """
         dates are in df columns: hdate, hdate_end, hdate_birth, hdate_death
         df must include either hdate or both of hdate_birth, hdate_death
@@ -56,11 +56,23 @@ class plTimeLine():
             dfs = df
 
         lo = lineorganiser.LineOrganiser()
-        for _, row in dfs.iterrows():  
-            color = row[colorcol] if colorcol and row[colorcol] else colorgen.get()
-            self.add_timeline_trace(row, 
-                            showbirthanddeath=showbirthanddeath, showlabel=showlabel,
-                            color=color, lo=lo)
+
+        def disp_set(dfset):
+            for _, row in dfset.iterrows():  
+                color = row[colorcol] if colorcol and row[colorcol] else colorgen.get()
+                self.add_timeline_trace(row, 
+                                showbirthanddeath=showbirthanddeath, showlabel=showlabel,
+                                color=color, lo=lo)
+
+        # -- split lives and display them first if required
+        if "hdate_birth" in dfs.columns and lives_first:
+            dfs["_hdplbirth"] = dfs["hdate_birth"].apply(hdate.calc_mid_date)
+            df_lives = dfs[dfs["_hdplbirth"].notna()].sort_values(["_hdplbirth"])
+            disp_set(df_lives)
+            dfs = dfs[dfs["_hdplbirth"].isna()]
+            lo.reset_startline()
+
+        disp_set(dfs)
         self.max_y_used += (len(lo.linerecord) + 2) * rowspacing    
 # -------------
     def add_timeline_trace(self, row, showbirthanddeath=False, 

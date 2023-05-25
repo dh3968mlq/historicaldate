@@ -19,7 +19,7 @@ import re
 import datetime
 
 def calc_mid_date(hdstring):
-    "Return the mid date from an hdate string"
+    "Return the mid date from an hdate string, or None"
     try:
         hd = HDate(hdstring)
         return hd.pdates['mid']
