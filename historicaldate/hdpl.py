@@ -6,6 +6,7 @@ sys.path.append("..")
 
 import datetime
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from plotly import colors as pc
 from historicaldate import hdate
 from historicaldate import lineorganiser
@@ -13,15 +14,16 @@ from dateutil.relativedelta import relativedelta
 from math import ceil
 
 class plTimeLine():
-    def __init__(self, mindate=None, maxdate=None, 
+    def __init__(self, title=None, mindate=None, maxdate=None, 
                 hovermode='closest', hoverdistance=5):
-        self.figure = go.Figure()
-        self.figure.update_layout(xaxis_title=None, title=None, margin={'l':0,'r':0,'t':0,'b':0})
+        self.figure = make_subplots(rows=1, cols=1, subplot_titles=[title])
+        self.figure.update_layout(xaxis_title=None, title=None, margin={'l':0,'r':0,'t':20,'b':0})
         self.maxdate = datetime.date.today() + datetime.timedelta(days=int(10*365.25)) \
                             if maxdate is None else maxdate
         self.mindate = self.maxdate - datetime.timedelta(days=int(200*365.25)) \
                             if mindate is None else mindate
         self.pointinterval = (self.maxdate - self.mindate) / 200.0
+        self.initial_range_years = (self.maxdate - self.mindate).days / 365.
 
         self.fig_config = {'scrollZoom': True}
         self.figure.update_layout(dragmode="pan", showlegend=False, 
@@ -55,7 +57,8 @@ class plTimeLine():
         else:
             dfs = df
 
-        lo = lineorganiser.LineOrganiser()
+        lo = lineorganiser.LineOrganiser(daysperlabelchar=1.3 * self.initial_range_years,
+                                         daysminspacing=0.5 * self.initial_range_years)
 
         def disp_set(dfset):
             for _, row in dfset.iterrows():  
@@ -226,7 +229,7 @@ class ColorGen():
         return self.colors[self.index % self.len]
 # ------------------------------------------------------------------------------------------------
 def add_trace_marker(fig, pdate=None, label="", y=0.0, 
-                   color=None, size=10, symbol='diamond', showlegend=False,
+                   color=None, size=8, symbol='diamond', showlegend=False,
                    hovertext=None, hyperlink=None):
     fig.add_trace(go.Scatter(x = [pdate], y=[y], name=label, legendgroup=label,
                         mode="markers", marker={'color':color, 'size':size,'symbol':symbol}, 
