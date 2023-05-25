@@ -8,6 +8,8 @@ https://github.com/dh3968mlq/historicaldate
 
 The partner repo https://github.com/dh3968mlq/historicaldate-data has some example datasets in CSV format
 
+See https://picoteal.com/historical-timelines/ for an example of the kind of output that can be produced
+
 Sample code:
 
 ```python
