@@ -161,6 +161,8 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 
 ### *pltl.add_event_set(df, title="", showbirthanddeath=True, showlabel=True, lives_first=True,  rowspacing=0.3)*
 
+Add a set of events/lives held in a Pandas dataframe to a timeline display
+
 | Parameter | Usage | Default |
 | ------ | ----- | ----- |
 | df : pandas.DataFrame | Dataframe to be displayed | (Required) |
