@@ -1,4 +1,4 @@
-# historicaldate
+# historicaldate 0.0.2
 
 An open source package for creating timelines
 of historical data.
@@ -8,10 +8,13 @@ https://github.com/dh3968mlq/historicaldate
 
 The partner repo https://github.com/dh3968mlq/historicaldate-data has some example datasets in CSV format
 
+See https://picoteal.com/historical-timelines/ for an example of the kind of output that can be produced
+
 Sample code:
 
 ```python
-# The folders historicaldate and historicaldate-data have been downloaded to...
+# Sample code for a timeline of British monarchs and Prime Ministers
+# The folders that historicaldate and historicaldate-data have been downloaded to...
 hdroot = "/svol1/pishare/users/pi/repos/historicaldate" 
 dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data" 
 import sys
@@ -27,7 +30,7 @@ df2 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Prime 
 pltl = hdpl.plTimeLine()
 pltl.add_event_set(df1, title="British Monarchs from 1066")
 pltl.add_event_set(df2, title="British Prime Ministers") 
-pltl.show()  # Show in a browser, or...
+pltl.show() # Show in a browser, or...
 pltl.write_html("/home/pi/example_timeline.html")
 ```
 
@@ -76,8 +79,7 @@ These are all allowed:
 
 **Ongoing events, or lives, are supported**
 
-A missing value of *hdeath_death*, or a value of 'ongoing'
-in *hdate_end* leads to an indication on a timeline that an event is ongoing, or that a person is still alive.
+A missing value of *hdeath_death* (if there is a value of *hdate_birth*), or a value of 'ongoing' in *hdate_end* leads to an indication on a timeline that an event is ongoing, or that a person is still alive.
 
 **Imprecise dates are treated properly**
 
@@ -114,21 +116,21 @@ print(hd.pdates)
 ...produces:
 
 ```text
-{'core': datetime.date(1066, 12, 15),
-  'slcore': 'm',
+{'mid': datetime.date(1066, 12, 15),
+  'slmid': 'm',
   'late': datetime.date(1066, 12, 31),
   'sllate': 'm',
   'early': datetime.date(1066, 12, 1),
   'slearly': 'm'}
   ```
 
-The basic idea here is that the dict entries *early*, *core* and *late* give the earliest possible, midpoint and latest possible Python dates corresonding to the date specified. These are then used by the timeline utility to indicate the range of uncertainty on the timeline.
+The basic idea here is that the dict entries *early*, *mid* and *late* give the earliest possible, midpoint and latest possible Python dates corresonding to the date specified. These are then used by the timeline utility to indicate the range of uncertainty on the timeline.
 
 ## Limitations
 
-This is a very early (0.0.1) release, an indication of the direction of travel.
+This is an early (0.0.2) release, and much remains to be done.
 
 At present dates BC (BCE) are not supported, since date representation depends on Python *datetime.date* dates, which have this same limitation.
 
-Support for date formats DD/MM/YYYY or MM/DD/YYYY is also planned.
+Support for date formats DD/MM/YYYY or MM/DD/YYYY is also as yet not supported. If implemented they are expected to be non-default formats, because of the risk of confusion between them.
 

@@ -1,5 +1,5 @@
 # Sample code for a timeline of British monarchs and Prime Ministers
-# The folders historicaldate and historicaldate-data have been downloaded to...
+# The folders that historicaldate and historicaldate-data have been downloaded to...
 hdroot = "/svol1/pishare/users/pi/repos/historicaldate" 
 dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data" 
 import sys
