@@ -3,6 +3,8 @@
 An open source package for creating timelines
 of historical data.
 
+![Example timeline image](https://picoteal.com/wp-content/uploads/2023/05/basic_timeline_example.png)
+
 Download from 
 https://github.com/dh3968mlq/historicaldate
 
