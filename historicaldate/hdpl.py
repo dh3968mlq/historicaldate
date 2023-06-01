@@ -57,7 +57,7 @@ class plTimeLine():
         else:
             dfs = df
 
-        lo = lineorganiser.LineOrganiser(daysperlabelchar=1.3 * self.initial_range_years,
+        lo = lineorganiser.LineOrganiser(daysperlabelchar=2.5 * self.initial_range_years,
                                          daysminspacing=0.5 * self.initial_range_years)
 
         def disp_set(dfset):
