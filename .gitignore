@@ -6,6 +6,9 @@ __pycache__/
 # VS code stuff
 .vscode
 
+# HTML output
+html/
+
 # emacs backup files
 *~
 
