@@ -1,6 +1,9 @@
-# imports
+
+# The path this repo (https://github.com/dh3968mlq/historicaldate) has been downloaded to
 hdroot = "/svol1/pishare/users/pi/repos/historicaldate"
+# The path the data repo (https://github.com/dh3968mlq/historicaldate-data) has been downloaded to
 dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data"
+
 import sys
 sys.path.append(hdroot)
 from historicaldate import hdpl
