@@ -2,16 +2,16 @@
 
 An open source Python package for creating interactive graphical timelines of historical data.
 
-![Example timeline image](https://picoteal.com/wp-content/uploads/2023/05/basic_timeline_example.png)
+![Example timeline image](https://historicaldate.com/wp-content/uploads/2023/05/basic_timeline_example.png)
 
 To create a timeline:
    * Download this package from 
 https://github.com/dh3968mlq/historicaldate
    * Download sample data from https://github.com/dh3968mlq/historicaldate-data, and/or
    * Create .csv files of data (see below for column names and date formats)
-   * Create and run a Python program, similar to below
+   * Create and run a Python program, similar to below, or see sample timeline code in the *timelines* folder in this repository
 
-See https://picoteal.com/historical-timelines/ for an example of the interactive output that can be produced
+See https://historicaldate.com/ for example outputs
 
 Sample code:
 
