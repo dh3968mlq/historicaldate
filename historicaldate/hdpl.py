@@ -33,7 +33,7 @@ class plTimeLine():
 # -------------
     def add_event_set(self, df, 
                     title="", showbirthanddeath=True, showlabel=True,
-                    lives_first=True,  rowspacing=0.3):
+                    lives_first=True,  rowspacing=0.3, hover_datetype='day'):
         """
         dates are in df columns: hdate, hdate_end, hdate_birth, hdate_death
         df must include either hdate or both of hdate_birth, hdate_death
@@ -65,7 +65,7 @@ class plTimeLine():
                 color = row[colorcol] if colorcol and row[colorcol] else colorgen.get()
                 self.add_timeline_trace(row, 
                                 showbirthanddeath=showbirthanddeath, showlabel=showlabel,
-                                color=color, lo=lo)
+                                color=color, lo=lo, hover_datetype=hover_datetype)
 
         # -- split lives and display them first if required
         if "hdate_birth" in dfs.columns and lives_first:
@@ -80,7 +80,8 @@ class plTimeLine():
 # -------------
     def add_timeline_trace(self, row, showbirthanddeath=False, 
                                     showlegend=True, showlabel=True,
-                                    color=None, lo=None, rowspacing=0.3):
+                                    color=None, lo=None, rowspacing=0.3,
+                                    hover_datetype='day'):
         '''
         Add a timeline trace for a given row
         '''        
@@ -116,12 +117,13 @@ class plTimeLine():
             if pdates_end:
                 labeldate = pdates_start['mid'] + (pdates_end['mid'] - pdates_start['mid'])/2.0
                 if ongoing:
-                    hovertext = f"{htext} ({calc_yeartext(pdates_start)}...)"
+                    hovertext = f"{htext} ({calc_yeartext(pdates_start, hover_datetype=hover_datetype)}...)"
                 else:
-                    hovertext = f"{htext} ({calc_yeartext(pdates_start)}-{calc_yeartext(pdates_end)})"
+                    hovertext = f"{htext} ({calc_yeartext(pdates_start, hover_datetype=hover_datetype)}-"\
+                                        f"{calc_yeartext(pdates_end, hover_datetype=hover_datetype)})"
             else:
                 labeldate = pdates_start['mid']
-                hovertext = f"{htext} ({calc_yeartext(pdates_start)})"
+                hovertext = f"{htext} ({calc_yeartext(pdates_start, hover_datetype=hover_datetype)})"
         elif pdates_birth and pdates_birth['mid']:
             if pdates_death:
                 labeldate = pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid'])/2.0
@@ -161,7 +163,7 @@ class plTimeLine():
         
         if showbirthanddeath:
             if pdates_birth and pdates_birth['mid']:
-                hovertext = f"{htext} (b. {calc_yeartext(pdates_birth)})"
+                hovertext = f"{htext} (b. {calc_yeartext(pdates_birth, hover_datetype=hover_datetype)})"
                 endpoint = pdates_start['early'] if pdates_start else \
                             pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
                 self.add_trace_part(pdate_start=pdates_birth['late'], 
@@ -172,8 +174,8 @@ class plTimeLine():
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
             if pdates_death and pdates_death['mid']:
-                hovertext = f"{htext} (b. {calc_yeartext(pdates_birth)})" if alive \
-                            else f"{htext} (d. {calc_yeartext(pdates_death)}" +\
+                hovertext = f"{htext} (b. {calc_yeartext(pdates_birth, hover_datetype=hover_datetype)})" if alive \
+                            else f"{htext} (d. {calc_yeartext(pdates_death, hover_datetype=hover_datetype)}" +\
                                     f" aged {calc_agetext(pdates_birth, pdates_death)})"
                 startpoint = pdates_end['late'] if pdates_end else \
                             pdates_start['late'] if pdates_start else \
@@ -245,15 +247,18 @@ def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None):
                                 textposition='bottom center',
                                 hoverinfo='skip', hoverlabel={'namelength':-1}, showlegend=False))
 # ------------------------------------------------------------------------------------------------
-def calc_yeartext(pdates):
-    if pdates['early'].year != pdates['late'].year:
-        return f"{pdates['mid'].year}?"
-    elif pdates['early'].month != pdates['late'].month:
-        return f"{pdates['mid'].year}"
-    elif pdates['early'].day != pdates['late'].day:
-        return pdates['mid'].strftime("%b %Y")
+def calc_yeartext(pdates, hover_datetype='day'):
+    if hover_datetype not in {'year','month','day'}:
+        raise ValueError(f"hover_datetype must be year, month or day. found:{hover_datetype}")
+    
+    if (pdates['early'].year != pdates['late'].year):
+        return f"{pdates['mid'].year}?"             # Show uncertain year
+    elif (pdates['early'].month != pdates['late'].month) or hover_datetype in {'year'}:
+        return f"{pdates['mid'].year}"              # Show year
+    elif (pdates['early'].day != pdates['late'].day) or hover_datetype in {'year','month'}:
+        return pdates['mid'].strftime("%b %Y")      # Show month and year
     else:
-        return pdates['mid'].strftime("%d %b %Y")
+        return pdates['mid'].strftime("%d %b %Y")   # Show exact date
 # ------------------------------------------------------------------------------------------------    
 def calc_agetext(pdates_birth, pdates_ref):
     "Calculate age text, including ? to indicate uncertainty"
