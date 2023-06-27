@@ -62,6 +62,7 @@ Dataframes passed to *add_event_set* have one row per event or life, and specifi
 | hdate_end | End date of a persistent event |
 | hdate_birth | A person's birth date |
 | hdate_death | A person's date of death, defaults to *alive* if *hdate_birth* is present|
+| htext_end | Hover text linked to the marker drawn at *hdate_end* |
 | color (or colour) | Colour to draw the event or life
 | url | hyperlink, active by clicking on the displayed label |
 
@@ -171,6 +172,7 @@ Add a set of events/lives held in a Pandas dataframe to a timeline display
 | showlabel: bool | Whether the label of each event is displayed | True |
 | lives_first: bool | Whether lives (rows with *hdate_birth* specified) are displayed above, and on separate lines from, oher events | True |
 | rowspacing: float | Space between rows | 0.3 |
+| hover_datetype: str | Specifies the precision to which dates in hover text are displayed. Must be one of 'day' (default), 'month' or 'year' |
 
 ### *pltl.show(fix_y_range=False)*
 
@@ -196,3 +198,12 @@ This is an early (0.0.2) release, and much remains to be done.
 At present dates BC (BCE) are not supported, since date representation depends on Python *datetime.date* dates, which have this same limitation.
 
 Support for date formats DD/MM/YYYY or MM/DD/YYYY is also as yet not supported. If implemented they are expected to be non-default formats, because of the risk of confusion between them.
+
+## Changes
+
+### New in 0.0.3
+
+   * New English Football timeline code (*english_football.py*)
+   * New *hover_datetype* parameter to *add_event_set*
+   * New *htext_end* column supported
+   
