@@ -76,7 +76,10 @@ class plTimeLine():
             lo.reset_startline()
 
         disp_set(dfs)
-        self.max_y_used += (len(lo.linerecord) + 2) * rowspacing    
+        self.max_y_used += (len(lo.linerecord) + 2) * rowspacing
+        self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
+                                 visible=False)
+ 
 # -------------
     def add_timeline_trace(self, row, showbirthanddeath=False, 
                                     showlegend=True, showlabel=True,
