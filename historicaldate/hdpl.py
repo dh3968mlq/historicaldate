@@ -30,6 +30,18 @@ class plTimeLine():
                     hovermode=hovermode, hoverdistance=hoverdistance)
         self.figure.update_xaxes(range=[self.mindate, self.maxdate])
         self.max_y_used = 0.0
+        self.earliest_trace_date = None
+        self.latest_trace_date = None
+# -------------
+    def fit_xaxis(self, mindate=None, maxdate=None):
+        "Fit x axis to specified dates, or to data range"
+        earliest = mindate if mindate else self.earliest_trace_date
+        latest = maxdate if maxdate else self.latest_trace_date
+        if fitted := earliest and latest and (latest > earliest):
+            self.maxdate = latest + datetime.timedelta(days=int(5*365.25))
+            self.mindate = earliest - datetime.timedelta(days=int(5*365.25))
+            self.figure.update_xaxes(range=[self.mindate, self.maxdate])
+        return fitted 
 # -------------
     def add_event_set(self, df, 
                     title="", showbirthanddeath=True, showlabel=True,
@@ -72,7 +84,7 @@ class plTimeLine():
             dfs["_hdplbirth"] = dfs["hdate_birth"].apply(hdate.calc_mid_date)
             df_lives = dfs[dfs["_hdplbirth"].notna()].sort_values(["_hdplbirth"])
             disp_set(df_lives)
-            dfs = dfs[dfs["_hdplbirth"].isna()]
+            dfs = dfs[dfs["_hdplbirth"].isna()]   # -- not lives
             lo.reset_startline()
 
         disp_set(dfs)
@@ -141,6 +153,10 @@ class plTimeLine():
 
         iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
         y = self.max_y_used + (iline + 1) * rowspacing
+
+        # -- Update timeline object earliest / latest trace dates
+        self.earliest_trace_date = min(self.earliest_trace_date, earliest) if self.earliest_trace_date else earliest
+        self.latest_trace_date = max(self.latest_trace_date, latest) if self.latest_trace_date else latest
 
         if showlabel:
             add_trace_label(fig, pdate=labeldate, label=text, y=y, hyperlink=hlink)
