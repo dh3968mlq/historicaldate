@@ -28,7 +28,7 @@ class plTimeLine():
         self.fig_config = {'scrollZoom': True}
         self.figure.update_layout(dragmode="pan", showlegend=False, 
                     hovermode=hovermode, hoverdistance=hoverdistance)
-        self.figure.update_xaxes(range=[self.mindate, self.maxdate])
+        self.figure.update_xaxes(range=[self.mindate, self.maxdate], side="top")
         self.max_y_used = 0.0
         self.earliest_trace_date = None
         self.latest_trace_date = None
@@ -40,7 +40,7 @@ class plTimeLine():
         if fitted := earliest and latest and (latest > earliest):
             self.maxdate = latest + datetime.timedelta(days=int(5*365.25))
             self.mindate = earliest - datetime.timedelta(days=int(5*365.25))
-            self.figure.update_xaxes(range=[self.mindate, self.maxdate])
+            self.figure.update_xaxes(range=[self.mindate, self.maxdate], side="top")
         return fitted 
 # -------------
     def add_event_set(self, df, 
