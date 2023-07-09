@@ -45,7 +45,8 @@ class plTimeLine():
 # -------------
     def add_event_set(self, df, 
                     title="", showbirthanddeath=True, showlabel=True,
-                    lives_first=True,  rowspacing=0.3, hover_datetype='day'):
+                    lives_first=True,  rowspacing=0.3, hover_datetype='day',
+                    study_range_start=None, study_range_end=None):
         """
         dates are in df columns: hdate, hdate_end, hdate_birth, hdate_death
         df must include either hdate or both of hdate_birth, hdate_death
@@ -73,30 +74,38 @@ class plTimeLine():
                                          daysminspacing=0.5 * self.initial_range_years)
 
         def disp_set(dfset):
+            some_traces_added = False
             for _, row in dfset.iterrows():  
                 color = row[colorcol] if colorcol and row[colorcol] else colorgen.get()
-                self.add_timeline_trace(row, 
+                some_traces_added = self.add_timeline_trace(row, 
                                 showbirthanddeath=showbirthanddeath, showlabel=showlabel,
-                                color=color, lo=lo, hover_datetype=hover_datetype)
+                                color=color, lo=lo, hover_datetype=hover_datetype,
+                                study_range_start=study_range_start, 
+                                study_range_end=study_range_end) or \
+                            some_traces_added
+            return some_traces_added
 
         # -- split lives and display them first if required
+        some_events_added = False
         if "hdate_birth" in dfs.columns and lives_first:
             dfs["_hdplbirth"] = dfs["hdate_birth"].apply(hdate.calc_mid_date)
             df_lives = dfs[dfs["_hdplbirth"].notna()].sort_values(["_hdplbirth"])
-            disp_set(df_lives)
+            some_events_added = disp_set(df_lives) or some_events_added
             dfs = dfs[dfs["_hdplbirth"].isna()]   # -- not lives
             lo.reset_startline()
 
-        disp_set(dfs)
+        some_events_added = disp_set(dfs) or some_events_added 
         self.max_y_used += (len(lo.linerecord) + 2) * rowspacing
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
                                  visible=False)
+        return some_events_added
  
 # -------------
     def add_timeline_trace(self, row, showbirthanddeath=False, 
-                                    showlegend=True, showlabel=True,
-                                    color=None, lo=None, rowspacing=0.3,
-                                    hover_datetype='day'):
+                        showlegend=True, showlabel=True,
+                        color=None, lo=None, rowspacing=0.3,
+                        hover_datetype='day',
+                        study_range_start=None, study_range_end=None):
         '''
         Add a timeline trace for a given row
         '''        
@@ -125,6 +134,11 @@ class plTimeLine():
             pdates_birth, earliest, latest = get_pdates("hdate_birth", earliest, latest)
             pdates_death, earliest, latest = get_pdates("hdate_death", earliest, latest, 
                         missingasongoing=pdates_birth and pdates_birth['mid'])
+        
+        if study_range_start and study_range_end:
+            if latest < study_range_start or earliest > study_range_end:
+                # Trace is outside study range, ignore it
+                return False
 
         ongoing = pdates_end['slmid'] == 'o' if pdates_end else False
         alive = pdates_death['slmid'] == 'o' if pdates_death else False
