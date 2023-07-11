@@ -46,7 +46,8 @@ class plTimeLine():
     def add_event_set(self, df, 
                     title="", showbirthanddeath=True, showlabel=True,
                     lives_first=True,  rowspacing=0.3, hover_datetype='day',
-                    study_range_start=None, study_range_end=None):
+                    study_range_start=None, study_range_end=None,
+                    max_rank=1):
         """
         dates are in df columns: hdate, hdate_end, hdate_birth, hdate_death
         df must include either hdate or both of hdate_birth, hdate_death
@@ -67,8 +68,14 @@ class plTimeLine():
         if "hdate" in df.columns:
             df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_mid_date)
             dfs = df.sort_values("_hdplsortorder")
+        elif "hdate_birth" in df.columns:
+            df["_hdplsortorder"] = df["hdate_birth"].apply(hdate.calc_mid_date)
+            dfs = df.sort_values("_hdplsortorder") 
         else:
             dfs = df
+
+        if "rank" in dfs.columns:
+            dfs = dfs[dfs["rank"] <= max_rank]
 
         lo = lineorganiser.LineOrganiser(daysperlabelchar=2.5 * self.initial_range_years,
                                          daysminspacing=0.5 * self.initial_range_years)
