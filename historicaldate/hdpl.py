@@ -165,6 +165,7 @@ class plTimeLine():
         else:
             return False # If we cannot calculate a labeldate the trace cannot be shown
 
+        # Decide what line to draw it on
         iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
         y = self.max_y_used + (iline + 1) * rowspacing
 

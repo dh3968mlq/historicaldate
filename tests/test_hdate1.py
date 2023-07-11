@@ -34,6 +34,8 @@ def test1():
     compare("24 Jun 1066",{'midpreday': '24', 'midpremon': 'Jun', 'midyear': '1066'})
     compare("circa 1066-6-24",{'circa': 'circa', 'midyear': '1066', 
                                'midpostmon': '6', 'midpostday': '24'})
+    compare("c. 1066-6-24",{'circa': 'c.', 'midyear': '1066', 
+                               'midpostmon': '6', 'midpostday': '24'})
     compare("1066 bce",{'midyear': '1066', 'midcalendar': 'bce'})
     compare("1483 earliest 1428 latest 1486 ce", 
             {'midyear': '1483', 'earlyyear': '1428', 
@@ -66,6 +68,18 @@ def test2():
             pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'c', 
                      'late': datetime.date(1068, 12, 24), 'sllate': 'c', 
                      'early': datetime.date(1064, 12, 25), 'slearly': 'c'})
+    compare("circa 1066-6-24", 
+            pdcheck={'mid': datetime.date(1066, 6, 24), 'slmid': 'c', 
+                     'late': datetime.date(1071, 6, 24), 'sllate': 'c', 
+                     'early': datetime.date(1061, 6, 24), 'slearly': 'c'})
+    compare("c. 1066-6-24", 
+            pdcheck={'mid': datetime.date(1066, 6, 24), 'slmid': 'c', 
+                     'late': datetime.date(1071, 6, 24), 'sllate': 'c', 
+                     'early': datetime.date(1061, 6, 24), 'slearly': 'c'})
+    compare("c. 1578 ",                          # Also checking trailing space
+            pdcheck={'mid': datetime.date(1578, 6, 15), 'slmid': 'c',
+                     'late': datetime.date(1583, 6, 15), 'sllate': 'c', 
+                     'early': datetime.date(1573, 6, 15), 'slearly': 'c'})
     compare("487 bc", 
             dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
             pdcheck={})
