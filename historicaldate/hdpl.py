@@ -61,10 +61,7 @@ class plTimeLine():
         colorcol = "color" if "color" in df.columns \
                     else "colour" if "colour" in df.columns \
                     else ""
-        if title:
-            self.figure.add_annotation(text=f"<b>{title}</b>", 
-                    x=0.02, xref='paper', y=self.max_y_used, 
-                    showarrow=False, font={'size':14})
+
         if "hdate" in df.columns:
             df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_mid_date)
             dfs = df.sort_values("_hdplsortorder")
@@ -102,9 +99,17 @@ class plTimeLine():
             lo.reset_startline()
 
         some_events_added = disp_set(dfs) or some_events_added 
-        self.max_y_used += (len(lo.linerecord) + 2) * rowspacing
-        self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
-                                 visible=False)
+
+        # The event set is ignored if it lies entirely outside the study range
+        if some_events_added:
+            if title:
+                self.figure.add_annotation(text=f"<b>{title}</b>", 
+                        x=0.02, xref='paper', y=self.max_y_used, 
+                        showarrow=False, font={'size':14})
+
+            self.max_y_used += (len(lo.linerecord) + 2) * rowspacing
+            self.figure.update_yaxes(range=[max(self.max_y_used+0.25,6.0),-0.25], 
+                                    visible=False)
         return some_events_added
  
 # -------------
