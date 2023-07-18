@@ -35,11 +35,11 @@ class plTimeLine():
 # -------------
     def fit_xaxis(self, mindate=None, maxdate=None):
         "Fit x axis to specified dates, or to data range"
-        earliest = mindate if mindate else self.earliest_trace_date
-        latest = maxdate if maxdate else self.latest_trace_date
+        earliest = mindate if mindate else self.earliest_trace_date - datetime.timedelta(days=int(5*365.25))
+        latest = maxdate if maxdate else self.latest_trace_date + datetime.timedelta(days=int(5*365.25))
         if fitted := earliest and latest and (latest > earliest):
-            self.maxdate = latest + datetime.timedelta(days=int(5*365.25))
-            self.mindate = earliest - datetime.timedelta(days=int(5*365.25))
+            self.maxdate = latest 
+            self.mindate = earliest 
             self.figure.update_xaxes(range=[self.mindate, self.maxdate], side="top")
         return fitted 
 # -------------
