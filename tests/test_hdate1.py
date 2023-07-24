@@ -1,8 +1,8 @@
 import sys
 import os
 import datetime
-sys.path.append(os.getcwd())
 
+sys.path.append("historicaldate")
 from historicaldate import hdate
 
 def compare(s,re_check=None, dcheck=None, pdcheck=None):
