@@ -2,16 +2,22 @@
 Plotly timelines for historicaldate package
 """
 import sys
-sys.path.append("..")
-
 import datetime
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plotly import colors as pc
-from historicaldate import hdate
-from historicaldate import lineorganiser
 from dateutil.relativedelta import relativedelta
 from math import ceil
+
+try:
+    from historicaldate import hdate
+except:
+    from historicaldate.historicaldate import hdate
+
+try:
+    from historicaldate import lineorganiser
+except:
+    from historicaldate.historicaldate import lineorganiser
 
 class plTimeLine():
     def __init__(self, title=None, mindate=None, maxdate=None, 
