@@ -9,15 +9,17 @@ from plotly import colors as pc
 from dateutil.relativedelta import relativedelta
 from math import ceil
 
-try:
-    from historicaldate import hdate
-except:
-    from historicaldate.historicaldate import hdate
+from historicaldate import hdate
+from historicaldate import lineorganiser
+#try:
+#    from historicaldate import hdate
+#except:
+#    from historicaldate.historicaldate import hdate
 
-try:
-    from historicaldate import lineorganiser
-except:
-    from historicaldate.historicaldate import lineorganiser
+#try:
+#    from historicaldate import lineorganiser
+#except:
+#    from historicaldate.historicaldate import lineorganiser
 
 class plTimeLine():
     def __init__(self, title=None, mindate=None, maxdate=None, 
