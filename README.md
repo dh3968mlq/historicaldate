@@ -4,7 +4,7 @@ An open source Python package for creating interactive graphical timelines of hi
 
 ![Example timeline image](https://historicaldate.com/wp-content/uploads/2023/05/basic_timeline_example.png)
 
-To create a timeline:
+### To create a timeline:
    * Download this package from 
 https://github.com/dh3968mlq/historicaldate
    * Download sample data from https://github.com/dh3968mlq/historicaldate-data, and/or
@@ -13,7 +13,7 @@ https://github.com/dh3968mlq/historicaldate
 
 See https://historicaldate.com/ for example outputs
 
-Sample code:
+### Sample code:
 
 ```python
 # Sample code for a timeline of British monarchs and Prime Ministers
