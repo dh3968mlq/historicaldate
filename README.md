@@ -65,6 +65,7 @@ Dataframes passed to *add_event_set* have one row per event or life, and specifi
 | htext_end | Hover text linked to the marker drawn at *hdate_end* |
 | color (or colour) | Colour to draw the event or life
 | url | hyperlink, active by clicking on the displayed label |
+| rank | An integer, use together with *max_rank* to control which rows are displayed
 
 ## Date formats
 
@@ -160,7 +161,11 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 
 ### Methods
 
-### *pltl.add_event_set(df, title="", showbirthanddeath=True, showlabel=True, lives_first=True,  rowspacing=0.3)*
+### *pltl.fit_xaxis(self, mindate=None, maxdate=None)*
+
+Fit x axis to specified dates, or to the date range of the data currently displayed
+
+### *pltl.add_event_set(df, title="", showbirthanddeath=True, showlabel=True, lives_first=True,  rowspacing=0.3, hover_datetype='day', study_range_start=None, study_range_end=None, max_rank=1)*
 
 Add a set of events/lives held in a Pandas dataframe to a timeline display
 
@@ -173,6 +178,9 @@ Add a set of events/lives held in a Pandas dataframe to a timeline display
 | lives_first: bool | Whether lives (rows with *hdate_birth* specified) are displayed above, and on separate lines from, oher events | True |
 | rowspacing: float | Space between rows | 0.3 |
 | hover_datetype: str | Specifies the precision to which dates in hover text are displayed. Must be one of 'day' (default), 'month' or 'year' |
+| study_range_start: datetime.date | Start of study range. Events lying entirely before this date will be ignored |
+| study_range_end: datetime.date | End of study range. Events lying entirely after this date will be ignored |
+| max_rank: int | Indicates the maximum value of the *rank* column in input data that will be displayed |
 
 ### *pltl.show(fix_y_range=False)*
 
@@ -193,13 +201,25 @@ Writes HTML file of the timeline
 
 ## Limitations
 
-This is an early (0.0.2) release, and much remains to be done.
+This is an early (0.0.4) release, and much remains to be done.
 
 At present dates BC (BCE) are not supported, since date representation depends on Python *datetime.date* dates, which have this same limitation.
 
 Support for date formats DD/MM/YYYY or MM/DD/YYYY is also as yet not supported. If implemented they are expected to be non-default formats, because of the risk of confusion between them.
 
 ## Changes
+
+### New in 0.0.4
+
+*add_event_set()* now updates yaxes to fit the displayed data
+
+New method *plTimeLine().fit_xaxis(self, mindate=None, maxdate=None)* that fits the X axis either to the data or to a specified range of dates
+
+X axis date labels moved to top of display
+
+Study range filtering added, parameters *study_range_start* and *study_range_end* of the *add_event_set* method. Event sets lying entirely outside the study range are not displayed.
+
+Filtering on the value of a *rank* column in input data, parameter *max_rank* of the *add_event_set* method. 
 
 ### New in 0.0.3
 
