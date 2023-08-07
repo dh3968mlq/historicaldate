@@ -3,7 +3,11 @@ import os
 import datetime
 
 sys.path.append("historicaldate")
-from historicaldate import hdate
+
+try:
+    import historicaldate.hdate as hdate
+except:
+    import historicaldate.historicaldate.hdate as hdate
 
 def compare(s,re_check=None, dcheck=None, pdcheck=None):
     hd = hdate.HDate(s)
