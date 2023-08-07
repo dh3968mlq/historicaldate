@@ -1,8 +1,8 @@
 
 # The path this repo (https://github.com/dh3968mlq/historicaldate) has been downloaded to
-hdroot = "/svol1/pishare/users/pi/repos/historicaldate"
+hdroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate"
 # The path the data repo (https://github.com/dh3968mlq/historicaldate-data) has been downloaded to
-dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data"
+dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data"
 
 import sys
 sys.path.append(hdroot)
@@ -10,15 +10,15 @@ from historicaldate import hdpl
 import pandas as pd
 import datetime
 
-df_charlotte = pd.read_csv(f"{dataroot}/data/culture/brontes/charlotte_bronte.csv",
+df_charlotte = pd.read_csv(f"{dataroot}/data/culture/brontes/Charlotte Bronte.csv",
                  na_filter=False)
-df_emily = pd.read_csv(f"{dataroot}/data/culture/brontes/emily_bronte.csv",
+df_emily = pd.read_csv(f"{dataroot}/data/culture/brontes/Emily Bronte.csv",
                  na_filter=False)
-df_anne = pd.read_csv(f"{dataroot}/data/culture/brontes/anne_bronte.csv",
+df_anne = pd.read_csv(f"{dataroot}/data/culture/brontes/Anne Bronte.csv",
                  na_filter=False)
-df_other = pd.read_csv(f"{dataroot}/data/culture/brontes/other_brontes.csv",
+df_other = pd.read_csv(f"{dataroot}/data/culture/brontes/Other Brontes.csv",
                  na_filter=False)
-df_history = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/Major events in British History.csv",
+df_history = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/Events in British History.csv",
                  na_filter=False)
 
 
@@ -31,4 +31,4 @@ pltl.add_event_set(df_other, title="Brontë Family")
 pltl.add_event_set(df_history,title="Events in British History")
 pltl.show() 
 
-pltl.write_html("html/tl_brontes.html")
+pltl.write_html("historicaldate/html/tl_brontes.html")

@@ -18,8 +18,8 @@ See https://historicaldate.com/ for example outputs
 ```python
 # Sample code for a timeline of British monarchs and Prime Ministers
 # The folders that historicaldate and historicaldate-data have been downloaded to...
-hdroot = "/svol1/pishare/users/pi/repos/historicaldate" 
-dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data" 
+hdroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate" 
+dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data" 
 import sys
 sys.path.append(hdroot)
 from historicaldate import hdpl  # Timelines using Plotly

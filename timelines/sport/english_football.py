@@ -1,8 +1,8 @@
 
 # The path this repo (https://github.com/dh3968mlq/historicaldate) has been downloaded to
-hdroot = "/svol1/pishare/users/pi/repos/historicaldate"
+hdroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate"
 # The path the data repo (https://github.com/dh3968mlq/historicaldate-data) has been downloaded to
-dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data"
+dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data"
 
 import sys
 sys.path.append(hdroot)
@@ -12,7 +12,7 @@ import datetime
 
 # Abbreviations and colours
 def get_colxref(filename):
-    df = pd.read_csv(f"{dataroot}/data/sport/football/{filename}")[["abbreviation","colour"]]
+    df = pd.read_csv(f"{dataroot}/data/sport/football/reference_tables/{filename}")[["abbreviation","colour"]]
     df = df[df["colour"].notna()]
     df["abbreviation"] = df["abbreviation"].str.strip()
     return df
@@ -30,15 +30,15 @@ def read_file(filename, df_xref=None):
         df["colour"] = df["colour"].fillna("black")
     return df
 
-df_epl = read_file(f"{dataroot}/data/sport/football/english_premier_league.csv",
+df_epl = read_file(f"{dataroot}/data/sport/football/English Premier League and First Division.csv",
                    df_xref=df_colxref)
-df_facup = read_file(f"{dataroot}/data/sport/football/fa_cup.csv",
+df_facup = read_file(f"{dataroot}/data/sport/football/FA Cup.csv",
                    df_xref=df_colxref)
-df_ucl = read_file(f"{dataroot}/data/sport/football/uefa_champions_league.csv",
+df_ucl = read_file(f"{dataroot}/data/sport/football/UEFA Champions League.csv",
                    df_xref=df_colxref)
-df_world = read_file(f"{dataroot}/data/sport/football/world_cup.csv",
+df_world = read_file(f"{dataroot}/data/sport/football/FIFA World Cup.csv",
                    df_xref=df_colxref_national)
-df_euros = read_file(f"{dataroot}/data/sport/football/european_championship.csv",
+df_euros = read_file(f"{dataroot}/data/sport/football/European Championship.csv",
                    df_xref=df_colxref_national)
 
 pltl = hdpl.plTimeLine(mindate=datetime.date(1990,7,1), 
@@ -51,4 +51,4 @@ pltl.add_event_set(df_world, title="FIFA World Cup")
 pltl.add_event_set(df_euros, title="UEFA European Championships")
 pltl.show() 
 
-pltl.write_html("html/english_club_football.html")
+pltl.write_html("historicaldate/html/english_club_football.html")
