@@ -2,7 +2,7 @@ import sys
 import os
 import datetime
 
-sys.path.append("historicaldate")
+sys.path.append(".")
 
 try:
     import historicaldate.hdate as hdate
