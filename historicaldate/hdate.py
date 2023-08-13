@@ -74,11 +74,12 @@ class HDate():
                     f"(\\s+(?P<{prefix}calendar>{calendar_pattern}))?"
             return datepattern
 
-        pattern = f"^(?P<ongoing>ongoing)|((?P<circa>{circa_pattern})((?P<clen>{year_pattern})(?P<clentype>y|m|d))?)?" + \
+        pattern = f"^(" + \
+                f"(?P<ongoing>ongoing)|((?P<circa>{circa_pattern})((?P<clen>{year_pattern})(?P<clentype>y|m|d))?)?" + \
                 f"(\\s*" + makedatepattern(prefix="mid") + ")?" + \
                 f"(\\s*(earliest|after|between)\\s+" + makedatepattern(prefix="early") + ")?" + \
                 f"(\\s*(latest|before|and)\\s+" + makedatepattern(prefix="late") + ")?" + \
-                "$"  
+                ")$"  
 
         return pattern
     # ------------------------------------------------------------------------------------------------------

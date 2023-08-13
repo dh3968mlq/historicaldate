@@ -26,6 +26,13 @@ def compare(s,re_check=None, dcheck=None, pdcheck=None):
         expected = {k:pdcheck.get(k,None) for k in found}
         assert found == {}, f"pdate mismatches for '{s}': Found {found} Expected {expected}"
 
+def expect_valueerror(s):
+    try:
+        hd = hdate.HDate(s)
+        assert False, f"Illegal date '{s}' has not raised a ValueError"
+    except ValueError:
+        return True
+
 def test1():
     compare("25 Dec 1066", {'midpreday':'25','midpremon':'Dec','midyear':'1066'}, 
                         {'circa':False,'ongoing':False,'midday':25,'midmon':12,'midyear':1066})
@@ -91,3 +98,7 @@ def test2():
             pdcheck={'mid':datetime.date.today(), 'slmid': 'o', 'slearly': 'o', 'sllate': 'o', 
                      'late': datetime.date.today() + datetime.timedelta(days=int(5 * 365.25)), 
                      'early': datetime.date.today()})
+    
+# -- Some pdate checks
+def test3():
+    expect_valueerror("25/12/1066")
