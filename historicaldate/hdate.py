@@ -31,10 +31,10 @@ class HDate():
     Object class to deal with historical dates, stored as strings
     See README.md at https://github.com/dh3968mlq/historicaldate
     """
-    def __init__(self, hdstr="", missingasongoing=False):
+    def __init__(self, hdstr="", missingasongoing=False, prefixdateorder=None):
         self.circa_interval_days = int(5 * 365.25)
-        self.match_pattern = self._create_match_pattern()
-        self.compiled_pattern = re.compile(self.match_pattern, re.IGNORECASE)
+        self.match_pattern = self._create_match_pattern(prefixdateorder)
+        self.compiled_pattern = re.compile(self.match_pattern, re.VERBOSE | re.IGNORECASE)
 
         if s := hdstr.strip() if (hdstr.strip() or not missingasongoing) else "ongoing":
             srch = self.compiled_pattern.search(s)
@@ -53,33 +53,70 @@ class HDate():
             self.pdates = None
             
     # ------------------------------------------------------------------------------------------------------
-    def _create_match_pattern(self):
+    def _create_match_pattern(self, prefixdateorder):
         circa_pattern = "circa|c|c.|about|estimated"
         day_pattern = "[0-9]{1,2}"
 
         months = ["january", "february","march","april","may","june",
                 "july","august","september","october","november","december"]
         self.months = [month[0:3] for month in months]   # three-letter abbreviations 
+        self.monthnumberpattern = '[1-9]|0[1-9]|1[0-2]'
         month_pattern = "|".join(months + self.months)   # allow either full month names or 3-letter abbrevations
+
+        if prefixdateorder:   # if not None then numerical months are also allowed
+            month_pattern += "|" + self.monthnumberpattern
+
         year_pattern = "[0-9]{1,8}"    # should we require at least three year digits to avoid confusion with month and day?
         nmonth_pattern = "[0-9]{1,2}"
         calendar_pattern = "ce|ad|bc|bce"
 
         def makedatepattern(prefix=""):
-            datepattern = f"(((?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?)?" \
-                    f"\\s*(?P<{prefix}premon>{month_pattern}))?" \
-                    f"\\s*(?P<{prefix}year>{year_pattern})" +  \
-                    f"(-(?P<{prefix}postmon>{nmonth_pattern})" + \
-                    f"(-(?P<{prefix}postday>{day_pattern}))?)?" + \
-                    f"(\\s+(?P<{prefix}calendar>{calendar_pattern}))?"
+            if prefixdateorder is None or prefixdateorder.lower() == "dmy":
+                datepattern = f"""
+                    (
+                        (
+                            (?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?)?
+                            \\s*/?\\s*(?P<{prefix}premon>{month_pattern})(,)?
+                        )?
+                        \\s*/?\\s*(?P<{prefix}year>{year_pattern})
+                        (-(?P<{prefix}postmon>{nmonth_pattern})
+                            (-(?P<{prefix}postday>{day_pattern})
+                            )?
+                        )?
+                        (\\s+(?P<{prefix}calendar>{calendar_pattern}))?
+                """
+            elif prefixdateorder.lower() == "mdy":
+                datepattern = f"""
+                    (
+                        (
+                            (?P<{prefix}premon>{month_pattern})
+                            \\s*/?\\s*(?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?)?
+                            (,)?
+                        )?
+                        \\s*/?\\s*(?P<{prefix}year>{year_pattern})
+                        (-(?P<{prefix}postmon>{nmonth_pattern})
+                            (-(?P<{prefix}postday>{day_pattern})
+                            )?
+                        )?
+                        (\\s+(?P<{prefix}calendar>{calendar_pattern}))?
+                """
+            else:
+                raise NotImplementedError(f"prefixdateorder must be None, dmy or mdy: found '{prefixdateorder}'")
             return datepattern
 
-        pattern = f"^(" + \
-                f"(?P<ongoing>ongoing)|((?P<circa>{circa_pattern})((?P<clen>{year_pattern})(?P<clentype>y|m|d))?)?" + \
-                f"(\\s*" + makedatepattern(prefix="mid") + ")?" + \
-                f"(\\s*(earliest|after|between)\\s+" + makedatepattern(prefix="early") + ")?" + \
-                f"(\\s*(latest|before|and)\\s+" + makedatepattern(prefix="late") + ")?" + \
-                ")$"  
+        pattern = f"""
+                ^(
+                    (?P<ongoing>ongoing)|
+                    ((?P<circa>{circa_pattern})
+                        ((?P<clen>{year_pattern})
+                            (?P<clentype>y|m|d)
+                        )?
+                    )?
+                    (\\s*{makedatepattern(prefix="mid")})?
+                    (\\s*(earliest|after|between)\\s+{makedatepattern(prefix="early")})?
+                    (\\s*(latest|before|and)\\s+{makedatepattern(prefix="late")})?
+                )$
+        """  
 
         return pattern
     # ------------------------------------------------------------------------------------------------------
@@ -113,7 +150,14 @@ class HDate():
         hd["clentype"] = sp["clentype"]
 
         def getmonthnum(month):
-            return self.months.index(month[0:3].lower()) + 1
+            if len(month) >= 3 and month[0:3].lower() in self.months:
+                monthnum = self.months.index(month[0:3].lower()) + 1
+            elif re.search(self.monthnumberpattern, month):
+                monthnum = int(month)
+            else:
+                assert False, f"Illegal month string {month}"
+            assert monthnum >= 1 and monthnum <= 12
+            return monthnum
                             
         def set_dmy(prefix=""):
             """

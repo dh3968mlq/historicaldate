@@ -9,8 +9,8 @@ try:
 except:
     import historicaldate.historicaldate.hdate as hdate
 
-def compare(s,re_check=None, dcheck=None, pdcheck=None):
-    hd = hdate.HDate(s)
+def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None):
+    hd = hdate.HDate(s, prefixdateorder=prefixdateorder)
     if re_check is not None: # Check output from re
         found = {k:v for k, v in hd.re_parsed.items() if v != re_check.get(k, None)}
         expected = {k:re_check.get(k,None) for k in found}
@@ -102,3 +102,11 @@ def test2():
 # -- Some pdate checks
 def test3():
     expect_valueerror("25/12/1066")
+    compare("25/12/1066", prefixdateorder="dmy",
+            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
+                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
+                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
+    compare("12/25/1066", prefixdateorder="mdy",
+            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
+                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
+                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
