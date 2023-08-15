@@ -243,6 +243,58 @@ class HDate():
             
             return datetime.timedelta(days=days)
     # ------------------------------------------------------------------------------------------------------
+    def _ymd_to_dfragment(self, year, month, day, prefix="mid", speclevel="", isbce=False):
+        if isbce:
+            pythondate = None
+            if year % 4 == 1:  # These are the years treates as BC leap years
+                idays_4ad = (datetime.date(4, month, day) - datetime.date(1, 1, 1)).days
+                nleapdays = (year + 3) // 4 
+                idays = idays_4ad - 365 * (year + 3) - nleapdays
+            else:
+                idays_1ad = (datetime.date(1, month, day) - datetime.date(1, 1, 1)).days
+                nleapdays = (year + 3) // 4 
+                idays = idays_1ad - 365 * year - nleapdays
+        else:
+            pythondate = datetime.date(year, month, day)
+            idays = (pythondate - datetime.date(1, 1, 1)).days
+        return  {prefix:pythondate, 
+                 f"days_{prefix}":idays,
+                 f"sl{prefix}":speclevel}
+    # ------------------------------------------------------------------------------------------------------
+    def _convert_one_date(self, prefix=""):
+        'Convert a date drawing on self.d_parsed. Also returns indicator of y/m/d specification'
+        assert prefix in {"early","mid","late"}
+        default_month = 1 if prefix == "early" else 12 if prefix == "late" else 6
+        def default_day(year, month):
+            return 1 if prefix=="early" \
+                        else self.max_day_in_month(year, month) if prefix=="late" \
+                        else 15
+
+        isbce = self.d_parsed['midcalendar'] == 'bce'
+
+        if self.d_parsed[f'{prefix}year'] is None:
+            if self.d_parsed["circa"] or (prefix == "mid") or \
+                        (self.d_parsed[f'midyear'] is None): # Cannot copy from mid year
+                return {prefix:None, f"sl{prefix}":""} 
+            else:                # Copy from mid year
+                speclevel = self.pdates['slmid']
+                year = self.d_parsed[f'midyear']
+                month = self.d_parsed[f'midmon'] if speclevel in {"m","d"} else default_month
+                day = self.d_parsed[f'midday'] if speclevel == "d" else default_day(year, month)
+                return  self._ymd_to_dfragment(year, month, day, prefix=prefix, speclevel=speclevel, isbce=isbce)
+        else:    # The date has been specified
+            speclevel = "y"
+            year = self.d_parsed[f'{prefix}year']
+
+            if self.d_parsed[f'{prefix}mon']: speclevel = "m"
+            month = self.d_parsed[f'{prefix}mon'] if speclevel == "m" else default_month
+            
+            if self.d_parsed[f'{prefix}day']: speclevel = "d"
+            day = self.d_parsed[f'{prefix}day'] if speclevel == "d" else default_day(year, month)
+
+            if (self.d_parsed['circa']) and (prefix == "mid"): speclevel = 'c'
+            return self._ymd_to_dfragment(year, month, day, prefix=prefix, speclevel=speclevel, isbce=isbce)
+    # ------------------------------------------------------------------------------------------------------
     def convert_to_python_date_naive(self):
         """
         date.MINYEAR == 1, so this can only be used for ce (AD) dates
@@ -261,52 +313,21 @@ class HDate():
         If a date like 29 Feb 300, which existed in Julian calendars but does not
         exist in the proleptic Gregorian calendar, turns up then it is converted to
         28th Feb in the same year
-        """
-        # function to convert a date. Also returns indicator of y/m/d specification
-        def convert_one_date(prefix=""):
-            assert prefix in {"early","mid","late"}
-            default_month = 1 if prefix == "early" else 12 if prefix == "late" else 6
-            def default_day(year, month):
-                return 1 if prefix=="early" \
-                         else self.max_day_in_month(year, month) if prefix=="late" \
-                         else 15
-
-            if self.d_parsed[f'{prefix}year'] is None:
-                if self.d_parsed["circa"] or (prefix == "mid") or \
-                            (self.d_parsed[f'midyear'] is None): # Cannot copy from mid year
-                    return {prefix:None, f"sl{prefix}":""} 
-                else:                # Copy from mid year
-                    speclevel = self.pdates['slmid']
-                    year = self.d_parsed[f'midyear']
-                    month = self.d_parsed[f'midmon'] if speclevel in {"m","d"} else default_month
-                    day = self.d_parsed[f'midday'] if speclevel == "d" else default_day(year, month)
-                    return  {prefix:datetime.date(year, month, day), f"sl{prefix}":speclevel}
-            else:    # The date has been specified
-                speclevel = "y"
-                year = self.d_parsed[f'{prefix}year']
-
-                if self.d_parsed[f'{prefix}mon']: speclevel = "m"
-                month = self.d_parsed[f'{prefix}mon'] if speclevel == "m" else default_month
-                
-                if self.d_parsed[f'{prefix}day']: speclevel = "d"
-                day = self.d_parsed[f'{prefix}day'] if speclevel == "d" else default_day(year, month)
-
-                if (self.d_parsed['circa']) and (prefix == "mid"): speclevel = 'c'
-                return {prefix:datetime.date(year, month, day), f"sl{prefix}":speclevel}
-            
-        if self.d_parsed['midcalendar'] == 'bce':
-            self.pdates = {'mid': None, 'slmid': None, 
-                     'late': None, 'sllate': None, 'early': None, 'slearly': None}
-        elif self.d_parsed['ongoing']:
+        """            
+        #if self.d_parsed['midcalendar'] == 'bce':
+        #    self.pdates = {'mid': None, 'slmid': None, 
+        #             'late': None, 'sllate': None, 'early': None, 'slearly': None}
+        #elif self.d_parsed['ongoing']:
+        if self.d_parsed['ongoing']:
             self.pdates = {'mid': datetime.date.today(), 'slmid': 'o', 'slearly': 'o', 'sllate': 'o'}
             self.pdates.update(
                 {'late': self.pdates['mid'] + datetime.timedelta(days=self.circa_interval_days),
                  'early': self.pdates['mid']})
         else:     # Normal treatment, not ongoing
             # -- convert the three dates
-            self.pdates = convert_one_date("mid") 
-            self.pdates.update(convert_one_date("late"))
-            self.pdates.update(convert_one_date("early"))
+            self.pdates = self._convert_one_date("mid") 
+            self.pdates.update(self._convert_one_date("late"))
+            self.pdates.update(self._convert_one_date("early"))
 
             # -- Fill early and late dates if missing from (a) circa (b) main date
             circa_interval = self.calc_clen_interval()

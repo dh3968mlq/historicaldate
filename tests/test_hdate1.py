@@ -9,7 +9,7 @@ try:
 except:
     import historicaldate.historicaldate.hdate as hdate
 
-def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None):
+def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None, check_days=False):
     hd = hdate.HDate(s, prefixdateorder=prefixdateorder)
     if re_check is not None: # Check output from re
         found = {k:v for k, v in hd.re_parsed.items() if v != re_check.get(k, None)}
@@ -22,7 +22,8 @@ def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None):
         assert found == {}, f"d_parsed mismatches for '{s}': Found {found} Expected {expected}"
 
     if pdcheck is not None: # Check canonical dictionary
-        found = {k:v for k, v in hd.pdates.items() if v != pdcheck.get(k, None)}
+        found = {k:v for k, v in hd.pdates.items() 
+                    if ((v != pdcheck.get(k, None)) and (check_days or (k[0:5] != "days_")))}
         expected = {k:pdcheck.get(k,None) for k in found}
         assert found == {}, f"pdate mismatches for '{s}': Found {found} Expected {expected}"
 
@@ -91,15 +92,12 @@ def test2():
             pdcheck={'mid': datetime.date(1578, 6, 15), 'slmid': 'c',
                      'late': datetime.date(1583, 6, 15), 'sllate': 'c', 
                      'early': datetime.date(1573, 6, 15), 'slearly': 'c'})
-    compare("487 bc", 
-            dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={})
     compare("ongoing",
             pdcheck={'mid':datetime.date.today(), 'slmid': 'o', 'slearly': 'o', 'sllate': 'o', 
                      'late': datetime.date.today() + datetime.timedelta(days=int(5 * 365.25)), 
                      'early': datetime.date.today()})
     
-# -- Some pdate checks
+# -- Some prefixdateorder checks
 def test3():
     expect_valueerror("25/12/1066")
     compare("25/12/1066", prefixdateorder="dmy",
@@ -110,3 +108,23 @@ def test3():
             pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
                      'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
                      'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
+
+# -- Some BC date checks
+def test4():
+    compare("487 bc", 
+            dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
+            pdcheck={'days_early': -177877, 'days_late': -177513, 'days_mid': -177712,
+                    'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
+            check_days=True)
+    compare("12 July 100 BC",
+            pdcheck={'days_early': -36333, 'days_late': -36333, 'days_mid': -36333,
+                    'slearly': 'd', 'sllate': 'd', 'slmid': 'd'},
+            check_days=True)
+
+def test_sandbox():
+    'Put a test here if we want to run it as a one-off'
+    compare("487 bc", 
+            dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
+            pdcheck={'days_early': -177877, 'days_late': -177513, 'days_mid': -177712,
+                    'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
+            check_days=True)
