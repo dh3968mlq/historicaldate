@@ -9,13 +9,10 @@ from plotly import colors as pc
 from dateutil.relativedelta import relativedelta
 from math import ceil
 
-#from historicaldate import hdate
 try:
     import historicaldate.hdate as hdate
 except:
     import historicaldate.historicaldate.hdate as hdate
-
-#from historicaldate import lineorganiser
 
 try:
     import historicaldate.lineorganiser as lineorganiser
@@ -43,9 +40,14 @@ class plTimeLine():
         self.latest_trace_date = None
 # -------------
     def fit_xaxis(self, mindate=None, maxdate=None):
-        "Fit x axis to specified dates, or to data range"
-        earliest = mindate if mindate else self.earliest_trace_date - datetime.timedelta(days=int(5*365.25))
-        latest = maxdate if maxdate else self.latest_trace_date + datetime.timedelta(days=int(5*365.25))
+        """
+        Fit x axis to specified dates, or to data range
+        At present mindate and maxdate are Python dates, will need to be changed
+        """
+        earliest = mindate if mindate else \
+                    datetime.date(year=1, month=1, day=1) + datetime.timedelta(days=self.earliest_trace_date - int(5*365.25))
+        latest = maxdate if maxdate else \
+                    datetime.date(year=1, month=1, day=1) + datetime.timedelta(days=self.latest_trace_date + int(5*365.25))
         if fitted := earliest and latest and (latest > earliest):
             self.maxdate = latest 
             self.mindate = earliest 
@@ -65,6 +67,8 @@ class plTimeLine():
             label: String label or identifier (required)
             text: Hovertext (optional, defaults to label)
             url: hyperlink (optional)
+
+        At present study_range_start and study_range_end are Python dates, this will need changing
         """
         colorgen = ColorGen()
         colorcol = "color" if "color" in df.columns \
@@ -129,6 +133,8 @@ class plTimeLine():
                         study_range_start=None, study_range_end=None):
         '''
         Add a timeline trace for a given row
+
+        At present study_range_start and study_range_end are Python dates, this will need changing
         '''        
         fig = self.figure
         cols = list(row.index)
@@ -145,8 +151,8 @@ class plTimeLine():
                 return None, earliest, latest
             else:
                 if pd := hdate.HDate(row[col], missingasongoing=missingasongoing).pdates:
-                    earliest = min(pd['early'], earliest) if earliest else pd['early']
-                    latest = max(pd['late'], latest) if latest else pd['late']
+                    earliest = min(pd['days_early'], earliest) if earliest is not None else pd['days_early']
+                    latest = max(pd['days_late'], latest) if latest is not None else pd['days_late']
                 return pd, earliest, latest
 
         pdates_start, earliest, latest = get_pdates("hdate", earliest, latest)
@@ -157,7 +163,8 @@ class plTimeLine():
                         missingasongoing=pdates_birth and pdates_birth['mid'])
         
         if study_range_start and study_range_end:
-            if latest < study_range_start or earliest > study_range_end:
+            if latest < (study_range_start - datetime.date(1, 1, 1)).days or \
+                earliest > (study_range_end - datetime.date(1, 1, 1)).days:
                 # Trace is outside study range, ignore it
                 return False
 
@@ -187,12 +194,12 @@ class plTimeLine():
             return False # If we cannot calculate a labeldate the trace cannot be shown
 
         # Decide what line to draw it on
-        iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
+        iline = lo.add_trace(earliest, latest, (labeldate - datetime.date(1, 1, 1)).days, text if showlabel else "")
         y = self.max_y_used + (iline + 1) * rowspacing
 
         # -- Update timeline object earliest / latest trace dates
-        self.earliest_trace_date = min(self.earliest_trace_date, earliest) if self.earliest_trace_date else earliest
-        self.latest_trace_date = max(self.latest_trace_date, latest) if self.latest_trace_date else latest
+        self.earliest_trace_date = min(self.earliest_trace_date, earliest) if self.earliest_trace_date is not None else earliest
+        self.latest_trace_date = max(self.latest_trace_date, latest) if self.latest_trace_date is not None else latest
 
         if showlabel:
             add_trace_label(fig, pdate=labeldate, label=text, y=y, hyperlink=hlink)
