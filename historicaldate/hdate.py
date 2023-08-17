@@ -19,26 +19,46 @@ import re
 import datetime
 
 # -- Some utilities
-def python_date_to_ordinal(date, delta=0):
-    "Takes either a python date or an (int) ordinal, returns an ordinal. Optionally apply a delta"
-    if type(date) == datetime.date:
+def to_ordinal(date, delta=0):
+    "Takes either a python date or an (int) ordinal, returns an ordinal. Optionally apply a delta (days)"
+    if date is None:
+        return None
+    elif type(date) == datetime.date:
         return date.toordinal() + delta
     elif type(date) == int:
         return date + delta
     else:
         raise TypeError(f"date must be int or datetime.date, not {type(date)}")
 # ----
-def ordinal_to_python_date(ordinal):
+def to_python_date(ordinal):
     """
     Takes either a python date or an (int) ordinal.
     Returns a Python date if ordinal >= 1, None otherwise.
     """
-    if type(ordinal) == datetime.date:
+    if ordinal is None:
+        return None
+    elif type(ordinal) == datetime.date:
         return ordinal
     elif type(ordinal) == int:
         return datetime.date.fromordinal(ordinal) if ordinal >= 1 else None
     else:
-        raise TypeError(f"ordinal must be int or datetime.date, not {type(date)}")
+        raise TypeError(f"ordinal must be int or datetime.date, not {type(ordinal)}")
+
+def to_years(date_or_ordinal):
+    """
+    Takes either a python date or an (int) ordinal, returns an number of years (float).
+    Years is continuous, with 0.0 corresponding to ordinal day 0, i.e. 31st December 1BC
+    """
+    if pdate := to_python_date(date_or_ordinal):
+        daynum = pdate.toordinal() - datetime.date(pdate.year,1,1).toordinal() + 1
+        daysinyear = datetime.date(pdate.year,12,31).toordinal() - datetime.date(pdate.year,1,1).toordinal() + 1
+        years = float(pdate.year) - 1 + daynum / daysinyear
+        return years
+    elif odate := to_ordinal(date_or_ordinal) is not None:   # BC
+        years = odate / 365.25                    # Sloppy, but good enough for most applications
+    else:
+        years = None
+    return years
 
 # ----
 def calc_mid_date(hdstring):
@@ -270,16 +290,16 @@ class HDate():
         if isbce: # BC (BCE)
             pythondate = None
             if year % 4 == 1:  # These are the years treated as BC leap years 1, 5, etc.
-                idays_4ad = python_date_to_ordinal(datetime.date(4, month, day))
+                idays_4ad = to_ordinal(datetime.date(4, month, day))
                 nleapdays = (year + 3) // 4 
                 idays = idays_4ad - 365 * (year + 3) - nleapdays
             else:
-                idays_1ad = python_date_to_ordinal(datetime.date(1, month, day))
+                idays_1ad = to_ordinal(datetime.date(1, month, day))
                 nleapdays = (year + 3) // 4 
                 idays = idays_1ad - 365 * year - nleapdays
         else: # AD (CE)
             pythondate = datetime.date(year, month, day)
-            idays = python_date_to_ordinal(pythondate)
+            idays = to_ordinal(pythondate)
         return  {prefix:pythondate, 
                  f"days_{prefix}":idays,
                  f"sl{prefix}":speclevel}
@@ -340,7 +360,7 @@ class HDate():
 
         if self.d_parsed['ongoing']:
             self.pdates = {'mid': datetime.date.today(), 
-                           'days_mid': python_date_to_ordinal(datetime.date.today()), 
+                           'days_mid': to_ordinal(datetime.date.today()), 
                            'slmid': 'o', 'slearly': 'o', 'sllate': 'o'}
             self.pdates.update(
                 {'late': self.pdates['mid'] + datetime.timedelta(days=self.circa_interval_days),
