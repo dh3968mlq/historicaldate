@@ -113,11 +113,11 @@ def test3():
 def test4():
     compare("487 bc", 
             dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={'days_early': -177877, 'days_late': -177513, 'days_mid': -177712,
+            pdcheck={'days_early': -177876, 'days_late': -177512, 'days_mid': -177711,
                     'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
             check_days=True)
     compare("12 July 100 BC",
-            pdcheck={'days_early': -36333, 'days_late': -36333, 'days_mid': -36333,
+            pdcheck={'days_early': -36332, 'days_late': -36332, 'days_mid': -36332,
                     'slearly': 'd', 'sllate': 'd', 'slmid': 'd'},
             check_days=True)
 
@@ -125,6 +125,6 @@ def test_sandbox():
     'Put a test here if we want to run it as a one-off'
     compare("487 bc", 
             dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={'days_early': -177877, 'days_late': -177513, 'days_mid': -177712,
+            pdcheck={'days_early': -177876, 'days_late': -177512, 'days_mid': -177711,
                     'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
             check_days=True)

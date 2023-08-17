@@ -21,20 +21,28 @@ except:
 
 class plTimeLine():
     def __init__(self, title=None, mindate=None, maxdate=None, 
-                hovermode='closest', hoverdistance=5):
+                hovermode='closest', hoverdistance=5, xmode="date"):
+        """
+        To do... When calling this, mindate and maxdate may be either int (ordinal days) or dates
+        self.mindate, self.maxdate always stored as ordinals
+        """
+        if xmode not in {"date","years"}:
+            raise ValueError(f"xmode must be 'date' or 'years', not '{xmode}'")
+        
         self.figure = make_subplots(rows=1, cols=1, subplot_titles=[title])
         self.figure.update_layout(xaxis_title=None, title=None, margin={'l':0,'r':0,'t':20,'b':0})
-        self.maxdate = datetime.date.today() + datetime.timedelta(days=int(10*365.25)) \
-                            if maxdate is None else maxdate
-        self.mindate = self.maxdate - datetime.timedelta(days=int(200*365.25)) \
-                            if mindate is None else mindate
-        self.pointinterval = (self.maxdate - self.mindate) / 200.0
-        self.initial_range_years = (self.maxdate - self.mindate).days / 365.
+        self.maxdate = hdate.python_date_to_ordinal(datetime.date.today(), delta=int(10*365.25)) \
+                        if maxdate is None else hdate.python_date_to_ordinal(maxdate)
+        self.mindate = hdate.python_date_to_ordinal(self.maxdate, delta= -int(200*365.25)) \
+                            if mindate is None else hdate.python_date_to_ordinal(mindate)
+        self.pointinterval = datetime.timedelta(days=(self.maxdate - self.mindate) / 200.0)
+        self.initial_range_years = (self.maxdate - self.mindate) / 365.
 
         self.fig_config = {'scrollZoom': True}
         self.figure.update_layout(dragmode="pan", showlegend=False, 
                     hovermode=hovermode, hoverdistance=hoverdistance)
-        self.figure.update_xaxes(range=[self.mindate, self.maxdate], side="top")
+        self.figure.update_xaxes(range=[hdate.ordinal_to_python_date(self.mindate), 
+                                        hdate.ordinal_to_python_date(self.maxdate)], side="top")
         self.max_y_used = 0.0
         self.earliest_trace_date = None
         self.latest_trace_date = None
@@ -51,7 +59,8 @@ class plTimeLine():
         if fitted := earliest and latest and (latest > earliest):
             self.maxdate = latest 
             self.mindate = earliest 
-            self.figure.update_xaxes(range=[self.mindate, self.maxdate], side="top")
+            self.figure.update_xaxes(range=[hdate.ordinal_to_python_date(self.mindate), 
+                                        hdate.ordinal_to_python_date(self.maxdate)], side="top")
         return fitted 
 # -------------
     def add_event_set(self, df, 

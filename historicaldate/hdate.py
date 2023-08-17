@@ -18,6 +18,29 @@
 import re
 import datetime
 
+# -- Some utilities
+def python_date_to_ordinal(date, delta=0):
+    "Takes either a python date or an (int) ordinal, returns an ordinal. Optionally apply a delta"
+    if type(date) == datetime.date:
+        return date.toordinal() + delta
+    elif type(date) == int:
+        return date + delta
+    else:
+        raise TypeError(f"date must be int or datetime.date, not {type(date)}")
+# ----
+def ordinal_to_python_date(ordinal):
+    """
+    Takes either a python date or an (int) ordinal.
+    Returns a Python date if ordinal >= 1, None otherwise.
+    """
+    if type(ordinal) == datetime.date:
+        return ordinal
+    elif type(ordinal) == int:
+        return datetime.date.fromordinal(ordinal) if ordinal >= 1 else None
+    else:
+        raise TypeError(f"ordinal must be int or datetime.date, not {type(date)}")
+
+# ----
 def calc_mid_date(hdstring):
     "Return the mid date from an hdate string, or None"
     try:
@@ -25,7 +48,7 @@ def calc_mid_date(hdstring):
         return hd.pdates['mid']
     except:
         return None
-
+# ------------------------------------------------------------------------------------------------------
 class HDate():
     """
     Object class to deal with historical dates, stored as strings
@@ -247,16 +270,16 @@ class HDate():
         if isbce: # BC (BCE)
             pythondate = None
             if year % 4 == 1:  # These are the years treated as BC leap years 1, 5, etc.
-                idays_4ad = (datetime.date(4, month, day) - datetime.date(1, 1, 1)).days
+                idays_4ad = python_date_to_ordinal(datetime.date(4, month, day))
                 nleapdays = (year + 3) // 4 
                 idays = idays_4ad - 365 * (year + 3) - nleapdays
             else:
-                idays_1ad = (datetime.date(1, month, day) - datetime.date(1, 1, 1)).days
+                idays_1ad = python_date_to_ordinal(datetime.date(1, month, day))
                 nleapdays = (year + 3) // 4 
                 idays = idays_1ad - 365 * year - nleapdays
         else: # AD (CE)
             pythondate = datetime.date(year, month, day)
-            idays = (pythondate - datetime.date(1, 1, 1)).days  # As usual, ignore Julian / Gregorian niceties
+            idays = python_date_to_ordinal(pythondate)
         return  {prefix:pythondate, 
                  f"days_{prefix}":idays,
                  f"sl{prefix}":speclevel}
@@ -275,7 +298,7 @@ class HDate():
         if self.d_parsed[f'{prefix}year'] is None:
             if self.d_parsed["circa"] or (prefix == "mid") or \
                         (self.d_parsed[f'midyear'] is None): # Cannot copy from mid year
-                return {prefix:None, f"sl{prefix}":""} 
+                return {prefix:None, f"days_{prefix}":None ,f"sl{prefix}":""} 
             else:                # Copy from mid year
                 speclevel = self.pdates['slmid']
                 year = self.d_parsed[f'midyear']
@@ -317,7 +340,7 @@ class HDate():
 
         if self.d_parsed['ongoing']:
             self.pdates = {'mid': datetime.date.today(), 
-                           'days_mid': (datetime.date.today() - datetime.date(1,1,1)).days, 
+                           'days_mid': python_date_to_ordinal(datetime.date.today()), 
                            'slmid': 'o', 'slearly': 'o', 'sllate': 'o'}
             self.pdates.update(
                 {'late': self.pdates['mid'] + datetime.timedelta(days=self.circa_interval_days),
