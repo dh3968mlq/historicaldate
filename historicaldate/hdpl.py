@@ -95,10 +95,10 @@ class plTimeLine():
                     else ""
 
         if "hdate" in df.columns:
-            df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_mid_date)
+            df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_mid_ordinal)
             dfs = df.sort_values("_hdplsortorder")
         elif "hdate_birth" in df.columns:
-            df["_hdplsortorder"] = df["hdate_birth"].apply(hdate.calc_mid_date)
+            df["_hdplsortorder"] = df["hdate_birth"].apply(hdate.calc_mid_ordinal)
             dfs = df.sort_values("_hdplsortorder") 
         else:
             dfs = df
@@ -124,7 +124,7 @@ class plTimeLine():
         # -- split lives and display them first if required
         some_events_added = False
         if "hdate_birth" in dfs.columns and lives_first:
-            dfs["_hdplbirth"] = dfs["hdate_birth"].apply(hdate.calc_mid_date)
+            dfs["_hdplbirth"] = dfs["hdate_birth"].apply(hdate.calc_mid_ordinal)
             df_lives = dfs[dfs["_hdplbirth"].notna()].sort_values(["_hdplbirth"])
             some_events_added = disp_set(df_lives) or some_events_added
             dfs = dfs[dfs["_hdplbirth"].isna()]   # -- not lives
@@ -170,8 +170,8 @@ class plTimeLine():
                 return None, earliest, latest
             else:
                 if pd := hdate.HDate(row[col], missingasongoing=missingasongoing).pdates:
-                    earliest = min(pd['days_early'], earliest) if earliest is not None else pd['days_early']
-                    latest = max(pd['days_late'], latest) if latest is not None else pd['days_late']
+                    earliest = min(pd['ordinal_early'], earliest) if earliest is not None else pd['ordinal_early']
+                    latest = max(pd['ordinal_late'], latest) if latest is not None else pd['ordinal_late']
                 return pd, earliest, latest
 
         pdates_start, earliest, latest = get_pdates("hdate", earliest, latest)
@@ -179,7 +179,7 @@ class plTimeLine():
         if showbirthanddeath:
             pdates_birth, earliest, latest = get_pdates("hdate_birth", earliest, latest)
             pdates_death, earliest, latest = get_pdates("hdate_death", earliest, latest, 
-                        missingasongoing=pdates_birth and pdates_birth['mid'])
+                        missingasongoing=pdates_birth and (pdates_birth['ordinal_mid'] is not None))
         
         if study_range_start and study_range_end:
             if latest < (study_range_start - datetime.date(1, 1, 1)).days or \
@@ -191,9 +191,9 @@ class plTimeLine():
         alive = pdates_death['slmid'] == 'o' if pdates_death else False
 
         hovertext_end = None
-        if pdates_start and pdates_start['mid']:
+        if pdates_start and (pdates_start['ordinal_mid'] is not None):
             if pdates_end:
-                labeldate = pdates_start['mid'] + (pdates_end['mid'] - pdates_start['mid'])/2.0
+                labeldate = pdates_start['ordinal_mid'] + int((pdates_end['ordinal_mid'] - pdates_start['ordinal_mid'])/2.0)
                 if ongoing:
                     hovertext = f"{htext} ({calc_yeartext(pdates_start, hover_datetype=hover_datetype)}...)"
                 else:
@@ -202,18 +202,18 @@ class plTimeLine():
                     if htext_end != htext:
                         hovertext_end = f"{htext_end} ({calc_yeartext(pdates_end, hover_datetype='day')})"
             else:
-                labeldate = pdates_start['mid']
+                labeldate = pdates_start['ordinal_mid']
                 hovertext = f"{htext} ({calc_yeartext(pdates_start, hover_datetype=hover_datetype)})"
-        elif pdates_birth and pdates_birth['mid']:
+        elif pdates_birth and (pdates_birth['ordinal_mid'] is not None):
             if pdates_death:
-                labeldate = pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid'])/2.0
+                labeldate = pdates_birth['ordinal_mid'] + int((pdates_death['ordinal_mid'] - pdates_birth['ordinal_mid'])/2.0)
             else:
-                labeldate = pdates_birth['mid']
+                labeldate = pdates_birth['ordinal_mid']
         else:
             return False # If we cannot calculate a labeldate the trace cannot be shown
 
         # Decide what line to draw it on
-        iline = lo.add_trace(earliest, latest, (labeldate - datetime.date(1, 1, 1)).days, text if showlabel else "")
+        iline = lo.add_trace(earliest, latest, labeldate, text if showlabel else "")
         y = self.max_y_used + (iline + 1) * rowspacing
 
         # -- Update timeline object earliest / latest trace dates
@@ -225,56 +225,56 @@ class plTimeLine():
 
         # Main part, from hdate to hdate_end
         if pdates_start:
-            self.add_trace_part(pdate_start=pdates_start['early'], pdate_end=pdates_start['late'], 
+            self.add_trace_part(pdate_start=pdates_start['ordinal_early'], pdate_end=pdates_start['ordinal_late'], 
                         label=text, y=y, color=color, width=1, hovertext=hovertext)
-            add_trace_marker(fig, pdate=pdates_start['mid'], y=y, color=color,
+            add_trace_marker(fig, pdate=pdates_start['ordinal_mid'], y=y, color=color,
                             showlegend=showlegend, label=text, 
                             hovertext=hovertext, hyperlink=hlink, xmode=self._xmode)
             if pdates_end:
-                self.add_trace_part(pdate_start=pdates_start['late'], 
-                            pdate_end=pdates_end['early'], 
+                self.add_trace_part(pdate_start=pdates_start['ordinal_late'], 
+                            pdate_end=pdates_end['ordinal_early'], 
                             label=text, y=y, color=color, 
                             hovertext=hovertext, hovertext_end=hovertext_end)
-                self.add_trace_part(pdate_start=pdates_end['early'], pdate_end=pdates_end['late'], 
+                self.add_trace_part(pdate_start=pdates_end['ordinal_early'], pdate_end=pdates_end['ordinal_late'], 
                                 label=text, y=y, color=color, width=1, 
                                 hovertext=hovertext, hovertext_end=hovertext_end)
 
                 if ongoing:   # Right arrow at end of 'ongoing' period
-                    add_trace_marker(fig, pdate=pdates_end['late'], y=y, color=color,
+                    add_trace_marker(fig, pdate=pdates_end['ordinal_late'], y=y, color=color,
                                 symbol='arrow-right',
                                 hovertext=hovertext, hyperlink=hlink, xmode=self._xmode)
                 else:        # Normal marker at end of period
-                    add_trace_marker(fig, pdate=pdates_end['mid'], y=y, color=color,
+                    add_trace_marker(fig, pdate=pdates_end['ordinal_mid'], y=y, color=color,
                                 hovertext=hovertext_end if hovertext_end else hovertext, 
                                 hyperlink=hlink, xmode=self._xmode)
         
         if showbirthanddeath:
-            if pdates_birth and pdates_birth['mid']:
+            if pdates_birth and pdates_birth['ordinal_mid']:
                 hovertext = f"{htext} (b. {calc_yeartext(pdates_birth, hover_datetype=hover_datetype)})"
-                endpoint = pdates_start['early'] if pdates_start else \
-                            pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
-                self.add_trace_part(pdate_start=pdates_birth['late'], 
+                endpoint = pdates_start['ordinal_early'] if pdates_start else \
+                            pdates_birth['ordinal_mid'] + int((pdates_death['ordinal_mid'] - pdates_birth['ordinal_mid']) / 2.0)
+                self.add_trace_part(pdate_start=pdates_birth['ordinal_late'], 
                                     pdate_end=endpoint, 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
-                if pdates_birth['early'] < pdates_birth['late']:
-                    self.add_trace_part(pdate_start=pdates_birth['early'], pdate_end=pdates_birth['late'], 
+                if pdates_birth['ordinal_early'] < pdates_birth['ordinal_late']:
+                    self.add_trace_part(pdate_start=pdates_birth['ordinal_early'], pdate_end=pdates_birth['ordinal_late'], 
                         label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
 
-            if pdates_death and pdates_death['mid']:
+            if pdates_death and (pdates_death['ordinal_mid'] is not None):
                 hovertext = f"{htext} (b. {calc_yeartext(pdates_birth, hover_datetype=hover_datetype)})" if alive \
                             else f"{htext} (d. {calc_yeartext(pdates_death, hover_datetype=hover_datetype)}" +\
                                     f" aged {calc_agetext(pdates_birth, pdates_death)})"
-                startpoint = pdates_end['late'] if pdates_end else \
-                            pdates_start['late'] if pdates_start else \
-                            pdates_birth['mid'] + (pdates_death['mid'] - pdates_birth['mid']) / 2.0
-                self.add_trace_part(pdate_start=startpoint, pdate_end=pdates_death['early'], 
+                startpoint = pdates_end['ordinal_late'] if pdates_end else \
+                            pdates_start['ordinal_late'] if pdates_start else \
+                            pdates_birth['ordinal_mid'] + int((pdates_death['ordinal_mid'] - pdates_birth['ordinal_mid']) / 2.0)
+                self.add_trace_part(pdate_start=startpoint, pdate_end=pdates_death['ordinal_early'], 
                     label=text, y=y, color=color, dash='dot', hovertext=hovertext)
-                if pdates_death['early'] < pdates_death['late']:
-                    self.add_trace_part(pdate_start=max(startpoint,pdates_death['early']), 
-                               pdate_end=pdates_death['late'], 
+                if pdates_death['ordinal_early'] < pdates_death['ordinal_late']:
+                    self.add_trace_part(pdate_start=max(startpoint,pdates_death['ordinal_early']), 
+                               pdate_end=pdates_death['ordinal_late'], 
                     label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext)
-                if alive and (pdates_death['late'] > startpoint):   # Right arrow 
-                    add_trace_marker(fig, pdate=pdates_death['late'], y=y, color=color,
+                if alive and (pdates_death['ordinal_late'] > startpoint):   # Right arrow 
+                    add_trace_marker(fig, pdate=pdates_death['ordinal_late'], y=y, color=color,
                                 symbol='arrow-right',
                                 hovertext=hovertext, xmode=self._xmode)
         return True
@@ -295,7 +295,7 @@ class plTimeLine():
             else:
                 xs = [hdate.to_years(hdate.to_ordinal(pdate_start) + n * self.pointinterval) for n in 
                         range(ceil((hdate.to_ordinal(pdate_end) - hdate.to_ordinal(pdate_start))/
-                                    self.pointinterval))] + [hdate.to_ordinal(pdate_end)]
+                                    self.pointinterval))] + [hdate.to_years(pdate_end)]
             ys = [y for _ in xs]
             hovertexts = label if not hovertext \
                             else hovertext if hovertext == hovertext_end \

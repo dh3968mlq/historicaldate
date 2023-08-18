@@ -23,7 +23,7 @@ def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None, ch
 
     if pdcheck is not None: # Check canonical dictionary
         found = {k:v for k, v in hd.pdates.items() 
-                    if ((v != pdcheck.get(k, None)) and (check_days or (k[0:5] != "days_")))}
+                    if ((v != pdcheck.get(k, None)) and (check_days or (k[0:8] != "ordinal_")))}
         expected = {k:pdcheck.get(k,None) for k in found}
         assert found == {}, f"pdate mismatches for '{s}': Found {found} Expected {expected}"
 
@@ -113,11 +113,11 @@ def test3():
 def test4():
     compare("487 bc", 
             dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={'days_early': -177876, 'days_late': -177512, 'days_mid': -177711,
+            pdcheck={'ordinal_early': -177876, 'ordinal_late': -177512, 'ordinal_mid': -177711,
                     'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
             check_days=True)
     compare("12 July 100 BC",
-            pdcheck={'days_early': -36332, 'days_late': -36332, 'days_mid': -36332,
+            pdcheck={'ordinal_early': -36332, 'ordinal_late': -36332, 'ordinal_mid': -36332,
                     'slearly': 'd', 'sllate': 'd', 'slmid': 'd'},
             check_days=True)
 
@@ -125,6 +125,6 @@ def test_sandbox():
     'Put a test here if we want to run it as a one-off'
     compare("487 bc", 
             dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={'days_early': -177876, 'days_late': -177512, 'days_mid': -177711,
+            pdcheck={'ordinal_early': -177876, 'ordinal_late': -177512, 'ordinal_mid': -177711,
                     'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
             check_days=True)

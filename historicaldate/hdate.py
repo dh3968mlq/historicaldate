@@ -61,11 +61,11 @@ def to_years(date_or_ordinal):
     return years
 
 # ----
-def calc_mid_date(hdstring):
+def calc_mid_ordinal(hdstring):
     "Return the mid date from an hdate string, or None"
     try:
         hd = HDate(hdstring)
-        return hd.pdates['mid']
+        return hd.pdates['ordinal_mid']
     except:
         return None
 # ------------------------------------------------------------------------------------------------------
@@ -290,18 +290,18 @@ class HDate():
         if isbce: # BC (BCE)
             pythondate = None
             if year % 4 == 1:  # These are the years treated as BC leap years 1, 5, etc.
-                idays_4ad = to_ordinal(datetime.date(4, month, day))
+                ordinal_4ad = to_ordinal(datetime.date(4, month, day))
                 nleapdays = (year + 3) // 4 
-                idays = idays_4ad - 365 * (year + 3) - nleapdays
+                ordinal = ordinal_4ad - 365 * (year + 3) - nleapdays
             else:
-                idays_1ad = to_ordinal(datetime.date(1, month, day))
+                ordinal_1ad = to_ordinal(datetime.date(1, month, day))
                 nleapdays = (year + 3) // 4 
-                idays = idays_1ad - 365 * year - nleapdays
+                ordinal = ordinal_1ad - 365 * year - nleapdays
         else: # AD (CE)
             pythondate = datetime.date(year, month, day)
-            idays = to_ordinal(pythondate)
+            ordinal = to_ordinal(pythondate)
         return  {prefix:pythondate, 
-                 f"days_{prefix}":idays,
+                 f"ordinal_{prefix}":ordinal,
                  f"sl{prefix}":speclevel}
     # ------------------------------------------------------------------------------------------------------
     def _convert_one_date(self, prefix=""):
@@ -318,7 +318,7 @@ class HDate():
         if self.d_parsed[f'{prefix}year'] is None:
             if self.d_parsed["circa"] or (prefix == "mid") or \
                         (self.d_parsed[f'midyear'] is None): # Cannot copy from mid year
-                return {prefix:None, f"days_{prefix}":None ,f"sl{prefix}":""} 
+                return {prefix:None, f"ordinal_{prefix}":None ,f"sl{prefix}":""} 
             else:                # Copy from mid year
                 speclevel = self.pdates['slmid']
                 year = self.d_parsed[f'midyear']
@@ -360,13 +360,13 @@ class HDate():
 
         if self.d_parsed['ongoing']:
             self.pdates = {'mid': datetime.date.today(), 
-                           'days_mid': to_ordinal(datetime.date.today()), 
+                           'ordinal_mid': to_ordinal(datetime.date.today()), 
                            'slmid': 'o', 'slearly': 'o', 'sllate': 'o'}
             self.pdates.update(
                 {'late': self.pdates['mid'] + datetime.timedelta(days=self.circa_interval_days),
-                 'days_late': self.pdates['days_mid'] + self.circa_interval_days, 
+                 'ordinal_late': self.pdates['ordinal_mid'] + self.circa_interval_days, 
                  'early': self.pdates['mid'],
-                 'days_early': self.pdates['days_mid']
+                 'ordinal_early': self.pdates['ordinal_mid']
                  })
         else:     # Normal treatment, not ongoing
             # -- convert the three dates
@@ -378,37 +378,37 @@ class HDate():
             circa_interval = self.calc_clen_interval()
             if self.pdates['slmid'] and not self.pdates['slearly']:
                 self.pdates.update({'early':self.pdates['mid'] - circa_interval,
-                                    'days_early':self.pdates['days_mid'] - circa_interval.days,
+                                    'ordinal_early':self.pdates['ordinal_mid'] - circa_interval.days,
                                     'slearly':'c'})
                 
             if self.pdates['slmid'] and not self.pdates['sllate']:
                 self.pdates.update({'late':self.pdates['mid'] + circa_interval,
-                                    'days_late':self.pdates['days_mid'] + circa_interval.days,
+                                    'ordinal_late':self.pdates['ordinal_mid'] + circa_interval.days,
                                     'sllate':'c'})
                     
             # -- Fill in midpoint date if it is missing and both early and late dates are present
             if self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slmid']:
                 self.pdates.update({'mid':self.pdates['early'] + 
                                             (self.pdates['late'] - self.pdates['early'])/2.0,
-                                    'days_mid':(self.pdates['days_early'] + self.pdates['days_late'])//2,
+                                    'ordinal_mid':(self.pdates['ordinal_early'] + self.pdates['ordinal_late'])//2,
                                     'slmid':'c'})
 
             # -- Fill in mid and late dates from circa if early is the only date specified
             if self.pdates['slearly'] and not self.pdates['sllate'] and not self.pdates['slmid']:
                 self.pdates.update({'mid':self.pdates['early'] + circa_interval,
-                                    'days_mid':self.pdates['days_early'] + circa_interval.days,
+                                    'ordinal_mid':self.pdates['ordinal_early'] + circa_interval.days,
                                     'slmid':'c',
                             'late':self.pdates['early'] + 2 * circa_interval,
-                            'days_late':self.pdates['days_early'] + 2*circa_interval.days,
+                            'ordinal_late':self.pdates['ordinal_early'] + 2*circa_interval.days,
                             'sllate':'c'})
 
             # -- Fill in mid and early dates from circa if late is the only date specified
             if not self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slmid']:
                 self.pdates.update({'mid':self.pdates['late'] - circa_interval,
-                                    'days_mid':self.pdates['days_late'] - circa_interval.days,
+                                    'ordinal_mid':self.pdates['ordinal_late'] - circa_interval.days,
                                 'slmid':'c',
                                 'early':self.pdates['late'] - 2 * circa_interval,
-                                'days_early':self.pdates['days_late'] - 2 * circa_interval.days,
+                                'ordinal_early':self.pdates['ordinal_late'] - 2 * circa_interval.days,
                                 'slearly':'c'})
 
         # >> to do: deal with dates out of range, 29th feb 1100 etc.

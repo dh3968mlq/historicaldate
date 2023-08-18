@@ -16,7 +16,9 @@ df2 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/Events in Brit
 df3 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Prime Ministers.csv",
                  na_filter=False)
 
-pltl = hdpl.plTimeLine()
+xmode = 'date'
+xmode = 'years'
+pltl = hdpl.plTimeLine(xmode=xmode)
 pltl.add_event_set(df1, title="British Monarchs from 1066", showbirthanddeath=True)
 pltl.add_event_set(df2,title="Events in British History")
 pltl.add_event_set(df3, title="British Prime Ministers") 
