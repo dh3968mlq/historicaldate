@@ -55,7 +55,7 @@ def to_years(date_or_ordinal):
         daysinyear = datetime.date(pdate.year,12,31).toordinal() - datetime.date(pdate.year,1,1).toordinal() + 1
         years = float(pdate.year) - 1 + daynum / daysinyear
         return years
-    elif odate := to_ordinal(date_or_ordinal) is not None:   # BC
+    elif (odate := to_ordinal(date_or_ordinal)) is not None:   # BC
         years = odate / 365.25                    # Sloppy, but good enough for most applications
     else:
         years = None
@@ -65,7 +65,7 @@ def to_ymd(date_or_ordinal):
     YMD = namedtuple("YMD", "year month day")
     if pdate := to_python_date(date_or_ordinal):
         ymd = YMD(pdate.year, pdate.month, pdate.day)
-    elif odate := to_ordinal(date_or_ordinal) is not None:   # BC
+    elif (odate := to_ordinal(date_or_ordinal)) is not None:   # BC
         days_in_4years_julian = 3*365 + 366
         cycles = odate // days_in_4years_julian           # cycles < 0
         ad_ordinal = odate - cycles * days_in_4years_julian # Shift it forward by a multiple of 4 years to positive number
@@ -95,7 +95,7 @@ class HDate():
         self.match_pattern = self._create_match_pattern(prefixdateorder)
         self.compiled_pattern = re.compile(self.match_pattern, re.VERBOSE | re.IGNORECASE)
 
-        if s := hdstr.strip() if (hdstr.strip() or not missingasongoing) else "ongoing":
+        if s := (hdstr.strip() if (hdstr.strip() or not missingasongoing) else "ongoing"):
             srch = self.compiled_pattern.search(s)
             if srch is None:
                 raise ValueError(f"Illegal date format: {hdstr}")

@@ -347,7 +347,7 @@ def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None, xmode="dat
 # ------------------------------------------------------------------------------------------------
 def calc_yeartext(pdates, hover_datetype='day'):
     if hover_datetype not in {'year','month','day'}:
-        raise ValueError(f"hover_datetype must be year, month or day. found:{hover_datetype}")
+        raise ValueError(f"hover_datetype must be year, month or day. Found:{hover_datetype}")
     
     ymd_early = hdate.to_ymd(pdates['ordinal_early'])
     ymd_mid = hdate.to_ymd(pdates['ordinal_mid'])
