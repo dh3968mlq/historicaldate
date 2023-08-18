@@ -17,6 +17,7 @@
 
 import re
 import datetime
+from collections import namedtuple
 
 # -- Some utilities
 def to_ordinal(date, delta=0):
@@ -59,7 +60,22 @@ def to_years(date_or_ordinal):
     else:
         years = None
     return years
+# ----
+def to_ymd(date_or_ordinal):
+    YMD = namedtuple("YMD", "year month day")
+    if pdate := to_python_date(date_or_ordinal):
+        ymd = YMD(pdate.year, pdate.month, pdate.day)
+    elif odate := to_ordinal(date_or_ordinal) is not None:   # BC
+        days_in_4years_julian = 3*365 + 366
+        cycles = odate // days_in_4years_julian           # cycles < 0
+        ad_ordinal = odate - cycles * days_in_4years_julian # Shift it forward by a multiple of 4 years to positive number
+        assert ad_ordinal > 0
 
+        ad_date = datetime.date.fromordinal(ad_ordinal)
+        ymd = YMD(ad_date.year + 4*cycles - 1, ad_date.month, ad_date.day) # Adjust year, there is no year 0
+    else:
+        ymd = None
+    return ymd
 # ----
 def calc_mid_ordinal(hdstring):
     "Return the mid date from an hdate string, or None"

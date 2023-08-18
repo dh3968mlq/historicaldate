@@ -349,20 +349,42 @@ def calc_yeartext(pdates, hover_datetype='day'):
     if hover_datetype not in {'year','month','day'}:
         raise ValueError(f"hover_datetype must be year, month or day. found:{hover_datetype}")
     
-    if (pdates['early'].year != pdates['late'].year):
-        return f"{pdates['mid'].year}?"             # Show uncertain year
-    elif (pdates['early'].month != pdates['late'].month) or hover_datetype in {'year'}:
-        return f"{pdates['mid'].year}"              # Show year
-    elif (pdates['early'].day != pdates['late'].day) or hover_datetype in {'year','month'}:
-        return pdates['mid'].strftime("%b %Y")      # Show month and year
-    else:
-        return pdates['mid'].strftime("%d %b %Y")   # Show exact date
+    ymd_early = hdate.to_ymd(pdates['ordinal_early'])
+    ymd_mid = hdate.to_ymd(pdates['ordinal_mid'])
+    ymd_late = hdate.to_ymd(pdates['ordinal_late'])
+
+    ytext = str(ymd_mid.year) if ymd_mid.year > 0 else str(-ymd_mid.year) + "BCE"
+    if (ymd_early.year != ymd_late.year):
+        ytext = ytext + "?"             # Show uncertain year
+    if (ymd_early.month == ymd_late.month) and (ymd_early.year == ymd_late.year) and hover_datetype != 'year':
+        months = ["Jan", "Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        ytext = f"{months[ymd_mid.month - 1]} {ytext}"
+    if (ymd_early == ymd_late) and hover_datetype == 'day':
+        ytext = f"{ymd_mid.day} {ytext}"      # Show exact date
+    return ytext
 # ------------------------------------------------------------------------------------------------    
+def calc_age(ymd_birth, ymd_ref):
+    age = ymd_ref.year - ymd_birth.year
+    if ymd_birth.year < 0 and ymd_ref.year > 0:
+        age = age - 1   # there is no year 0
+    if (ymd_ref.month < ymd_birth.month) or (ymd_ref.month < ymd_birth.month and ymd_ref.day < ymd_birth.day):
+        age = age - 1 
+    if age < 0:
+        raise ValueError("Age calculated as less than 0")
+    return age
+# ----
 def calc_agetext(pdates_birth, pdates_ref):
     "Calculate age text, including ? to indicate uncertainty"
-    years_largest = relativedelta(pdates_ref['late'],pdates_birth['early']).years
-    years_smallest = relativedelta(pdates_ref['early'],pdates_birth['late']).years
+    ymd_birth_early = hdate.to_ymd(pdates_birth['ordinal_early'])
+    ymd_birth_mid = hdate.to_ymd(pdates_birth['ordinal_mid'])
+    ymd_birth_late = hdate.to_ymd(pdates_birth['ordinal_late'])
+    ymd_ref_early = hdate.to_ymd(pdates_ref['ordinal_early'])
+    ymd_ref_mid = hdate.to_ymd(pdates_ref['ordinal_mid'])
+    ymd_ref_late = hdate.to_ymd(pdates_ref['ordinal_late'])
+
+    years_largest = calc_age(ymd_birth_early, ymd_ref_late)
+    years_smallest = calc_age(ymd_birth_late, ymd_ref_early)
     uncertain = '?' if years_largest > years_smallest else ""
 
-    years = relativedelta(pdates_ref['mid'],pdates_birth['mid']).years
+    years = calc_age(ymd_birth_mid, ymd_ref_mid)
     return f"{years}{uncertain}"
