@@ -393,37 +393,44 @@ class HDate():
             # -- Fill early and late dates if missing from (a) circa (b) main date
             circa_interval = self.calc_clen_interval()
             if self.pdates['slmid'] and not self.pdates['slearly']:
-                self.pdates.update({'early':self.pdates['mid'] - circa_interval,
-                                    'ordinal_early':self.pdates['ordinal_mid'] - circa_interval.days,
+                if self.pdates['mid'] and self.pdates['mid'].toordinal() > circa_interval.days:
+                    self.pdates.update({'early':self.pdates['mid'] - circa_interval})
+                self.pdates.update({'ordinal_early':self.pdates['ordinal_mid'] - circa_interval.days,
                                     'slearly':'c'})
                 
             if self.pdates['slmid'] and not self.pdates['sllate']:
-                self.pdates.update({'late':self.pdates['mid'] + circa_interval,
-                                    'ordinal_late':self.pdates['ordinal_mid'] + circa_interval.days,
+                if self.pdates['mid']:
+                    self.pdates.update({'late':self.pdates['mid'] + circa_interval})
+                self.pdates.update({'ordinal_late':self.pdates['ordinal_mid'] + circa_interval.days,
                                     'sllate':'c'})
                     
             # -- Fill in midpoint date if it is missing and both early and late dates are present
             if self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slmid']:
-                self.pdates.update({'mid':self.pdates['early'] + 
-                                            (self.pdates['late'] - self.pdates['early'])/2.0,
-                                    'ordinal_mid':(self.pdates['ordinal_early'] + self.pdates['ordinal_late'])//2,
+                if self.pdates['early'] and self.pdates['late']:
+                    self.pdates.update({'mid':self.pdates['early'] + 
+                                            (self.pdates['late'] - self.pdates['early'])/2.0})
+                self.pdates.update({'ordinal_mid':(self.pdates['ordinal_early'] + self.pdates['ordinal_late'])//2,
                                     'slmid':'c'})
 
             # -- Fill in mid and late dates from circa if early is the only date specified
             if self.pdates['slearly'] and not self.pdates['sllate'] and not self.pdates['slmid']:
-                self.pdates.update({'mid':self.pdates['early'] + circa_interval,
-                                    'ordinal_mid':self.pdates['ordinal_early'] + circa_interval.days,
+                if self.pdates['early']:
+                    self.pdates.update({'mid':self.pdates['early'] + circa_interval,
+                                        'late':self.pdates['early'] + 2 * circa_interval
+                                        })
+                self.pdates.update({'ordinal_mid':self.pdates['ordinal_early'] + circa_interval.days,
                                     'slmid':'c',
-                            'late':self.pdates['early'] + 2 * circa_interval,
-                            'ordinal_late':self.pdates['ordinal_early'] + 2*circa_interval.days,
-                            'sllate':'c'})
+                                    'ordinal_late':self.pdates['ordinal_early'] + 2*circa_interval.days,
+                                    'sllate':'c'})
 
             # -- Fill in mid and early dates from circa if late is the only date specified
             if not self.pdates['slearly'] and self.pdates['sllate'] and not self.pdates['slmid']:
-                self.pdates.update({'mid':self.pdates['late'] - circa_interval,
-                                    'ordinal_mid':self.pdates['ordinal_late'] - circa_interval.days,
+                if self.pdates['late'] and self.pdates['late'].toordinal() > 2 * circa_interval.days:
+                    self.pdates.update({'mid':self.pdates['late'] - circa_interval,
+                                        'early':self.pdates['late'] - 2 * circa_interval
+                                        })
+                self.pdates.update({'ordinal_mid':self.pdates['ordinal_late'] - circa_interval.days,
                                 'slmid':'c',
-                                'early':self.pdates['late'] - 2 * circa_interval,
                                 'ordinal_early':self.pdates['ordinal_late'] - 2 * circa_interval.days,
                                 'slearly':'c'})
 
