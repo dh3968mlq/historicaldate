@@ -31,6 +31,7 @@ class plTimeLine():
         
         self._xmode = xmode
         self.figure = make_subplots(rows=1, cols=1, subplot_titles=[title])
+        self.figure.update_annotations(y=1.015, yref="paper", selector={'text':title})
         self.figure.update_layout(xaxis_title=None, title=None, margin={'l':0,'r':0,'t':40,'b':0})
         self.maxdate = hdate.to_ordinal(datetime.date.today(), delta=int(10*365.25)) \
                         if maxdate is None else hdate.to_ordinal(maxdate)
