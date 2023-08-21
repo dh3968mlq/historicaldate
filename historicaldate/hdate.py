@@ -46,7 +46,7 @@ def to_python_date(ordinal):
         return datetime.date.fromordinal(ordinal) if ordinal >= 1 else None
     else:
         raise TypeError(f"ordinal must be int or datetime.date, not {type(ordinal)}")
-
+# ----
 def to_years(date_or_ordinal):
     """
     Takes either a python date or an (int) ordinal, returns an number of years (float).
@@ -58,13 +58,13 @@ def to_years(date_or_ordinal):
         years = float(pdate.year) - 1 + daynum / daysinyear
         return years
     elif (odate := to_ordinal(date_or_ordinal)) is not None:   # BC
-        years = odate / 365.25                    # Sloppy, but good enough for most applications
+        years = odate / 365.2425                    # Sloppy, but good enough for most applications
     else:
         years = None
     return years
 # ----
 def years_to_ordinal(years):
-    return int(years * 365.25)           # Just as sloppy, but good enough for its only application to date
+    return int(years * 365.2425)           # Just as sloppy, but good enough for its only application to date
 # ----
 def to_ymd(date_or_ordinal):
     YMD = namedtuple("YMD", "year month day")
