@@ -21,13 +21,15 @@ from collections import namedtuple
 
 # -- Some utilities
 def to_ordinal(date, delta=0):
-    "Takes either a python date or an (int) ordinal, returns an ordinal. Optionally apply a delta (days)"
+    "Takes either a python date, an (int) ordinal or a string, returns an ordinal. Optionally apply a delta (days)"
     if date is None:
         return None
     elif type(date) == datetime.date:
         return date.toordinal() + delta
     elif type(date) == int:
         return date + delta
+    elif type(date) == str:
+        return HDate(date).pdates["ordinal_mid"]
     else:
         raise TypeError(f"date must be int or datetime.date, not {type(date)}")
 # ----
@@ -60,6 +62,9 @@ def to_years(date_or_ordinal):
     else:
         years = None
     return years
+# ----
+def years_to_ordinal(years):
+    return int(years * 365.25)           # Just as sloppy, but good enough for its only application to date
 # ----
 def to_ymd(date_or_ordinal):
     YMD = namedtuple("YMD", "year month day")

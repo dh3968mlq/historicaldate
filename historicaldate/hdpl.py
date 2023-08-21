@@ -88,7 +88,7 @@ class plTimeLine():
             text: Hovertext (optional, defaults to label)
             url: hyperlink (optional)
 
-        At present study_range_start and study_range_end are Python dates, this will need changing
+        study_range_start, study_range_end may be either Python dates or ordinals
         """
         colorgen = ColorGen()
         colorcol = "color" if "color" in df.columns \
@@ -153,8 +153,7 @@ class plTimeLine():
                         study_range_start=None, study_range_end=None):
         '''
         Add a timeline trace for a given row
-
-        At present study_range_start and study_range_end are Python dates, this will need changing
+        study_range start, study_range_end may be either python dates or ordinals
         '''        
         fig = self.figure
         cols = list(row.index)
@@ -162,6 +161,9 @@ class plTimeLine():
         htext = row["description"] if "description" in cols and row["description"] else text
         htext_end = row["htext_end"] if "htext_end" in cols and row["htext_end"] else htext
         hlink = row['url'] if 'url' in cols else None
+
+        study_ordinal_start = hdate.to_ordinal(study_range_start)
+        study_ordinal_end = hdate.to_ordinal(study_range_end)
 
         earliest, latest = None, None
 
@@ -182,9 +184,8 @@ class plTimeLine():
             pdates_death, earliest, latest = get_pdates("hdate_death", earliest, latest, 
                         missingasongoing=pdates_birth and (pdates_birth['ordinal_mid'] is not None))
         
-        if study_range_start and study_range_end:
-            if latest < (study_range_start - datetime.date(1, 1, 1)).days or \
-                earliest > (study_range_end - datetime.date(1, 1, 1)).days:
+        if (study_ordinal_start is not None) and (study_ordinal_end is not None):
+            if latest < study_ordinal_start or earliest > study_ordinal_end:
                 # Trace is outside study range, ignore it
                 return False
 
