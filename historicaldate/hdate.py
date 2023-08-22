@@ -63,6 +63,17 @@ def to_years(date_or_ordinal):
         years = None
     return years
 # ----
+def format_year(year, showzeroas1ad=True, adtext="AD", bctext="BC"):
+    iyear = int(year)
+    if iyear > 0 or (iyear == 0 and not showzeroas1ad):
+        syear = f"{iyear:04d}"
+    elif iyear == 0:
+        syear = f"1{adtext}"
+    else:
+        syear = f"{abs(iyear)}{bctext}"
+    return syear
+
+# ----
 def years_to_ordinal(years):
     return int(years * 365.2425)           # Just as sloppy, but good enough for its only application to date
 # ----
