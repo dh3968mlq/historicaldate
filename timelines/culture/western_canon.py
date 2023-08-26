@@ -10,7 +10,7 @@ from historicaldate import hdpl
 import pandas as pd
 import datetime
 
-df_monarchs = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Monarchs.csv",
+df_monarchs = pd.read_csv(f"{dataroot}/data/history/europe/British Monarchs.csv",
                  na_filter=False)
 df_playwrights = pd.read_csv(f"{dataroot}/data/culture/western_canon/Playwrights.csv",
                  na_filter=False)

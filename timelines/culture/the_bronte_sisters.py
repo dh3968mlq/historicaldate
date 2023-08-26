@@ -18,7 +18,7 @@ df_anne = pd.read_csv(f"{dataroot}/data/culture/brontes/Anne Bronte.csv",
                  na_filter=False)
 df_other = pd.read_csv(f"{dataroot}/data/culture/brontes/Other Brontes.csv",
                  na_filter=False)
-df_history = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/Events in British History.csv",
+df_history = pd.read_csv(f"{dataroot}/data/history/europe/Events in British History.csv",
                  na_filter=False)
 
 

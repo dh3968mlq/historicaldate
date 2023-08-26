@@ -9,11 +9,11 @@ sys.path.append(hdroot)
 from historicaldate import hdpl
 import pandas as pd
 
-df1 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Monarchs.csv",
+df1 = pd.read_csv(f"{dataroot}/data/history/europe/British Monarchs.csv",
                  na_filter=False)
-df2 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/Events in British History.csv",
+df2 = pd.read_csv(f"{dataroot}/data/history/europe/Events in British History.csv",
                  na_filter=False)
-df3 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Prime Ministers.csv",
+df3 = pd.read_csv(f"{dataroot}/data/history/europe/British Prime Ministers.csv",
                  na_filter=False)
 
 xmode = 'date'

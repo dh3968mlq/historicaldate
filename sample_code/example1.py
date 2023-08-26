@@ -7,9 +7,9 @@ sys.path.append(hdroot)
 from historicaldate import hdpl  # Timelines using Plotly
 import pandas as pd
 
-df1 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Monarchs.csv",
+df1 = pd.read_csv(f"{dataroot}/data/history/europe/British Monarchs.csv",
                  na_filter=False)
-df2 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Prime Ministers.csv",
+df2 = pd.read_csv(f"{dataroot}/data/history/europe/British Prime Ministers.csv",
                  na_filter=False)
 
 pltl = hdpl.plTimeLine()
