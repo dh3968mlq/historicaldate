@@ -21,7 +21,7 @@ except:
 
 class plTimeLine():
     def __init__(self, title=None, mindate=None, maxdate=None, 
-                hovermode='closest', hoverdistance=5, xmode="date"):
+                hovermode='closest', hoverdistance=5, xmode="date", dateformat=None):
         """
         To do... When calling this, mindate and maxdate may be either int (ordinal days) or dates
         self.mindate, self.maxdate always stored as ordinals
@@ -29,7 +29,13 @@ class plTimeLine():
         if xmode not in {"date","years"}:
             raise ValueError(f"xmode must be 'date' or 'years', not '{xmode}'")
         
+        dateformat_valid = {None, "default", "mdy", "dmy"}
+        if dateformat not in dateformat_valid:
+            raise ValueError(f"dateformat must be in {dateformat_valid}, not '{dateformat}'")
+
         self._xmode = xmode
+        self._prefixdateorder = None if dateformat == "default" else dateformat
+
         self.figure = make_subplots(rows=1, cols=1, subplot_titles=[title])
         self.figure.update_annotations(y=1.015, yref="paper", selector={'text':title})
         self.figure.update_layout(xaxis_title=None, title=None, margin={'l':0,'r':0,'t':40,'b':0})
@@ -172,7 +178,7 @@ class plTimeLine():
             if col not in cols:
                 return None, earliest, latest
             else:
-                if pd := hdate.HDate(row[col], missingasongoing=missingasongoing).pdates:
+                if pd := hdate.HDate(row[col], missingasongoing=missingasongoing, prefixdateorder=self._prefixdateorder).pdates:
                     earliest = min(pd['ordinal_early'], earliest) if earliest is not None else pd['ordinal_early']
                     latest = max(pd['ordinal_late'], latest) if latest is not None else pd['ordinal_late']
                 return pd, earliest, latest
