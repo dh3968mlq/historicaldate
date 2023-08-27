@@ -19,6 +19,18 @@ try:
 except:
     import historicaldate.historicaldate.lineorganiser as lineorganiser
 
+def check_dataframe(df, study_range_start=None, study_range_end=None, dateformat="default"):
+    pltl = plTimeLine(mindate="2000 BC", maxdate="2200", xmode="years", dateformat=dateformat)
+    message = ""
+    try:
+        added = pltl.add_event_set(df, study_range_start=study_range_start, study_range_end=study_range_end)
+        if not added:
+            message = "No events found in study range"
+    except Exception as e:
+        added = False
+        message = f"Error: {e}"
+    return added, message
+
 class plTimeLine():
     def __init__(self, title=None, mindate=None, maxdate=None, 
                 hovermode='closest', hoverdistance=5, xmode="date", dateformat=None):
