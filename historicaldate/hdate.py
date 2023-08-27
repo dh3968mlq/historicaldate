@@ -83,7 +83,7 @@ def to_ymd(date_or_ordinal):
         ymd = YMD(pdate.year, pdate.month, pdate.day)
     elif (odate := to_ordinal(date_or_ordinal)) is not None:   # BC
         days_in_4years_julian = 3*365 + 366
-        cycles = odate // days_in_4years_julian           # cycles < 0
+        cycles = (odate - 1) // days_in_4years_julian           # cycles < 0
         ad_ordinal = odate - cycles * days_in_4years_julian # Shift it forward by a multiple of 4 years to positive number
         assert ad_ordinal > 0
 
