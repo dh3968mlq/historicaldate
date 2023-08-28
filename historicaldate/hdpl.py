@@ -28,7 +28,7 @@ def check_dataframe(df, study_range_start=None, study_range_end=None, dateformat
             message = "No events found in study range"
     except Exception as e:
         added = False
-        message = f"Error: {e}"
+        message = f"Error: {repr(e)}"
     return added, message
 
 class plTimeLine():
