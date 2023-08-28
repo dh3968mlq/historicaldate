@@ -1,8 +1,19 @@
 # historicaldate
 
-An open source Python package for creating interactive graphical timelines of historical data.
+   * Date handling including support for BC dates and uncertainty in dates
+   * Create interactive graphical timelines of historical data
 
 ![Example timeline image](https://historicaldate.com/wp-content/uploads/2023/05/basic_timeline_example.png)
+
+### Date handling
+
+Flexible and natural date formats are supported. 
+   * The default formats are variants of '25 Dec 1066' and '1066-12-25'
+   * ... with options to recognise '25/12/1055', '12/25/1066' and 'Dec 25 1066'
+   * '1066' is treated as being an undetermined date in that year
+   * 'circa' is allowed: e.g. 'circa 1028'
+   * Uncertainty can be specified. e.g. 'Between 1025 and 1032'
+   * BC dates are supported. e.g. 'circa 525 bc'
 
 ### To create a timeline:
    * Download this package from 
@@ -11,7 +22,7 @@ https://github.com/dh3968mlq/historicaldate
    * Create .csv files of data (see below for column names and date formats)
    * Create and run a Python program, similar to below, or see sample timeline code in the *timelines* folder in this repository
 
-See https://historicaldate.com/ for example outputs
+See https://historicaldate.com/ for example outputs and for an interactive timeline builder.
 
 ### Sample code:
 
@@ -201,13 +212,13 @@ Writes HTML file of the timeline
 
 ## Limitations
 
-This is an early (0.0.4) release, and much remains to be done.
-
-At present dates BC (BCE) are not supported, since date representation depends on Python *datetime.date* dates, which have this same limitation.
-
-Support for date formats DD/MM/YYYY or MM/DD/YYYY is also as yet not supported. If implemented they are expected to be non-default formats, because of the risk of confusion between them.
+This is an alpha release. Most initial functionality is in place now, but more work is ongoing
 
 ## Changes
+
+### New in 0.0.5
+
+## >>> To be completed
 
 ### New in 0.0.4
 
