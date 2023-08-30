@@ -104,13 +104,22 @@ def test3():
             pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
                      'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
                      'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
+    compare("1066-12-25", prefixdateorder="dmy",
+            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
+                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
+                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
     compare("12/25/1066", prefixdateorder="mdy",
             pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
                      'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
                      'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
+    compare("1066-12-25", prefixdateorder="mdy",
+            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
+                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
+                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
+
 
 # -- Some BC date checks
-def test4():
+def testbc():
     compare("487 bc", 
             dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
             pdcheck={'ordinal_early': -177876, 'ordinal_late': -177512, 'ordinal_mid': -177711,

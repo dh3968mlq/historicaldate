@@ -110,6 +110,7 @@ class HDate():
         self.circa_interval_days = int(5 * 365.25)
         self.match_pattern = self._create_match_pattern(prefixdateorder)
         self.compiled_pattern = re.compile(self.match_pattern, re.VERBOSE | re.IGNORECASE)
+        self.input = hdstr
 
         if s := (hdstr.strip() if (hdstr.strip() or not missingasongoing) else "ongoing"):
             srch = self.compiled_pattern.search(s)
@@ -142,7 +143,7 @@ class HDate():
             month_pattern += "|" + self.monthnumberpattern
 
         year_pattern = "[0-9]{1,8}"    # should we require at least three year digits to avoid confusion with month and day?
-        nmonth_pattern = "[0-9]{1,2}"
+        nmonth_pattern = self.monthnumberpattern  # was "[0-9]{1,2}"
         calendar_pattern = "ce|ad|bc|bce"
 
         def makedatepattern(prefix=""):
@@ -150,10 +151,12 @@ class HDate():
                 datepattern = f"""
                     (
                         (
-                            (?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?)?
-                            \\s*/?\\s*(?P<{prefix}premon>{month_pattern})(,)?
+                            (?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?\\s*(/|\\s))?
+                            \\s*(?P<{prefix}premon>{month_pattern})
+                            \\s*(/|\\s|,)
                         )?
-                        \\s*/?\\s*(?P<{prefix}year>{year_pattern})
+                        \\s*
+                        (?P<{prefix}year>{year_pattern})
                         (-(?P<{prefix}postmon>{nmonth_pattern})
                             (-(?P<{prefix}postday>{day_pattern})
                             )?
@@ -164,8 +167,8 @@ class HDate():
                 datepattern = f"""
                     (
                         (
-                            (?P<{prefix}premon>{month_pattern})
-                            \\s*/?\\s*(?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?)?
+                            (?P<{prefix}premon>{month_pattern})\\s*(/|\\s)
+                            \\s*(?P<{prefix}preday>{day_pattern})(st|nd|rd|th)?)?
                             (,)?
                         )?
                         \\s*/?\\s*(?P<{prefix}year>{year_pattern})
@@ -173,7 +176,8 @@ class HDate():
                             (-(?P<{prefix}postday>{day_pattern})
                             )?
                         )?
-                        (\\s+(?P<{prefix}calendar>{calendar_pattern}))?
+                        (\\s+(?P<{prefix}calendar>{calendar_pattern})
+                    )?
                 """
             else:
                 raise NotImplementedError(f"prefixdateorder must be None, 'dmy' or 'mdy': not '{prefixdateorder}'")
@@ -210,7 +214,7 @@ class HDate():
         # preday and postday cannot both be set, ditto premon and postmon
         def check_prepost_dup(prefix):
             if sp[f"{prefix}premon"] is not None and sp[f"{prefix}postmon"] is not None:
-                raise ValueError(f"Prefix month and postfix month ({prefix}) cannot both be set")
+                raise ValueError(f"Prefix month and postfix month ({prefix}) cannot both be set: {self.input}")
             # Failing here should be impossible if test above is passed
             assert sp[f"{prefix}preday"] is None or sp[f"{prefix}postday"] is None
 
