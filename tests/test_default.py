@@ -1,5 +1,4 @@
 import sys
-import os
 import datetime
 
 sys.path.append(".")
@@ -9,30 +8,8 @@ try:
 except:
     import historicaldate.historicaldate.hdate as hdate
 
-def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None, check_days=False):
-    hd = hdate.HDate(s, prefixdateorder=prefixdateorder)
-    if re_check is not None: # Check output from re
-        found = {k:v for k, v in hd.re_parsed.items() if v != re_check.get(k, None)}
-        expected = {k:re_check.get(k,None) for k in found}
-        assert found == {}, f"re_check mismatches for '{s}': Found {found} Expected {expected}"
-
-    if dcheck is not None: # Check canonical dictionary
-        found = {k:v for k, v in hd.d_parsed.items() if v != dcheck.get(k, None)}
-        expected = {k:dcheck.get(k,None) for k in found}
-        assert found == {}, f"d_parsed mismatches for '{s}': Found {found} Expected {expected}"
-
-    if pdcheck is not None: # Check canonical dictionary
-        found = {k:v for k, v in hd.pdates.items() 
-                    if ((v != pdcheck.get(k, None)) and (check_days or (k[0:8] != "ordinal_")))}
-        expected = {k:pdcheck.get(k,None) for k in found}
-        assert found == {}, f"pdate mismatches for '{s}': Found {found} Expected {expected}"
-
-def expect_valueerror(s):
-    try:
-        hd = hdate.HDate(s)
-        assert False, f"Illegal date '{s}' has not raised a ValueError"
-    except ValueError:
-        return True
+from utils_for_tests import compare
+from utils_for_tests import expect_valueerror
 
 def test1():
     compare("25 Dec 1066", {'midpreday':'25','midpremon':'Dec','midyear':'1066'}, 
@@ -96,44 +73,4 @@ def test2():
             pdcheck={'mid':datetime.date.today(), 'slmid': 'o', 'slearly': 'o', 'sllate': 'o', 
                      'late': datetime.date.today() + datetime.timedelta(days=int(5 * 365.25)), 
                      'early': datetime.date.today()})
-    
-# -- Some prefixdateorder checks
-def test3():
-    expect_valueerror("25/12/1066")
-    compare("25/12/1066", prefixdateorder="dmy",
-            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
-                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
-                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
-    compare("1066-12-25", prefixdateorder="dmy",
-            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
-                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
-                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
-    compare("12/25/1066", prefixdateorder="mdy",
-            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
-                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
-                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
-    compare("1066-12-25", prefixdateorder="mdy",
-            pdcheck={'mid': datetime.date(1066, 12, 25), 'slmid': 'd', 
-                     'late': datetime.date(1066, 12, 25), 'sllate': 'd', 
-                     'early': datetime.date(1066, 12, 25), 'slearly': 'd'})
 
-
-# -- Some BC date checks
-def testbc():
-    compare("487 bc", 
-            dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={'ordinal_early': -177876, 'ordinal_late': -177512, 'ordinal_mid': -177711,
-                    'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
-            check_days=True)
-    compare("12 July 100 BC",
-            pdcheck={'ordinal_early': -36332, 'ordinal_late': -36332, 'ordinal_mid': -36332,
-                    'slearly': 'd', 'sllate': 'd', 'slmid': 'd'},
-            check_days=True)
-
-def test_sandbox():
-    'Put a test here if we want to run it as a one-off'
-    compare("487 bc", 
-            dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={'ordinal_early': -177876, 'ordinal_late': -177512, 'ordinal_mid': -177711,
-                    'slearly': 'y', 'sllate': 'y', 'slmid': 'y'},
-            check_days=True)
