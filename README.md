@@ -1,6 +1,6 @@
 # historicaldate
 
-   * Date handling including support for BC dates and uncertainty in dates
+   * Date handling including support for BC dates and uncertainty
    * Create interactive graphical timelines of historical data
 
 ![Example timeline image](https://historicaldate.com/wp-content/uploads/2023/05/basic_timeline_example.png)
@@ -9,11 +9,16 @@
 
 Flexible and natural date formats are supported. 
    * The default formats are variants of '25 Dec 1066' and '1066-12-25'
-   * ... with options to recognise '25/12/1055', '12/25/1066' and 'Dec 25 1066'
+   * ... with options to recognise '25/12/1055', '12/25/1066' and 'Dec 25, 1066'
    * '1066' is treated as being an undetermined date in that year
    * 'circa' is allowed: e.g. 'circa 1028'
    * Uncertainty can be specified. e.g. 'Between 1025 and 1032'
    * BC dates are supported. e.g. 'circa 525 bc'
+
+The basic ideas are:
+   * An uncertain date is represented as three dates: the earliest possible, the midpoint and the latest possible
+   * These are represented as python dates (if AD) and as (int) ordinals extended backwards with non-positive values representing BC dates
+   * The difference between Julian and Gregorian calendars is naively ignored - which doesn't matter to and makes life simpler for most expected users
 
 ### To create a timeline:
    * Download this package from 
@@ -80,9 +85,30 @@ Dataframes passed to *add_event_set* have one row per event or life, and specifi
 
 ## Date formats
 
-**Two core formats are supported**
+**Two core formats are supported by default**
    * 25 Dec 1066 (or variants such as 25th Dec 1066 or 25 December 1066 etc.)
    * 1066-12-25
+
+**Additional formats are also supported**
+
+```python
+pltl = hdpl.plTimeLine(dateformat="dmy")
+```
+
+Specifying *dateformat="dmy"* also allows...
+   * 25/12/1066
+
+```python
+pltl = hdpl.plTimeLine(dateformat="mdy")
+```
+
+Specifying *dateformat="mdy"* allows...
+   * 12/25/1066
+   * Dec 25, 1066
+
+But does not allow...
+   * 25/12/1066
+   * 25 Dec 1066
 
 **The exact date is not required**
 
@@ -101,7 +127,7 @@ A missing value of *hdeath_death* (if there is a value of *hdate_birth*), or a v
 
 **Imprecise dates are treated properly**
 
-A date such as *circa 1066* leads to undertainty, of a few years, being shown on the timeline as a thin line.
+A date such as *circa 1066* leads to uncertainty, of a few years, being shown on the timeline as a thin line.
 
 **Python dates are used in a naive sort of way**
 
@@ -114,8 +140,7 @@ are supposed to be in the Gregorian calendar, or at least
 a 'proleptic' version of it - that is, extended backwards
 in time before the date it was introduced. 
 
-This hardly ever matters, however, and it's 
-much, much less confusing to take the naive route rather than
+This is expected to hardly ever matter in creation of timelines, however, and it is expected that this naive approach will be less  confusing for users than
 converting the (Julian) date *25 Dec 1066* to the equivalent
 proleptic Gregorian date (*31 Dec 1066*) when using Python dates.
 
@@ -127,22 +152,24 @@ The constructor takes a string as input, and the object has a property *pdates*,
 
 ```python
 from historicaldate import hdate
-hd = hdate.HDate('Dec 1066')
-print(hd.pdates)
+hd1 = hdate.HDate('Dec 1066')
+print(hd1.pdates)
+hd2 = hdate.HDate('Dec 20, 1066', dateformat="mdy")
+print(hd2.pdates)
 ```
 
 ...produces:
 
 ```text
-{'mid': datetime.date(1066, 12, 15),
-  'slmid': 'm',
-  'late': datetime.date(1066, 12, 31),
-  'sllate': 'm',
-  'early': datetime.date(1066, 12, 1),
-  'slearly': 'm'}
+{'mid': datetime.date(1066, 12, 15), 'ordinal_mid': 389332, 'slmid': 'm', 'late': datetime.date(1066, 12, 31), 'ordinal_late': 389348, 'sllate': 'm', 'early': datetime.date(1066, 12, 1), 'ordinal_early': 389318, 'slearly': 'm'}
+{'mid': datetime.date(1066, 12, 20), 'ordinal_mid': 389337, 'slmid': 'd', 'late': datetime.date(1066, 12, 20), 'ordinal_late': 389337, 'sllate': 'd', 'early': datetime.date(1066, 12, 20), 'ordinal_early': 389337, 'slearly': 'd'}
   ```
 
 The basic idea here is that the dict entries *early*, *mid* and *late* give the earliest possible, midpoint and latest possible Python dates corresonding to the date specified. These are then used by the timeline utility to indicate the range of uncertainty on the timeline.
+
+AD dates are given values of *mid*, *early*' and *late*. These are Python dates (*datetime.date* objects)
+
+All dates (AD and BC) are given values of *ordinal_mid*, *ordinal_early* and *ordinal_int*. These are usual Python date ordinals (int) for AD dates as created by *datetime.date.toordinal()*, extended backwards to non-positive numbers for BC dates assuming that 1BC, 5BC etc. are leap years. For AD dates the difference between Gregorian and Julian caledars is deliberately and naively ignored. The ordinal for *25 Dec 1066* is the value provided by *datetime.date.toordinal(datetime.date(1066, 12, 25))* (=389342). This is the ordinal for the **proleptic Gregorian** date and not the strictly correct ordinal for the Julian date. If this matters to you, *historicaldate* is probably not the package you should be using (not yet, anyway).
 
 The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specification level' of the corresponding date, and take the following values:
 
@@ -160,7 +187,8 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 
 **Constructor arguments**
 
-*pltl = hdpl.plTimeLine(title=None, mindate=None, maxdate=None, hovermode='closest', hoverdistance=5)*
+*pltl = hdpl.plTimeLine(self, title=None, mindate=None, maxdate=None, 
+                hovermode='closest', hoverdistance=5, xmode="date", dateformat=None)*
 
 | Parameter | Usage | Default |
 | ------ | ----- | ----- |
@@ -169,12 +197,17 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 | maxdate: datetime.date   | Initial latest date displayed  | 10 years after toay() |
 | hovermode: str   | Can be 'closest', 'x' or 'x unified' See https://plotly.com/python/hover-text-and-formatting/  | 'closest' |
 | hoverdistance: int   | See https://plotly.com/python-api-reference/generated/plotly.graph_objects.Layout.html  | 5 |
+| xmode: str | Controls how X-axis values are displayed. If *xmode='date'* X-axis values are displayed as Python *datetime.date* values, and BC dates are ignored. If *xmode='years'* X-axis values are displayed as years as *float* values, and both AD and BC dates can be displayed. | 'date' |
+| dateformat | If *None*, date formats accepted are variants of *25 Dec 1066* and *1066-12-25*. If *dateformat='dmy'* then *25/12/1066* is also accepted. If *dateformat='mdy'* then *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, but *25 Dec 1066* is not accepted. | None |
 
-### Methods
+
+### *plTimeLine()* Methods
 
 ### *pltl.fit_xaxis(self, mindate=None, maxdate=None)*
 
-Fit x axis to specified dates, or to the date range of the data currently displayed
+Fit x axis to specified dates, or to the date range of the data currently displayed.
+
+*mindate* and *maxdate* may be passed as either Python dates (datetime.date), Ordinals (int) (which may be less than zero) or as a date string (str) in a format acceptable to HDate. 
 
 ### *pltl.add_event_set(df, title="", showbirthanddeath=True, showlabel=True, lives_first=True,  rowspacing=0.3, hover_datetype='day', study_range_start=None, study_range_end=None, max_rank=1)*
 

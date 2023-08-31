@@ -72,8 +72,8 @@ class plTimeLine():
         Fit x axis to specified dates, or to data range
         mindate and maxdate may be either ordinals (int) or Python dates
         """
-        minord = hdate.to_ordinal(mindate)
-        maxord = hdate.to_ordinal(maxdate)
+        minord = hdate.to_ordinal(mindate, dateformat=self._dateformat)
+        maxord = hdate.to_ordinal(maxdate, dateformat=self._dateformat)
 
         earliest = minord if minord is not None \
                         else self.earliest_trace_date - int(5*365.25) if self.earliest_trace_date is not None \
@@ -114,10 +114,10 @@ class plTimeLine():
                     else ""
 
         if "hdate" in df.columns:
-            df["_hdplsortorder"] = df["hdate"].apply(hdate.calc_mid_ordinal)
+            df["_hdplsortorder"] = df["hdate"].apply(lambda x: hdate.calc_mid_ordinal(x, dateformat=self._dateformat))
             dfs = df.sort_values("_hdplsortorder")
         elif "hdate_birth" in df.columns:
-            df["_hdplsortorder"] = df["hdate_birth"].apply(hdate.calc_mid_ordinal)
+            df["_hdplsortorder"] = df["hdate_birth"].apply(lambda x: hdate.calc_mid_ordinal(x, dateformat=self._dateformat))
             dfs = df.sort_values("_hdplsortorder") 
         else:
             dfs = df
@@ -143,7 +143,7 @@ class plTimeLine():
         # -- split lives and display them first if required
         some_events_added = False
         if "hdate_birth" in dfs.columns and lives_first:
-            dfs["_hdplbirth"] = dfs["hdate_birth"].apply(hdate.calc_mid_ordinal)
+            dfs["_hdplbirth"] = dfs["hdate_birth"].apply(lambda x: hdate.calc_mid_ordinal(x, dateformat=self._dateformat))
             df_lives = dfs[dfs["_hdplbirth"].notna()].sort_values(["_hdplbirth"])
             some_events_added = disp_set(df_lives) or some_events_added
             dfs = dfs[dfs["_hdplbirth"].isna()]   # -- not lives
@@ -180,8 +180,8 @@ class plTimeLine():
         htext_end = row["htext_end"] if "htext_end" in cols and row["htext_end"] else htext
         hlink = row['url'] if 'url' in cols else None
 
-        study_ordinal_start = hdate.to_ordinal(study_range_start)
-        study_ordinal_end = hdate.to_ordinal(study_range_end)
+        study_ordinal_start = hdate.to_ordinal(study_range_start, dateformat=self._dateformat)
+        study_ordinal_end = hdate.to_ordinal(study_range_end, dateformat=self._dateformat)
 
         earliest, latest = None, None
 
@@ -302,9 +302,8 @@ class plTimeLine():
     def add_trace_part(self, pdate_start=None, pdate_end=None, label="", y=0.0, 
                     color=None, width=4, dash=None, 
                     hovertext=None, hovertext_end=None):
-
         # BC dates are ignored if xmode == "date"
-        if self._xmode == "date" and hdate.to_ordinal(pdate_start) <= 0:
+        if self._xmode == "date" and hdate.to_ordinal(pdate_start, dateformat=self._dateformat) <= 0:
             return
 
         if hovertext_end is None:
@@ -313,13 +312,15 @@ class plTimeLine():
         if (pdate_start <= pdate_end): 
             if self._xmode == "date":
                 pointinterval = datetime.timedelta(days=self.pointinterval)
-                xs = [hdate.to_python_date(pdate_start) + n * pointinterval for n in 
-                    range(ceil((hdate.to_python_date(pdate_end) - hdate.to_python_date(pdate_start)).total_seconds()/
-                                    pointinterval.total_seconds()))] + [hdate.to_python_date(pdate_end)]
+                xs = [hdate.to_python_date(pdate_start, dateformat=self._dateformat) + n * pointinterval for n in 
+                    range(ceil((hdate.to_python_date(pdate_end, dateformat=self._dateformat) - 
+                                        hdate.to_python_date(pdate_start, dateformat=self._dateformat)).total_seconds()/
+                                    pointinterval.total_seconds()))] + [hdate.to_python_date(pdate_end, dateformat=self._dateformat)]
             else:
-                xs = [hdate.to_years(hdate.to_ordinal(pdate_start) + n * self.pointinterval) for n in 
-                        range(ceil((hdate.to_ordinal(pdate_end) - hdate.to_ordinal(pdate_start))/
-                                    self.pointinterval))] + [hdate.to_years(pdate_end)]
+                xs = [hdate.to_years(hdate.to_ordinal(pdate_start, dateformat=self._dateformat) + n * self.pointinterval) for n in 
+                        range(ceil((hdate.to_ordinal(pdate_end, dateformat=self._dateformat) - 
+                                                hdate.to_ordinal(pdate_start, dateformat=self._dateformat))/
+                                    self.pointinterval))] + [hdate.to_years(pdate_end, dateformat=self._dateformat)]
             ys = [y for _ in xs]
             hovertexts = label if not hovertext \
                             else hovertext if hovertext == hovertext_end \
@@ -353,6 +354,7 @@ class ColorGen():
 def add_trace_marker(fig, pdate=None, label="", y=0.0, 
                    color=None, size=8, symbol='diamond', showlegend=False,
                    hovertext=None, hyperlink=None, xmode="date"):
+    "pdate must be an ordinal"
     pltdate = hdate.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y], name=label, legendgroup=label,
                         mode="markers", marker={'color':color, 'size':size,'symbol':symbol}, 
@@ -361,6 +363,7 @@ def add_trace_marker(fig, pdate=None, label="", y=0.0,
                         hoverlabel={'namelength':-1}, showlegend=showlegend))
 # ------------------------------------------------------------------------------------------------
 def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None, xmode="date"):
+    "pdate must be an ordinal"
     hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
     pltdate = hdate.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y+0.04], 
