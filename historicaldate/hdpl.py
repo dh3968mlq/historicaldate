@@ -303,6 +303,10 @@ class plTimeLine():
                     color=None, width=4, dash=None, 
                     hovertext=None, hovertext_end=None):
 
+        # BC dates are ignored if xmode == "date"
+        if self._xmode == "date" and hdate.to_ordinal(pdate_start) <= 0:
+            return
+
         if hovertext_end is None:
             hovertext_end = hovertext
 
