@@ -106,9 +106,9 @@ class HDate():
     Object class to deal with historical dates, stored as strings
     See README.md at https://github.com/dh3968mlq/historicaldate
     """
-    def __init__(self, hdstr="", missingasongoing=False, prefixdateorder=None):
+    def __init__(self, hdstr="", missingasongoing=False, dateformat=None):
         self.circa_interval_days = int(5 * 365.25)
-        self.match_pattern = self._create_match_pattern(prefixdateorder)
+        self.match_pattern = self._create_match_pattern(dateformat)
         self.compiled_pattern = re.compile(self.match_pattern, re.VERBOSE | re.IGNORECASE)
         self.input = hdstr
 
@@ -129,7 +129,7 @@ class HDate():
             self.pdates = None
             
     # ------------------------------------------------------------------------------------------------------
-    def _create_match_pattern(self, prefixdateorder):
+    def _create_match_pattern(self, dateformat):
         circa_pattern = "circa|c|c.|about|estimated"
         day_pattern = "[0-9]{1,2}"
 
@@ -139,7 +139,7 @@ class HDate():
         self.monthnumberpattern = '[1-9]|0[1-9]|1[0-2]'
         month_pattern = "|".join(months + self.months)   # allow either full month names or 3-letter abbrevations
 
-        if prefixdateorder:   # if not None then numerical months are also allowed
+        if dateformat:   # if not None then numerical months are also allowed
             month_pattern += "|" + self.monthnumberpattern
 
         year_pattern = "[0-9]{1,8}"    # should we require at least three year digits to avoid confusion with month and day?
@@ -147,7 +147,7 @@ class HDate():
         calendar_pattern = "ce|ad|bc|bce"
 
         def makedatepattern(prefix=""):
-            if prefixdateorder is None or prefixdateorder.lower() == "dmy":
+            if dateformat is None or dateformat.lower() == "dmy":
                 datepattern = f"""
                     (
                         (
@@ -163,7 +163,7 @@ class HDate():
                         )?
                         (\\s+(?P<{prefix}calendar>{calendar_pattern}))?
                 """
-            elif prefixdateorder.lower() == "mdy":
+            elif dateformat.lower() == "mdy":
                 datepattern = f"""
                     (
                         (
@@ -180,7 +180,7 @@ class HDate():
                     )?
                 """
             else:
-                raise NotImplementedError(f"prefixdateorder must be None, 'dmy' or 'mdy': not '{prefixdateorder}'")
+                raise NotImplementedError(f"dateformat must be None, 'dmy' or 'mdy': not '{dateformat}'")
             return datepattern
 
         pattern = f"""

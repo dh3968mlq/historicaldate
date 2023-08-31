@@ -46,7 +46,7 @@ class plTimeLine():
             raise ValueError(f"dateformat must be in {dateformat_valid}, not '{dateformat}'")
 
         self._xmode = xmode
-        self._prefixdateorder = None if dateformat == "default" else dateformat
+        self._dateformat = None if dateformat == "default" else dateformat
 
         self.figure = make_subplots(rows=1, cols=1, subplot_titles=[title])
         self.figure.update_annotations(y=1.015, yref="paper", selector={'text':title})
@@ -190,7 +190,7 @@ class plTimeLine():
             if col not in cols:
                 return None, earliest, latest
             else:
-                if pd := hdate.HDate(row[col], missingasongoing=missingasongoing, prefixdateorder=self._prefixdateorder).pdates:
+                if pd := hdate.HDate(row[col], missingasongoing=missingasongoing, dateformat=self._dateformat).pdates:
                     earliest = min(pd['ordinal_early'], earliest) if earliest is not None else pd['ordinal_early']
                     latest = max(pd['ordinal_late'], latest) if latest is not None else pd['ordinal_late']
                 return pd, earliest, latest

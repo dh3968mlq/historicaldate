@@ -9,8 +9,8 @@ try:
 except:
     import historicaldate.historicaldate.hdate as hdate
 
-def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None, check_days=False):
-    hd = hdate.HDate(s, prefixdateorder=prefixdateorder)
+def compare(s,re_check=None, dcheck=None, pdcheck=None, dateformat=None, check_days=False):
+    hd = hdate.HDate(s, dateformat=dateformat)
     if re_check is not None: # Check output from re
         found = {k:v for k, v in hd.re_parsed.items() if v != re_check.get(k, None)}
         expected = {k:re_check.get(k,None) for k in found}
@@ -27,9 +27,9 @@ def compare(s,re_check=None, dcheck=None, pdcheck=None, prefixdateorder=None, ch
         expected = {k:pdcheck.get(k,None) for k in found}
         assert found == {}, f"pdate mismatches for '{s}': Found {found} Expected {expected}"
 
-def expect_valueerror(s, prefixdateorder=None):
+def expect_valueerror(s, dateformat=None):
     try:
-        hd = hdate.HDate(s, prefixdateorder=prefixdateorder)
+        hd = hdate.HDate(s, dateformat=dateformat)
         assert False, f"Illegal date '{s}' has not raised a ValueError"
     except ValueError:
         return True
