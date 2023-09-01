@@ -10,13 +10,13 @@ from historicaldate import hdpl
 import pandas as pd
 import datetime
 
-df_charlotte = pd.read_csv(f"{dataroot}/data/culture/brontes/Charlotte Bronte.csv",
+df_charlotte = pd.read_csv(f"{dataroot}/data/culture/western_canon/brontes/Charlotte Bronte.csv",
                  na_filter=False)
-df_emily = pd.read_csv(f"{dataroot}/data/culture/brontes/Emily Bronte.csv",
+df_emily = pd.read_csv(f"{dataroot}/data/culture/western_canon/brontes/Emily Bronte.csv",
                  na_filter=False)
-df_anne = pd.read_csv(f"{dataroot}/data/culture/brontes/Anne Bronte.csv",
+df_anne = pd.read_csv(f"{dataroot}/data/culture/western_canon/brontes/Anne Bronte.csv",
                  na_filter=False)
-df_other = pd.read_csv(f"{dataroot}/data/culture/brontes/Other Brontes.csv",
+df_other = pd.read_csv(f"{dataroot}/data/culture/western_canon/brontes/Other Brontes.csv",
                  na_filter=False)
 df_history = pd.read_csv(f"{dataroot}/data/history/europe/Events in British History.csv",
                  na_filter=False)

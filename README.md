@@ -1,7 +1,11 @@
 # historicaldate
 
+A Python package for:
+
    * Date handling including support for BC dates and uncertainty
-   * Create interactive graphical timelines of historical data
+   * Creating graphical timelines of historical data. This uses *Plotly*, which gives zoom, pan, hovertext and hyperlink interactivity
+
+See https://historicaldate.com/ for example outputs and an interactive timeline builder based on this package.
 
 ![Example timeline image](https://historicaldate.com/wp-content/uploads/2023/05/basic_timeline_example.png)
 
@@ -17,8 +21,9 @@ Flexible and natural date formats are supported.
 
 The basic ideas are:
    * An uncertain date is represented as three dates: the earliest possible, the midpoint and the latest possible
-   * These are represented as Python dates (if AD) and as (int) ordinals extended backwards with non-positive values representing BC dates
-   * The difference between Julian and Gregorian calendars is naively ignored - which doesn't matter to and makes life simpler for most expected users
+   * These are represented as (int) ordinals with non-positive values representing BC dates
+   * AD dates are also represented as Python dates
+   * The difference between Julian and Gregorian calendars is naively ignored - which doesn't matter to most expected users and makes everything much simpler
 
 ### To create a timeline:
    * Download this package from 
@@ -53,13 +58,11 @@ pltl.show() # Show in a browser, or...
 pltl.write_html("/home/pi/example_timeline.html")
 ```
 
-The basic ideas here are:
-   * Dates are specified in natural text formats, allowing for uncertainty. '25 Dec 1066', 'Dec 1066','1066' and 'Circa 1066' are all allowed (see below for details of date formats)
-   * Data can be held in .csv files (see below for column names)
+In the CSV files used here:
+   * Dates are specified in natural text formats, allowing for uncertainty.
    * It's possible to specify a single date for an event...
    * ... or start and end dates of persistent events, such as a US presidency or a British monarch's reign...
    * ... and/or birth and death dates of persons
-   * There is support for easily displaying timelines of events using *Plotly* which gives basic interactivity: zoom, pan, hovertext and hyperlinks
    
 In the timeline display:
    * A person's life is displayed as a dotted line
@@ -324,6 +327,7 @@ Returns the mid-point ordinal from a date held as a string in *HDate* format
    * Ordinal dates implemented in *HDate*
    * *dateformat* implemented, allowing dates to be formatted as *25/12/1066* or *12/25/1066* or *Dec 25, 1066*
    * BC dates can now be displayed on timelines (*xmode=years*)
+   * X-axis (date axis) labels moved to top 
 
 ### New in 0.0.4
 
