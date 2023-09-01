@@ -65,9 +65,9 @@ In the CSV files used here:
    * ... and/or birth and death dates of persons
    
 In the timeline display:
-   * A person's life is displayed as a dotted line
-   * An event is displayed as a diamond symbol, or two diamonds linked by a solid line if it persists over time
-   * Uncertainty in dates is displayed as thin lines
+
+![Timeline explanation image](https://historicaldate.com/wp-content/uploads/timeline_explanation1.png)
+
 
 ## Input file format
 
@@ -146,11 +146,21 @@ It's expected this approach will continue to be the default, since to do anythin
 
 (*Proleptic Gregorian Calendar*: A Gregorian calendar extended backwards in time before the dates, starting in the 16th century AD, that the Gregorian calendar was actually introduced)
 
-## Dealing with dates - the HDate() object class
+# Dealing with dates - the HDate() class
 
-The underlying date processing uses the object class *historicaldate.hdate.HDate()*
+Objects of this class have a property *pdates*, a dictionary encoding the date information.
 
-The constructor takes a string as input, and the object has a property *pdates*, a dictionary encoding the date information.
+### Constructor
+
+hd = hdate.HDate(hdstr="", missingasongoing=False, dateformat=None)
+
+| Parameter | Usage |
+| ------ | ----- |
+| hdstr : str   | String indicating the date  |
+| missingasongoing: bool | Indicates if a null string is to be interpreted as indicating 'ongoing' or (equivalently) 'alive' |
+| dateformat : str | If *None*, date formats accepted are variants of *25 Dec 1066* and *1066-12-25*. If *dateformat='dmy'* then *25/12/1066* is also accepted. If *dateformat='mdy'* then *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, but *25 Dec 1066* is not accepted |
+
+### Examples
 
 ```python
 >>>from historicaldate import hdate
@@ -187,14 +197,11 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 | 'c'   | Derived from a 'circa' calculation  |
 | 'o'   | Derived from an 'ongoing' calculation  |
 
-# Package Documentation
+# Creating timelines: the *plTimeLine()* class
 
-## *plTimeLine()* object: timelines using Plotly
+**Constructor**
 
-**Constructor arguments**
-
-*pltl = hdpl.plTimeLine(self, title=None, mindate=None, maxdate=None, 
-                hovermode='closest', hoverdistance=5, xmode="date", dateformat=None)*
+*pltl = hdpl.plTimeLine(self, title=None, mindate=None, maxdate=None, hovermode='closest', hoverdistance=5, xmode="date", dateformat=None)*
 
 | Parameter | Usage | Default |
 | ------ | ----- | ----- |
