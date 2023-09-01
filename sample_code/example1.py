@@ -1,15 +1,15 @@
 # Sample code for a timeline of British monarchs and Prime Ministers
 # The folders that historicaldate and historicaldate-data have been downloaded to...
-hdroot = "/svol1/pishare/users/pi/repos/historicaldate" 
-dataroot = "/svol1/pishare/users/pi/repos/historicaldate-data" 
+hdroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate" 
+dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data" 
 import sys
 sys.path.append(hdroot)
 from historicaldate import hdpl  # Timelines using Plotly
 import pandas as pd
 
-df1 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Monarchs.csv",
+df1 = pd.read_csv(f"{dataroot}/data/history/europe/British Monarchs.csv",
                  na_filter=False)
-df2 = pd.read_csv(f"{dataroot}/data/history/europe/United Kingdom/British Prime Ministers.csv",
+df2 = pd.read_csv(f"{dataroot}/data/history/europe/British Prime Ministers.csv",
                  na_filter=False)
 
 pltl = hdpl.plTimeLine()

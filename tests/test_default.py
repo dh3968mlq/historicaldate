@@ -1,5 +1,4 @@
 import sys
-import os
 import datetime
 
 sys.path.append(".")
@@ -9,22 +8,8 @@ try:
 except:
     import historicaldate.historicaldate.hdate as hdate
 
-def compare(s,re_check=None, dcheck=None, pdcheck=None):
-    hd = hdate.HDate(s)
-    if re_check is not None: # Check output from re
-        found = {k:v for k, v in hd.re_parsed.items() if v != re_check.get(k, None)}
-        expected = {k:re_check.get(k,None) for k in found}
-        assert found == {}, f"re_check mismatches for '{s}': Found {found} Expected {expected}"
-
-    if dcheck is not None: # Check canonical dictionary
-        found = {k:v for k, v in hd.d_parsed.items() if v != dcheck.get(k, None)}
-        expected = {k:dcheck.get(k,None) for k in found}
-        assert found == {}, f"d_parsed mismatches for '{s}': Found {found} Expected {expected}"
-
-    if pdcheck is not None: # Check canonical dictionary
-        found = {k:v for k, v in hd.pdates.items() if v != pdcheck.get(k, None)}
-        expected = {k:pdcheck.get(k,None) for k in found}
-        assert found == {}, f"pdate mismatches for '{s}': Found {found} Expected {expected}"
+from utils_for_tests import compare
+from utils_for_tests import expect_valueerror
 
 def test1():
     compare("25 Dec 1066", {'midpreday':'25','midpremon':'Dec','midyear':'1066'}, 
@@ -84,10 +69,8 @@ def test2():
             pdcheck={'mid': datetime.date(1578, 6, 15), 'slmid': 'c',
                      'late': datetime.date(1583, 6, 15), 'sllate': 'c', 
                      'early': datetime.date(1573, 6, 15), 'slearly': 'c'})
-    compare("487 bc", 
-            dcheck={'circa': False, 'ongoing': False, 'midyear': 487, 'midcalendar': 'bce'},
-            pdcheck={})
     compare("ongoing",
             pdcheck={'mid':datetime.date.today(), 'slmid': 'o', 'slearly': 'o', 'sllate': 'o', 
                      'late': datetime.date.today() + datetime.timedelta(days=int(5 * 365.25)), 
                      'early': datetime.date.today()})
+
