@@ -3,36 +3,27 @@
 A Python package for:
 
    * Date handling including support for BC dates and uncertainty
-   * Creating graphical timelines of historical data. This uses *Plotly*, which gives zoom, pan, hovertext and hyperlink interactivity
+   * Creating interactive graphical timelines of historical data.
 
-See https://historicaldate.com/ for example outputs and an interactive timeline builder based on this package.
+See https://historicaldate.com/ for example outputs and a cloud-hosted interactive timeline builder based on this package.
 
 ![Example timeline image](https://historicaldate.com/wp-content/uploads/2023/05/basic_timeline_example.png)
 
-### Date handling
+When creating a timeline:
+   * Dates in input files are in a natural readable format, such as '25 Dec 1066'
+   * Dates can be uncertain (e.g. 'circa 1028') and can be BC (e.g. '525 BC')
+   * It is possible to specify start and end dates of persistent events, such as a wars or monarchs' reigns, and/or birth and death dates of persons
 
-Flexible and natural date formats are supported. 
-   * The default formats are variants of '25 Dec 1066' and '1066-12-25'
-   * ... with options to recognise '25/12/1055', '12/25/1066' and 'Dec 25, 1066'
-   * '1066' is treated as being an undetermined date in that year
-   * 'circa' is allowed: e.g. 'circa 1028'
-   * Uncertainty can be specified. e.g. 'Between 1025 and 1032'
-   * BC dates are supported. e.g. 'circa 525 bc'
+In the timeline display:
 
-The basic ideas are:
-   * An uncertain date is represented as three dates: the earliest possible, the midpoint and the latest possible
-   * These are represented as (int) ordinals with non-positive values representing BC dates
-   * AD dates are also represented as Python dates
-   * The difference between Julian and Gregorian calendars is naively ignored - which doesn't matter to most expected users and makes everything much simpler
+![Timeline explanation image](https://historicaldate.com/wp-content/uploads/timeline_explanation1.png)
 
-### To create a timeline:
+## To create a timeline:
    * Download this package from 
 https://github.com/dh3968mlq/historicaldate
    * Download sample data from https://github.com/dh3968mlq/historicaldate-data, and/or
    * Create .csv files of data (see below for column names and date formats)
    * Create and run a Python program, similar to below, or see sample timeline code in the *timelines* folder in this repository
-
-See https://historicaldate.com/ for example outputs and for an interactive timeline builder.
 
 ### Sample code:
 
@@ -58,17 +49,6 @@ pltl.show() # Show in a browser, or...
 pltl.write_html("/home/pi/example_timeline.html")
 ```
 
-In the CSV files used here:
-   * Dates are specified in natural text formats, allowing for uncertainty.
-   * It's possible to specify a single date for an event...
-   * ... or start and end dates of persistent events, such as a US presidency or a British monarch's reign...
-   * ... and/or birth and death dates of persons
-   
-In the timeline display:
-
-![Timeline explanation image](https://historicaldate.com/wp-content/uploads/timeline_explanation1.png)
-
-
 ## Input file format
 
 Dataframes passed to *add_event_set* have one row per event or life, and specific column names. *label* must be present, together with either *hdate* or both of *hdate_birth* and *hdate_death*. All other columns are optional.
@@ -88,24 +68,16 @@ Dataframes passed to *add_event_set* have one row per event or life, and specifi
 
 ## Date formats
 
-**Two core formats are supported by default**
+### Two core formats are supported by default
    * 25 Dec 1066 (or variants such as 25th Dec 1066 or 25 December 1066 etc.)
    * 1066-12-25
 
-**Additional formats are also supported**
+### Additional formats are also supported
 
-```python
-pltl = hdpl.plTimeLine(dateformat="dmy")
-```
-
-Specifying *dateformat="dmy"* also allows...
+Specifying ***dateformat="dmy"*** (as a parameter to either the *HDate* constructor or the *plTimeLine* constructor) also allows...
    * 25/12/1066
 
-```python
-pltl = hdpl.plTimeLine(dateformat="mdy")
-```
-
-Specifying *dateformat="mdy"* allows...
+Specifying ***dateformat="mdy"*** allows...
    * 12/25/1066
    * Dec 25, 1066
 
@@ -113,7 +85,7 @@ But does not allow...
    * 25/12/1066
    * 25 Dec 1066
 
-**The exact date is not required**
+### The exact date is not required
 
 These are all allowed:
    * Dec 1066
@@ -124,20 +96,20 @@ These are all allowed:
    * between 1066 and 1068
    * circa 1483 earliest 1483
 
-**Ongoing events, or lives, are supported**
+### Ongoing events, or lives, are supported
 
 A missing value of *hdeath_death* (if there is a value of *hdate_birth*), or a value of 'ongoing' in *hdate_end* leads to an indication on a timeline that an event is ongoing, or that a person is still alive.
 
-**Imprecise dates are treated properly**
+### Imprecise dates are treated properly
 
 A date such as *circa 1066* leads to uncertainty, of a few years, being shown on the timeline as a thin line.
 
-**The difference between Julian and Gregorian calendars is (as yet) ignored**
+### The difference between Julian and Gregorian calendars is (as yet) ignored
 
 Python dates are used for AD (CE) timeline displays,
 and *25 Dec 1066* converts to the Python date *1066-12-25*.
 
-This gets us into the tricky question of the few days difference between the Julian and Gregorian calendars. The philosophy adopted here is (at least for the moment) to observe that this difference doesn't have any significant impact on almost all timeline displays, and so can be ignored.
+This gets us into the tricky question of the few days difference between the Julian and Gregorian calendars. The approach here is (at least for the moment) to observe that this difference doesn't have any significant impact on almost all timeline displays, and so can be ignored.
 
 In effect this package naively assumes that any AD date string passed to *HDate* is (proleptic) Gregorian, the same assumption that is made by Python's *datetime.date*.
 This is 'naive' because the usual convention when quoting historical dates is to use the calendar in operation at the relevant place at the time. So when we say that the coronation of William I of England took place on 25 Dec 1066, that is a Julian date, not a proleptic Gregorian date (which I believe would be 31 Dec 1066).
@@ -149,16 +121,6 @@ It's expected this approach will continue to be the default, since to do anythin
 # Dealing with dates - the HDate() class
 
 Objects of this class have a property *pdates*, a dictionary encoding the date information.
-
-### Constructor
-
-hd = hdate.HDate(hdstr="", missingasongoing=False, dateformat=None)
-
-| Parameter | Usage |
-| ------ | ----- |
-| hdstr : str   | String indicating the date  |
-| missingasongoing: bool | Indicates if a null string is to be interpreted as indicating 'ongoing' or (equivalently) 'alive' |
-| dateformat : str | If *None*, date formats accepted are variants of *25 Dec 1066* and *1066-12-25*. If *dateformat='dmy'* then *25/12/1066* is also accepted. If *dateformat='mdy'* then *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, but *25 Dec 1066* is not accepted |
 
 ### Examples
 
@@ -183,7 +145,7 @@ hd = hdate.HDate(hdstr="", missingasongoing=False, dateformat=None)
 
 All dates (AD and BC) are given values of *ordinal_early*, *ordinal_mid* and *ordinal_late*. These represent the earliest possible, midpoint and latest possible ordinals (int) corresponding to the date specified.
 
-These are usual Python date ordinals (int) for AD dates as created by *datetime.date.toordinal()*, extended backwards in time to non-positive numbers for BC dates assuming that 1BC, 5BC etc. are leap years. See below for how the few days difference between the Julian and Gregorian calendars is treated.
+These are usual Python date ordinals (int) for AD dates as created by *datetime.date.toordinal()*, extended backwards in time to non-positive numbers for BC dates assuming that 1BC, 5BC etc. are leap years. See above for how the few days difference between the Julian and Gregorian calendars is treated.
 
 AD dates are also given values of *early*, *mid* and *late*, which are the equivalent Python dates (*datetime.date* objects).
 
@@ -196,6 +158,66 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 | 'y'   | year  |
 | 'c'   | Derived from a 'circa' calculation  |
 | 'o'   | Derived from an 'ongoing' calculation  |
+
+
+## Constructor
+
+*hd = hdate.HDate(hdstr="", missingasongoing=False, dateformat=None)*
+
+| Parameter | Usage |
+| ------ | ----- |
+| hdstr : str   | String indicating the date. See description above for allowed date formats  |
+| missingasongoing: bool | Indicates if a null string is to be interpreted as indicating 'ongoing' or (equivalently) 'alive' |
+| dateformat : str | If *None*, date formats accepted are variants of *25 Dec 1066* and *1066-12-25*. If *dateformat='dmy'* then *25/12/1066* is also accepted. If *dateformat='mdy'* then *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, but *25 Dec 1066* is not accepted |
+
+
+## *hdate* utility functions
+
+In all *hdate* utility functions 
+   * The parameter *date_or_ordinal* may be passed as either a Python date (datetime.date), an ordinal (int) (which may be less than zero) or as a date string (str) in a format acceptable to HDate.
+   * The parameter *dateformat* is equivalent to the same parameter in the *HDate* constructor. See above for details.
+
+### *ord = to_ordinal(date_or_ordinal, delta=0, dateformat=None)*
+
+Converts a date or ordinal value to an ordinal. 
+
+*delta*: indicates a number of days to be added to the original date.
+
+### *pdate = to_python_date(date_or_ordinal, dateformat=None)*
+
+Converts a date or ordinal value to a python date. 
+
+Returns a *None* value if *date_or_ordinal* is BC.
+
+### *yrs = to_years(date_or_ordinal, dateformat=None)*
+
+Converts a date or ordinal to an approximate number of years (float). The returned value 0.0 corresponds to ordinal value 0, which is 31st December, 1BC.
+
+The implementation is approximate, but believed to be good enough for most timeline displays.
+
+### *syear = format_year(year, showzeroas1ad=True, adtext="AD", bctext="BC")*
+
+Formats a year (int or float) in a way suitable for display on an X-axis that is showing dates as float values corresponding to years.
+
+### *ord = years_to_ordinal(years)*
+
+Converts a year number (float) to an ordinal.
+
+Also approximate, but an exact inverse of *to_years*
+
+### *ymd = to_ymd(date_or_ordinal, dateformat=None)*
+
+Converts a date or ordinal to a named tuple containing year, month and day numbers
+
+The tuple definition is:
+```python
+YMD = namedtuple("YMD", "year month day")
+```
+
+### *ord = calc_mid_ordinal(hdstring, dateformat=None)*
+
+Returns the mid-point ordinal from a date held as a string in *HDate* format
+
 
 # Creating timelines: the *plTimeLine()* class
 
@@ -265,66 +287,6 @@ Checks if a data frame can be used by *add_event_set()*.
 *added* is a bool indicating if events from the dataframe can be added.
 
 *message* indicates a reason if *added* is False. This function traps all errors and returns them formatted in *message*
-
-## The HDate object
-
-### Constructor arguments
-
-*hd = hdate.HDate(hdstr="", missingasongoing=False, dateformat=None)*
-
-hdstr : The input date string. See above for allowed formats
-
-missingasongoing : determines if a blank string is interpreted as 'ongoing' or (equivalently) 'alive'
-
-dateformat : may be None, "dmy" or "mdy". See above for how this affects the accepted date formats.
-
-## *hdate* utility functions
-
-In all *hdate* utility functions 
-   * The parameter *date_or_ordinal* may be passed as either a Python date (datetime.date), an ordinal (int) (which may be less than zero) or as a date string (str) in a format acceptable to HDate.
-   * The parameter *dateformat* is equivalent to the same parameter in the *HDate* constructor. See above for details.
-
-#### *ord = to_ordinal(date_or_ordinal, delta=0, dateformat=None)*
-
-Converts a date or ordinal value to an ordinal. 
-
-*delta*: indicates a number of days to be added to the original date.
-
-#### *pdate = to_python_date(date_or_ordinal, dateformat=None)*
-
-Converts a date or ordinal value to a python date. 
-
-Returns a *None* value if *date_or_ordinal* is BC.
-
-#### *yrs = to_years(date_or_ordinal, dateformat=None)*
-
-Converts a date or ordinal to an approximate number of years (float). The returned value 0.0 corresponds to ordinal value 0, which is 31st December, 1BC.
-
-The implementation is approximate, but believed to be good enough for most timeline displays.
-
-#### *syear = format_year(year, showzeroas1ad=True, adtext="AD", bctext="BC")*
-
-Formats a year (int or float) in a way suitable for display on an X-axis that is showing dates as float values corresponding to years.
-
-#### *ord = years_to_ordinal(years)*
-
-Converts a year number (float) to an ordinal.
-
-Also approximate, but an exact inverse of *to_years*
-
-#### *ymd = to_ymd(date_or_ordinal, dateformat=None)*
-
-Converts a date or ordinal to a named tuple containing year, month and day numbers
-
-The tuple definition is:
-```python
-YMD = namedtuple("YMD", "year month day")
-```
-
-### ord = calc_mid_ordinal(hdstring, dateformat=None)
-
-Returns the mid-point ordinal from a date held as a string in *HDate* format
-
 
 ## Changes
 
