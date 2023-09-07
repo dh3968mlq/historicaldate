@@ -3,7 +3,7 @@
 A Python package for:
 
    * Date handling including support for BC dates and uncertainty
-   * Creating interactive graphical timelines of historical data.
+   * Creating interactive graphical timelines of historical data using [Plotly](https://plotly.com/python/)
 
 See https://historicaldate.com/ for example outputs and a cloud-hosted interactive timeline builder based on this package.
 
