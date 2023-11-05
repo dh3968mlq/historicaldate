@@ -15,9 +15,9 @@ except:
     import historicaldate.historicaldate.hdate as hdate
 
 try:
-    import historicaldate.lineorganiser as lineorganiser
+    import historicaldate.hdplutils as hdplutils
 except:
-    import historicaldate.historicaldate.lineorganiser as lineorganiser
+    import historicaldate.historicaldate.hdplutils as hdplutils
 
 def check_dataframe(df, study_range_start=None, study_range_end=None, dateformat="default"):
     pltl = plTimeLine(mindate="2000 BC", maxdate="2200", xmode="years", dateformat=dateformat)
@@ -108,7 +108,7 @@ class plTimeLine():
 
         study_range_start, study_range_end may be either Python dates or ordinals
         """
-        colorgen = ColorGen()
+        colorgen = hdplutils.ColorGen()
         colorcol = "color" if "color" in df.columns \
                     else "colour" if "colour" in df.columns \
                     else ""
@@ -125,7 +125,7 @@ class plTimeLine():
         if "rank" in dfs.columns:
             dfs = dfs[dfs["rank"] <= max_rank]
 
-        lo = lineorganiser.LineOrganiser(daysperlabelchar=2.5 * self.initial_range_years,
+        lo = hdplutils.LineOrganiser(daysperlabelchar=2.5 * self.initial_range_years,
                                          daysminspacing=0.5 * self.initial_range_years)
 
         def disp_set(dfset):
@@ -341,15 +341,6 @@ class plTimeLine():
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
                                  visible=False, fixedrange=fix_y_range)
         self.figure.write_html(filename,include_plotlyjs='cdn', config=self.fig_config)
-# ------------------------------------------------------------------------------------------------
-class ColorGen():
-    def __init__(self):
-        self.index = -1
-        self.colors = pc.DEFAULT_PLOTLY_COLORS
-        self.len = len(self.colors)
-    def get(self):
-        self.index += 1
-        return self.colors[self.index % self.len]
 # ------------------------------------------------------------------------------------------------
 def add_trace_marker(fig, pdate=None, label="", y=0.0, 
                    color=None, size=8, symbol='diamond', showlegend=False,
