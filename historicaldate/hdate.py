@@ -1,6 +1,6 @@
 '''
     Handling dates of historical events and timelines
-    Copyright (C) 2023  David Harris
+    Author 2023  David Harris
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
