@@ -3,64 +3,15 @@ Utilities for figure manipulation in Plotly
 """
 import datetime
 import plotly.graph_objects as go
-from plotly import colors as pc
+from math import ceil
 
 try:
     import historicaldate.hdate as hdate
+    import historicaldate.hdateutils as hdateutils
 except:
     import historicaldate.historicaldate.hdate as hdate
+    import historicaldate.historicaldate.hdateutils as hdateutils
 
-# ----------------------------------------------------------------------------------------------------
-class LineOrganiser():
-    '''
-    Class to find a line to place a trace on
-    '''
-    def __init__(self, daysperlabelchar=500, daysminspacing = 200):
-        self.linerecord = []
-        self.daysperlabelchar = daysperlabelchar
-        self.daysminspacing = daysminspacing
-        self.previoustraceindex = 0
-        self.startline = 0
-
-    def reset_startline(self):
-        self.startline = len(self.linerecord)
-
-    def add_trace(self, earliest, latest, labeldate, text):
-        textdelta = int(len(text) * self.daysperlabelchar/2.0)
-        spacingdelta = int(self.daysminspacing/2.0)
-        t_earliest = min(earliest, labeldate - textdelta) - spacingdelta
-        t_latest = max(latest, labeldate + textdelta) + spacingdelta
-        lpd = {"earliest":t_earliest, "latest":t_latest}
-
-        for i in range(self.startline, nlines := len(self.linerecord)):
-            line = self.linerecord[(iline := (self.previoustraceindex + i + 1) % nlines)]
-            if self.is_available(line, lpd):
-                self.linerecord[iline] += [lpd]
-                self.previoustraceindex = iline
-                return iline
-
-        # Not found
-        self.linerecord += [[lpd]]
-        #print(self.linerecord)
-        self.previoustraceindex = len(self.linerecord) - 1
-        return self.previoustraceindex
-
-    def is_available(self, line, lpd):
-        return all([self.is_distinct(linepart, lpd) for linepart in line])
-    
-    def is_distinct(self, lpd1, lpd2):
-        #print("isd",lpd1,lpd2)
-        return (lpd1["earliest"] > lpd2["latest"]) or (lpd1["latest"] < lpd2["earliest"])
-
-# ---------------------------------------------------------------------------------
-class ColorGen():
-    def __init__(self):
-        self.index = -1
-        self.colors = pc.DEFAULT_PLOTLY_COLORS
-        self.len = len(self.colors)
-    def get(self):
-        self.index += 1
-        return self.colors[self.index % self.len]
 # -----------------------------------------------------------------------------------
 def calc_age(ymd_birth, ymd_ref):
     age = ymd_ref.year - ymd_birth.year
@@ -74,12 +25,12 @@ def calc_age(ymd_birth, ymd_ref):
 # ------------------------------------------------------------------------------------
 def calc_agetext(pdates_birth, pdates_ref):
     "Calculate age text, including ? to indicate uncertainty"
-    ymd_birth_early = hdate.to_ymd(pdates_birth['ordinal_early'])
-    ymd_birth_mid = hdate.to_ymd(pdates_birth['ordinal_mid'])
-    ymd_birth_late = hdate.to_ymd(pdates_birth['ordinal_late'])
-    ymd_ref_early = hdate.to_ymd(pdates_ref['ordinal_early'])
-    ymd_ref_mid = hdate.to_ymd(pdates_ref['ordinal_mid'])
-    ymd_ref_late = hdate.to_ymd(pdates_ref['ordinal_late'])
+    ymd_birth_early = hdateutils.to_ymd(pdates_birth['ordinal_early'])
+    ymd_birth_mid = hdateutils.to_ymd(pdates_birth['ordinal_mid'])
+    ymd_birth_late = hdateutils.to_ymd(pdates_birth['ordinal_late'])
+    ymd_ref_early = hdateutils.to_ymd(pdates_ref['ordinal_early'])
+    ymd_ref_mid = hdateutils.to_ymd(pdates_ref['ordinal_mid'])
+    ymd_ref_late = hdateutils.to_ymd(pdates_ref['ordinal_late'])
 
     years_largest = calc_age(ymd_birth_early, ymd_ref_late)
     years_smallest = calc_age(ymd_birth_late, ymd_ref_early)
@@ -92,9 +43,9 @@ def calc_yeartext(pdates, hover_datetype='day'):
     if hover_datetype not in {'year','month','day'}:
         raise ValueError(f"hover_datetype must be year, month or day. Found:{hover_datetype}")
     
-    ymd_early = hdate.to_ymd(pdates['ordinal_early'])
-    ymd_mid = hdate.to_ymd(pdates['ordinal_mid'])
-    ymd_late = hdate.to_ymd(pdates['ordinal_late'])
+    ymd_early = hdateutils.to_ymd(pdates['ordinal_early'])
+    ymd_mid = hdateutils.to_ymd(pdates['ordinal_mid'])
+    ymd_late = hdateutils.to_ymd(pdates['ordinal_late'])
 
     ytext = str(ymd_mid.year) if ymd_mid.year > 0 else str(-ymd_mid.year) + "BCE"
     if (ymd_early.year != ymd_late.year):
@@ -113,7 +64,7 @@ def add_trace_marker(fig, pdate=None, label="", y=0.0,
                    color=None, size=8, symbol='diamond', showlegend=False,
                    hovertext=None, hyperlink=None, xmode="date"):
     "pdate must be an ordinal"
-    pltdate = hdate.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
+    pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y], name=label, legendgroup=label,
                         mode="markers", marker={'color':color, 'size':size,'symbol':symbol}, 
                         hoverinfo='text',
@@ -123,11 +74,47 @@ def add_trace_marker(fig, pdate=None, label="", y=0.0,
 def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None, xmode="date"):
     "pdate must be an ordinal"
     hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
-    pltdate = hdate.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
+    pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y+0.04], 
                                 name=label, legendgroup=label,
                                 mode="text", text=hlinkedtext, 
                                 textposition='bottom center',
                                 hoverinfo='skip', hoverlabel={'namelength':-1}, showlegend=False))
 # ------------------------------------------------------------------------------------------------
+def add_trace_part(figure, pdate_start=None, pdate_end=None, label="", y=0.0, 
+                color=None, width=4, dash=None, 
+                hovertext=None, hovertext_end=None, 
+                xmode="date", dateformat="default", pointinterval=200
+                ):
+    "Add a line to the figure"
+    
+    # BC dates are ignored if xmode == "date"
+    if xmode == "date" and hdateutils.to_ordinal(pdate_start, dateformat=dateformat) <= 0:
+        return
+
+    if hovertext_end is None:
+        hovertext_end = hovertext
+
+    if (pdate_start <= pdate_end): 
+        if xmode == "date":
+            pointinterval = datetime.timedelta(days=pointinterval)
+            xs = [hdateutils.to_python_date(pdate_start, dateformat=dateformat) + n * pointinterval for n in 
+                range(ceil((hdateutils.to_python_date(pdate_end, dateformat=dateformat) - 
+                                    hdateutils.to_python_date(pdate_start, dateformat=dateformat)).total_seconds()/
+                                pointinterval.total_seconds()))] + [hdateutils.to_python_date(pdate_end, dateformat=dateformat)]
+        else:
+            xs = [hdateutils.to_years(hdateutils.to_ordinal(pdate_start, dateformat=dateformat) + n * pointinterval) for n in 
+                    range(ceil((hdateutils.to_ordinal(pdate_end, dateformat=dateformat) - 
+                                            hdateutils.to_ordinal(pdate_start, dateformat=dateformat))/
+                                pointinterval))] + [hdate.to_years(pdate_end, dateformat=dateformat)]
+        ys = [y for _ in xs]
+        hovertexts = label if not hovertext \
+                        else hovertext if hovertext == hovertext_end \
+                        else [hovertext for _ in range(len(xs) - 1)] + [hovertext_end]
+        figure.add_trace(go.Scatter(x = xs, y=ys, name=label, legendgroup=label,
+                            mode="lines", line={'color':color,'width':width,'dash':dash}, 
+                            hoverinfo='text',
+                            hovertext=hovertexts,
+                            hoverlabel={'namelength':-1}, showlegend=False))
+
 
