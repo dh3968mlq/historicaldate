@@ -24,11 +24,11 @@ df_history = pd.read_csv(f"{dataroot}/data/history/europe/Events in British Hist
 
 pltl = hdpl.plTimeLine(mindate=datetime.date(1800,1,1), maxdate=datetime.date(1870,1,1),
                        title="The Brontës")
-pltl.add_event_set(df_charlotte, title="Charlotte Brontë", showbirthanddeath=True)
-pltl.add_event_set(df_emily,title="Emily Brontë")
-pltl.add_event_set(df_anne, title="Anne Brontë") 
-pltl.add_event_set(df_other, title="Brontë Family") 
-pltl.add_event_set(df_history,title="Events in British History")
+pltl.add_topic_from_df(df_charlotte, title="Charlotte Brontë", showbirthanddeath=True)
+pltl.add_topic_from_df(df_emily,title="Emily Brontë")
+pltl.add_topic_from_df(df_anne, title="Anne Brontë") 
+pltl.add_topic_from_df(df_other, title="Brontë Family") 
+pltl.add_topic_from_df(df_history,title="Events in British History")
 pltl.show() 
 
 pltl.write_html("historicaldate/html/tl_brontes.html")

@@ -14,6 +14,11 @@ except:
 
 # -----------------------------------------------------------------------------------
 def calc_age(ymd_birth, ymd_ref):
+    """
+    Calculate a person's age from ymd of birth and death
+
+    *ymd_birth*, *ymd_death* must be named tuples, as returned by *hdateutils.to_ymd*
+    """
     age = ymd_ref.year - ymd_birth.year
     if ymd_birth.year < 0 and ymd_ref.year > 0:
         age = age - 1   # there is no year 0
@@ -24,7 +29,7 @@ def calc_age(ymd_birth, ymd_ref):
     return age
 # ------------------------------------------------------------------------------------
 def calc_agetext(pdates_birth, pdates_ref):
-    "Calculate age text, including ? to indicate uncertainty"
+    "Calculate age text, including ? to indicate uncertainty, from *plTimeLine().pdates* properties"
     ymd_birth_early = hdateutils.to_ymd(pdates_birth['ordinal_early'])
     ymd_birth_mid = hdateutils.to_ymd(pdates_birth['ordinal_mid'])
     ymd_birth_late = hdateutils.to_ymd(pdates_birth['ordinal_late'])
@@ -40,6 +45,10 @@ def calc_agetext(pdates_birth, pdates_ref):
     return f"{years}{uncertain}"
 # -----------------------------------------------------------------------------------
 def calc_yeartext(pdates, hover_datetype='day'):
+    """
+    Calculate text to represent a date, including representation of uncertainty,
+    from a *plTimeLine().pdates* property
+    """
     if hover_datetype not in {'year','month','day'}:
         raise ValueError(f"hover_datetype must be year, month or day. Found:{hover_datetype}")
     
@@ -60,10 +69,12 @@ def calc_yeartext(pdates, hover_datetype='day'):
 # ------------------------------------------------------------------------------------------------    
 # -- Now for functions that create the figure
 # ------------------------------------------------------------------------------------------------    
-def add_trace_marker(fig, pdate=None, label="", y=0.0, 
+def _add_trace_marker(fig, pdate=None, label="", y=0.0, 
                    color=None, size=8, symbol='diamond', showlegend=False,
                    hovertext=None, hyperlink=None, xmode="date"):
-    "pdate must be an ordinal"
+    """
+    Add a single marker to a plot
+    """
     pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y], name=label, legendgroup=label,
                         mode="markers", marker={'color':color, 'size':size,'symbol':symbol}, 
@@ -71,8 +82,8 @@ def add_trace_marker(fig, pdate=None, label="", y=0.0,
                         hovertext=hovertext if hovertext else label,
                         hoverlabel={'namelength':-1}, showlegend=showlegend))
 # ------------------------------------------------------------------------------------------------
-def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None, xmode="date"):
-    "pdate must be an ordinal"
+def _add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None, xmode="date"):
+    "Add a label to a plot"
     hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
     pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y+0.04], 
@@ -81,7 +92,7 @@ def add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None, xmode="dat
                                 textposition='bottom center',
                                 hoverinfo='skip', hoverlabel={'namelength':-1}, showlegend=False))
 # ------------------------------------------------------------------------------------------------
-def add_trace_part(figure, pdate_start=None, pdate_end=None, label="", y=0.0, 
+def _add_trace_part(figure, pdate_start=None, pdate_end=None, label="", y=0.0, 
                 color=None, width=4, dash=None, 
                 hovertext=None, hovertext_end=None, 
                 xmode="date", dateformat="default", pointinterval=200

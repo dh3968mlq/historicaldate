@@ -23,10 +23,11 @@ except:
     import historicaldate.historicaldate.hdplutils as hdplutils
 
 def check_dataframe(df, study_range_start=None, study_range_end=None, dateformat="default"):
+    "Check if a dataframe will successfully add as a plTimeLine topic"
     pltl = plTimeLine(mindate="2000 BC", maxdate="2200", xmode="years", dateformat=dateformat)
     message = ""
     try:
-        added = pltl.add_event_set(df, study_range_start=study_range_start, study_range_end=study_range_end)
+        added = pltl.add_topic_from_df(df, study_range_start=study_range_start, study_range_end=study_range_end)
         if not added:
             message = "No events found in study range"
     except Exception as e:
@@ -35,11 +36,18 @@ def check_dataframe(df, study_range_start=None, study_range_end=None, dateformat
     return added, message
 
 class plTimeLine():
+    """
+    An object class to wrap a Plotly figure displaying a timeline
+    """
     def __init__(self, title=None, mindate=None, maxdate=None, 
                 hovermode='closest', hoverdistance=5, xmode="date", dateformat=None):
         """
-        To do... When calling this, mindate and maxdate may be either int (ordinal days) or dates
-        self.mindate, self.maxdate always stored as ordinals
+        * title: str
+        * mindate: Python datetime.date, or ordinal (int) or (HDate format) string
+        * maxdate: Python datetime.date, or ordinal (int) or (HDate format) string
+        * hovermode, hoverdistance: See https://plotly.com/python/hover-text-and-formatting/
+        * xmode: "date" (default, allows AD only) or "years". Controls how the X axis is displayed in the Plotly figure
+        * dateformat: as for HDate()
         """
         if xmode not in {"date","years"}:
             raise ValueError(f"xmode must be 'date' or 'years', not '{xmode}'")
@@ -71,7 +79,8 @@ class plTimeLine():
     def fit_xaxis(self, mindate=None, maxdate=None):
         """
         Fit x axis to specified dates, or to data range
-        mindate and maxdate may be either ordinals (int) or Python dates
+        
+        mindate and maxdate may be either ordinals (int), Python dates or (HDate format) strings
         """
         minord = hdateutils.to_ordinal(mindate, dateformat=self._dateformat)
         maxord = hdateutils.to_ordinal(maxdate, dateformat=self._dateformat)
@@ -91,13 +100,16 @@ class plTimeLine():
                                             hdateutils.to_years(self.maxdate)], side="top")
         return fitted 
 # -------------
-    def add_event_set(self, df, 
+    def add_topic_from_df(self, df, 
                     title="", showbirthanddeath=True, showlabel=True,
                     lives_first=True,  rowspacing=0.3, hover_datetype='day',
                     study_range_start=None, study_range_end=None,
                     max_rank=1):
         """
+        Add topic to Plotly figure from a dataframe
+
         dates are in df columns: hdate, hdate_end, hdate_birth, hdate_death
+        
         df must include either hdate or both of hdate_birth, hdate_death
 
         Other columns:
@@ -105,7 +117,7 @@ class plTimeLine():
             text: Hovertext (optional, defaults to label)
             url: hyperlink (optional)
 
-        study_range_start, study_range_end may be either Python dates or ordinals
+        study_range_start, study_range_end may be Python dates, ordinals or (HDate) strings
         """
         cgen = colorgen.ColorGen()
         colorcol = "color" if "color" in df.columns \
@@ -165,11 +177,13 @@ class plTimeLine():
 # -------------
 # -------------
     def show(self,fix_y_range=False):
+        "Show the Plotly figure"
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
                                  visible=False, fixedrange=fix_y_range)
         self.figure.show(config=self.fig_config)
 # -------------
     def write_html(self, filename, fix_y_range=False):
+        "Output Plotly figure as html"
         self.figure.update_yaxes(range=[self.max_y_used+0.25,-0.25], 
                                  visible=False, fixedrange=fix_y_range)
         self.figure.write_html(filename,include_plotlyjs='cdn', config=self.fig_config)
@@ -180,8 +194,11 @@ class plTimeLine():
                         hover_datetype='day',
                         study_range_start=None, study_range_end=None):
         '''
-        Add a timeline trace for a given row
-        study_range start, study_range_end may be either python dates or ordinals
+        Add a timeline trace for an event
+        
+        row is (for now) a Pandas Series
+        
+        study_range start, study_range_end may be Python dates, ordinals or (HDate) strings
         '''        
         fig = self.figure
         cols = list(row.index)
@@ -247,27 +264,27 @@ class plTimeLine():
         y = self.max_y_used + (iline + 1) * rowspacing
 
         if showlabel:
-            hdplutils.add_trace_label(fig, pdate=labeldate, label=text, y=y, hyperlink=hlink, xmode=self._xmode)
+            hdplutils._add_trace_label(fig, pdate=labeldate, label=text, y=y, hyperlink=hlink, xmode=self._xmode)
 
         # Main part, from hdate to hdate_end
         if pdates_start:
-            hdplutils.add_trace_part(self.figure, 
+            hdplutils._add_trace_part(self.figure, 
                         pdate_start=pdates_start['ordinal_early'], pdate_end=pdates_start['ordinal_late'], 
                         label=text, y=y, color=color, width=1, hovertext=hovertext,
                         xmode=self._xmode, dateformat=self._dateformat, pointinterval=self.pointinterval
                         )
-            hdplutils.add_trace_marker(fig, pdate=pdates_start['ordinal_mid'], y=y, color=color,
+            hdplutils._add_trace_marker(fig, pdate=pdates_start['ordinal_mid'], y=y, color=color,
                             showlegend=showlegend, label=text, 
                             hovertext=hovertext, hyperlink=hlink, xmode=self._xmode)
             if pdates_end:
-                hdplutils.add_trace_part(self.figure, 
+                hdplutils._add_trace_part(self.figure, 
                             pdate_start=pdates_start['ordinal_late'], 
                             pdate_end=pdates_end['ordinal_early'], 
                             label=text, y=y, color=color, 
                             hovertext=hovertext, hovertext_end=hovertext_end,
                             xmode=self._xmode, dateformat=self._dateformat, pointinterval=self.pointinterval
                         )
-                hdplutils.add_trace_part(self.figure, 
+                hdplutils._add_trace_part(self.figure, 
                             pdate_start=pdates_end['ordinal_early'], pdate_end=pdates_end['ordinal_late'], 
                                 label=text, y=y, color=color, width=1, 
                                 hovertext=hovertext, hovertext_end=hovertext_end,
@@ -275,11 +292,11 @@ class plTimeLine():
                         )
 
                 if ongoing:   # Right arrow at end of 'ongoing' period
-                    hdplutils.add_trace_marker(fig, pdate=pdates_end['ordinal_late'], y=y, color=color,
+                    hdplutils._add_trace_marker(fig, pdate=pdates_end['ordinal_late'], y=y, color=color,
                                 symbol='arrow-right',
                                 hovertext=hovertext, hyperlink=hlink, xmode=self._xmode)
                 else:        # Normal marker at end of period
-                    hdplutils.add_trace_marker(fig, pdate=pdates_end['ordinal_mid'], y=y, color=color,
+                    hdplutils._add_trace_marker(fig, pdate=pdates_end['ordinal_mid'], y=y, color=color,
                                 hovertext=hovertext_end if hovertext_end else hovertext, 
                                 hyperlink=hlink, xmode=self._xmode)
         
@@ -288,14 +305,14 @@ class plTimeLine():
                 hovertext = f"{htext} (b. {hdplutils.calc_yeartext(pdates_birth, hover_datetype=hover_datetype)})"
                 endpoint = pdates_start['ordinal_early'] if pdates_start else \
                             pdates_birth['ordinal_mid'] + int((pdates_death['ordinal_mid'] - pdates_birth['ordinal_mid']) / 2.0)
-                hdplutils.add_trace_part(self.figure, 
+                hdplutils._add_trace_part(self.figure, 
                                 pdate_start=pdates_birth['ordinal_late'], 
                                 pdate_end=endpoint, 
                                 label=text, y=y, color=color, dash='dot', hovertext=hovertext,
                                 xmode=self._xmode, dateformat=self._dateformat, pointinterval=self.pointinterval
                                 )
                 if pdates_birth['ordinal_early'] < pdates_birth['ordinal_late']:
-                    hdplutils.add_trace_part(self.figure, 
+                    hdplutils._add_trace_part(self.figure, 
                                 pdate_start=pdates_birth['ordinal_early'], pdate_end=pdates_birth['ordinal_late'], 
                                 label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext,
                                 xmode=self._xmode, dateformat=self._dateformat, pointinterval=self.pointinterval
@@ -308,20 +325,20 @@ class plTimeLine():
                 startpoint = pdates_end['ordinal_late'] if pdates_end else \
                             pdates_start['ordinal_late'] if pdates_start else \
                             pdates_birth['ordinal_mid'] + int((pdates_death['ordinal_mid'] - pdates_birth['ordinal_mid']) / 2.0)
-                hdplutils.add_trace_part(self.figure, 
+                hdplutils._add_trace_part(self.figure, 
                             pdate_start=startpoint, pdate_end=pdates_death['ordinal_early'], 
                             label=text, y=y, color=color, dash='dot', hovertext=hovertext,
                             xmode=self._xmode, dateformat=self._dateformat, pointinterval=self.pointinterval
                             )
                 if pdates_death['ordinal_early'] < pdates_death['ordinal_late']:
-                    hdplutils.add_trace_part(self.figure, 
+                    hdplutils._add_trace_part(self.figure, 
                                 pdate_start=max(startpoint,pdates_death['ordinal_early']), 
                                 pdate_end=pdates_death['ordinal_late'], 
                                 label=text, y=y, color=color, width=1, dash='dot', hovertext=hovertext,
                                 xmode=self._xmode, dateformat=self._dateformat, pointinterval=self.pointinterval
                                 )
                 if alive and (pdates_death['ordinal_late'] > startpoint):   # Right arrow 
-                    hdplutils.add_trace_marker(fig, pdate=pdates_death['ordinal_late'], y=y, color=color,
+                    hdplutils._add_trace_marker(fig, pdate=pdates_death['ordinal_late'], y=y, color=color,
                                 symbol='arrow-right',
                                 hovertext=hovertext, xmode=self._xmode)
         return True

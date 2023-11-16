@@ -19,9 +19,9 @@ df3 = pd.read_csv(f"{dataroot}/data/history/europe/British Prime Ministers.csv",
 xmode = 'date'
 xmode = 'years'
 pltl = hdpl.plTimeLine(xmode=xmode)
-pltl.add_event_set(df1, title="British Monarchs from 1066", showbirthanddeath=True)
-pltl.add_event_set(df2,title="Events in British History")
-pltl.add_event_set(df3, title="British Prime Ministers") 
+pltl.add_topic_from_df(df1, title="British Monarchs from 1066", showbirthanddeath=True)
+pltl.add_topic_from_df(df2,title="Events in British History")
+pltl.add_topic_from_df(df3, title="British Prime Ministers") 
 pltl.show() 
 
 pltl.write_html("historicaldate/html/tl_ukhistory.html")

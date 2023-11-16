@@ -9,10 +9,40 @@ except:
 # ------------------------------------------------------------------------------------------------------
 class HDate():
     """
-    Object class to deal with historical dates, stored as strings
-    See README.md at https://github.com/dh3968mlq/historicaldate
+    Object class for date handling including support for BC dates and uncertainty
+
+    The date is represented in the property *pdates*, a dictionary with the following entries:
+
+    * *mid*: Python date, of midpoint if date is uncertain (AD/CE dates only)
+    * *early*: Python date, earliest possible if date is uncertain (AD/CE dates only)
+    * *late*: Python date, latest possible if date is uncertain (AD/CE dates only)
+    * *ordinal_mid*: Ordinal date (int), of midpoint if date is uncertain (including BC/BCE dates)
+    * *ordinal_early*: Ordinal date (int), earliest possible if date is uncertain (including BC/BCE dates)
+    * *ordinal_late*: Ordinal date (int), latest possible if date is uncertain (including BC/BCE dates)
+    * *slmid*, *slearly*, *sllate*: 'specification level' of each of the three dates. Can take values:
+        * 'd': an exact day was specified
+        * 'm': an month (but not a day) was specified
+        * 'y': a year (but not a month) was specified
+        * 'c': 'circa' was specified, and the date is estimated
+        * 'o': The date represents 'ongoing' or 'alive'
+    
+    See also the README.md at https://github.com/dh3968mlq/historicaldate
     """
     def __init__(self, hdstr="", missingasongoing=False, dateformat=None):
+        """
+        Create HDate object encoding the date represented by the string *hdstr*
+
+        *hdstr* (str): the specified date in string form. See https://github.com/dh3968mlq/historicaldate 
+        for allowed formats
+
+        *missingasongoing* (bool, default *False*): If true, a blank string is treated as 'ongoing' or 'alive'.
+
+        *dateformat* (str): If *None* (default), date formats accepted are variants of *25 Dec 1066*
+        and *1066-12-25*. If *dateformat='dmy'* then *25/12/1066* is also accepted. 
+        If *dateformat='mdy'* then *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, 
+        but *25 Dec 1066* is not accepted
+        
+        """
         self.circa_interval_days = int(5 * 365.25)
         self.match_pattern = self._create_match_pattern(dateformat)
         self.compiled_pattern = re.compile(self.match_pattern, re.VERBOSE | re.IGNORECASE)
@@ -182,17 +212,21 @@ class HDate():
     # ------------------------------------------------------------------------------------------------------
     def max_day_in_month(self,year, month, proleptic_gregorian=False, calendar='ce'):
         '''
-        month has range 1-12
+        Calculate the maximum day number in a month
 
-        If proleptic is False: Assumes possible Julian calendar to 1752, Gregorian after that
-        So max_day_in_month(1700, 2) == 29
-        So max_day_in_month(1800, 2) == 28
+        *month* is an int, in range 1-12
 
-        If proleptic is True: Assumes Gregorian calendar throughout
+        If *proleptic_gregorian* is False: Assumes a Julian calendar to 1752, Gregorian after that
+
+        * max_day_in_month(1700, 2) == 29
+        * max_day_in_month(1800, 2) == 28
+
+        If *proleptic_gregorian* is True, assumes a Gregorian calendar throughout
+
         So max_day_in_month(1700, 2) == 28
 
-        If a Julian calendar is used, a proleptic Julian calendar is used before 8AD, when leap years
-        every four years became standardised. So in both systems the years 4AD, 1BC, 5BC etc. are
+        A supposed proleptic Julian calendar is used before 8AD, when leap years
+        every four years became standardised, so the years 4AD, 1BC, 5BC etc. are
         treated as leap years
         '''
         mlengths = [31,28,31,30,31,30,31,31,30,31,30,31]
@@ -212,7 +246,8 @@ class HDate():
 
         return mlength
     # ------------------------------------------------------------------------------------------------------
-    def calc_clen_interval(self):
+    def _calc_clen_interval(self):
+        "Calculate the 'circa' uncertainty to be used, as a timedelta"
         if not self.d_parsed["clen"]:
             return datetime.timedelta(days=self.circa_interval_days)
         else:
@@ -229,6 +264,7 @@ class HDate():
             return datetime.timedelta(days=days)
     # ------------------------------------------------------------------------------------------------------
     def _ymd_to_dfragment(self, year, month, day, prefix="mid", speclevel="", isbce=False):
+        "Convert year, month, day to (part of) a pdates dictionary"
         if isbce: # BC (BCE)
             pythondate = None
             if year % 4 == 1:  # These are the years treated as BC leap years 1, 5, etc.
@@ -317,7 +353,7 @@ class HDate():
             self.pdates.update(self._convert_one_date("early"))
 
             # -- Fill early and late dates if missing from (a) circa (b) main date
-            circa_interval = self.calc_clen_interval()
+            circa_interval = self._calc_clen_interval()
             if self.pdates['slmid'] and not self.pdates['slearly']:
                 if self.pdates['mid'] and self.pdates['mid'].toordinal() > circa_interval.days:
                     self.pdates.update({'early':self.pdates['mid'] - circa_interval})

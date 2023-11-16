@@ -43,15 +43,15 @@ df2 = pd.read_csv(f"{dataroot}/data/history/europe/British Prime Ministers.csv",
                  na_filter=False)
 
 pltl = hdpl.plTimeLine()
-pltl.add_event_set(df1, title="British Monarchs from 1066")
-pltl.add_event_set(df2, title="British Prime Ministers") 
+pltl.add_topic_from_df(df1, title="British Monarchs from 1066")
+pltl.add_topic_from_df(df2, title="British Prime Ministers") 
 pltl.show() # Show in a browser, or...
 pltl.write_html("/home/pi/example_timeline.html")
 ```
 
 ## Input file format
 
-Dataframes passed to *add_event_set* have one row per event or life, and specific column names. *label* must be present, together with either *hdate* or both of *hdate_birth* and *hdate_death*. All other columns are optional.
+Dataframes passed to *add_topic_from_df* have one row per event or life, and specific column names. *label* must be present, together with either *hdate* or both of *hdate_birth* and *hdate_death*. All other columns are optional.
 
 | Column | Usage |
 | ------ | ----- |
@@ -244,7 +244,7 @@ Fit x axis to specified dates, or to the date range of the data currently displa
 
 *mindate* and *maxdate* may be passed as either a Python date (datetime.date), an ordinal (int) (which may be less than zero if xmode='years') or as a date string (str) in a format acceptable to HDate. 
 
-### *pltl.add_event_set(df, title="", showbirthanddeath=True, showlabel=True, lives_first=True,  rowspacing=0.3, hover_datetype='day', study_range_start=None, study_range_end=None, max_rank=1)*
+### *pltl.add_topic_from_df(df, title="", showbirthanddeath=True, showlabel=True, lives_first=True,  rowspacing=0.3, hover_datetype='day', study_range_start=None, study_range_end=None, max_rank=1)*
 
 Add a set of events/lives held in a Pandas dataframe to a timeline display
 
@@ -282,13 +282,17 @@ Writes HTML file of the timeline
 
 ### *added, message = hdpl.check_dataframe(df, study_range_start=None, study_range_end=None, dateformat="default")*
 
-Checks if a data frame can be used by *add_event_set()*.
+Checks if a data frame can be used by *add_topic_from_df()*.
 
 *added* is a bool indicating if events from the dataframe can be added.
 
 *message* indicates a reason if *added* is False. This function traps all errors and returns them formatted in *message*
 
 ## Changes
+
+### New in 0.0.6
+
+*add_event_set* renamed to *add_topic_from_df*
 
 ### New in 0.0.5
 

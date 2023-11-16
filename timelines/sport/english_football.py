@@ -44,11 +44,11 @@ df_euros = read_file(f"{dataroot}/data/sport/football/European Championship.csv"
 pltl = hdpl.plTimeLine(mindate=datetime.date(1990,7,1), 
                        maxdate=datetime.date.today() + datetime.timedelta(days=400),
                        title="English Men's Club and International Football (since 1993)")
-pltl.add_event_set(df_epl, title="Top Tier: Premier League", hover_datetype='year')
-pltl.add_event_set(df_facup, title="FA Cup")
-pltl.add_event_set(df_ucl, title="UEFA Champions League", hover_datetype='year')
-pltl.add_event_set(df_world, title="FIFA World Cup")
-pltl.add_event_set(df_euros, title="UEFA European Championships")
+pltl.add_topic_from_df(df_epl, title="Top Tier: Premier League", hover_datetype='year')
+pltl.add_topic_from_df(df_facup, title="FA Cup")
+pltl.add_topic_from_df(df_ucl, title="UEFA Champions League", hover_datetype='year')
+pltl.add_topic_from_df(df_world, title="FIFA World Cup")
+pltl.add_topic_from_df(df_euros, title="UEFA European Championships")
 pltl.show() 
 
 pltl.write_html("historicaldate/html/english_club_football.html")

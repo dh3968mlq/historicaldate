@@ -8,7 +8,11 @@ except:
 
 
 def to_ordinal(date_or_ordinal, delta=0, dateformat=None):
-    "Takes either a python date, an (int) ordinal or a string, returns an ordinal. Optionally apply a delta (days)"
+    """
+    Takes either a python date, an (int) ordinal or a string, returns an ordinal. Optionally apply a delta (days)
+
+    *dateformat* is as in the HDate() constructor
+    """
     if date_or_ordinal is None:
         return None
     elif type(date_or_ordinal) == datetime.date:
@@ -22,8 +26,10 @@ def to_ordinal(date_or_ordinal, delta=0, dateformat=None):
 # ----
 def to_python_date(date_or_ordinal, dateformat=None):
     """
-    Takes either a python date or an (int) ordinal.
-    Returns a Python date if ordinal >= 1, None otherwise.
+    Takes either a python date, an (int) ordinal or a string.
+    Returns a Python date if the ordinal is >= 1 or the string represnets an AD date, None otherwise.
+
+    *dateformat* is as in the HDate() constructor
     """
     if date_or_ordinal is None:
         return None
@@ -38,8 +44,10 @@ def to_python_date(date_or_ordinal, dateformat=None):
 # ----
 def to_years(date_or_ordinal, dateformat=None):
     """
-    Takes either a python date or an (int) ordinal, returns an number of years (float).
-    Years is continuous, with 0.0 corresponding to ordinal day 0, i.e. 31st December 1BC
+    Takes either a python date, an (int) ordinal or a string, returns an number of years (float), 
+    with a returned value of 0.0 corresponding to ordinal day 0, i.e. 31st December 1BC
+
+    *dateformat* is as in the HDate() constructor
     """
     if pdate := to_python_date(date_or_ordinal):
         daynum = pdate.toordinal() - datetime.date(pdate.year,1,1).toordinal() + 1
@@ -53,6 +61,7 @@ def to_years(date_or_ordinal, dateformat=None):
     return years
 # ----
 def format_year(year, showzeroas1ad=True, adtext="AD", bctext="BC"):
+    "Format the (int) year in a readable format, appending *BC* if needed"
     iyear = int(year)
     if iyear > 0 or (iyear == 0 and not showzeroas1ad):
         syear = f"{iyear:04d}"
@@ -64,9 +73,19 @@ def format_year(year, showzeroas1ad=True, adtext="AD", bctext="BC"):
 
 # ----
 def years_to_ordinal(years):
+    """
+    (Approximately) convert a (float) year to an int ordinal. 
+    Year 0.0 converts to ordinal 0, representing 31st December 1BC, in the usual way of things in this package
+    """
     return int(years * 365.2425)           # Just as sloppy, but good enough for its only application to date
 # ----
 def to_ymd(date_or_ordinal, dateformat=None):
+    """
+    Takes either a python date, an (int) ordinal or a string. 
+    Returns year, month, day as a named tuple with items named 'year', 'month', 'day'
+
+    *dateformat* is as in the HDate() constructor
+    """
     YMD = namedtuple("YMD", "year month day")
     if pdate := to_python_date(date_or_ordinal):
         ymd = YMD(pdate.year, pdate.month, pdate.day)
@@ -83,7 +102,11 @@ def to_ymd(date_or_ordinal, dateformat=None):
     return ymd
 # ----
 def calc_mid_ordinal(hdstring, dateformat=None):
-    "Return the mid date from an hdate string, or None"
+    """
+    Return the mid date from an hdate string, or None
+
+    *dateformat* is as in the HDate() constructor
+    """
     try:
         hd = hdate.HDate(hdstring, dateformat=dateformat)
         return hd.pdates['ordinal_mid']
