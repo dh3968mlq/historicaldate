@@ -75,7 +75,7 @@ def _add_trace_marker(fig, pdate=None, label="", y=0.0,
     """
     Add a single marker to a plot
     """
-    pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
+    pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdateutils.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y], name=label, legendgroup=label,
                         mode="markers", marker={'color':color, 'size':size,'symbol':symbol}, 
                         hoverinfo='text',
@@ -85,7 +85,7 @@ def _add_trace_marker(fig, pdate=None, label="", y=0.0,
 def _add_trace_label(fig, pdate=None, label="", y=0.0, hyperlink=None, xmode="date"):
     "Add a label to a plot"
     hlinkedtext = f'<a href="{hyperlink}">{label}</a>' if hyperlink else label
-    pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdate.to_years(pdate)
+    pltdate = hdateutils.to_python_date(pdate) if xmode == "date" else hdateutils.to_years(pdate)
     fig.add_trace(go.Scatter(x = [pltdate], y=[y+0.04], 
                                 name=label, legendgroup=label,
                                 mode="text", text=hlinkedtext, 
@@ -117,7 +117,7 @@ def _add_trace_part(figure, pdate_start=None, pdate_end=None, label="", y=0.0,
             xs = [hdateutils.to_years(hdateutils.to_ordinal(pdate_start, dateformat=dateformat) + n * pointinterval) for n in 
                     range(ceil((hdateutils.to_ordinal(pdate_end, dateformat=dateformat) - 
                                             hdateutils.to_ordinal(pdate_start, dateformat=dateformat))/
-                                pointinterval))] + [hdate.to_years(pdate_end, dateformat=dateformat)]
+                                pointinterval))] + [hdateutils.to_years(pdate_end, dateformat=dateformat)]
         ys = [y for _ in xs]
         hovertexts = label if not hovertext \
                         else hovertext if hovertext == hovertext_end \
