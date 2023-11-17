@@ -1,5 +1,5 @@
-import sys
 import datetime
+import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from plotly import colors as pc
@@ -173,8 +173,25 @@ class plTimeLine():
             self.figure.update_yaxes(range=[max(self.max_y_used+0.25,6.0),-0.25], 
                                     visible=False)
         return some_events_added
- 
 # -------------
+    def add_topic(self, topic=None, 
+                    showbirthanddeath=True, showlabel=True,
+                    lives_first=True,  rowspacing=0.3, hover_datetype='day',
+                    study_range_start=None, study_range_end=None,
+                    max_rank=1):
+        """
+        Add topic to Plotly figure from an hdTopic object
+        study_range_start, study_range_end may be Python dates, ordinals or (HDate) strings
+        """
+        df = pd.DataFrame(topic.events)
+        title = topic.title
+        some_events_added = self.add_topic_from_df(df=df, 
+                    title=title, showbirthanddeath=showbirthanddeath, showlabel=showlabel,
+                    lives_first=lives_first,  rowspacing=rowspacing, hover_datetype=hover_datetype,
+                    study_range_start=study_range_start, study_range_end=study_range_end,
+                    max_rank=max_rank)
+
+        return some_events_added
 # -------------
     def show(self,fix_y_range=False):
         "Show the Plotly figure"
