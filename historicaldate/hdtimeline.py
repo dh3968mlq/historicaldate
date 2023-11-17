@@ -34,13 +34,13 @@ class hdTimeLine():
              "topics":[topic.to_dict() for topic in self.topics]}
         return d
     # ----------    
-    def add_topic(self, title, df):
+    def add_topic_df(self, title, df):
         events = df.to_dict(orient='records')
         self.topics.append(hdtopic.hdTopic(title, events))
     # ----------
     def add_topic_csv(self, title, filename, dataroot="./historicaldate-data/data"):
         df = pd.read_csv(f"{dataroot}/{filename}", na_filter=False)
-        self.add_topic(title, df)
+        self.add_topic_df(title, df)
     # ----------
     def get_date_range(self):
         topic_ranges = [topic.get_date_range() for topic in self.topics]
