@@ -16,9 +16,11 @@ class LineOrganiser():
     def add_trace(self, earliest, latest, labeldate, text):
         """
         Find a line to display a trace on
-        earliest, latest: the start and end dates of the trace (HDate ordinals)
-        labeldate: the position the label will be displayed at (HDate ordinal)
-        text: the label text
+
+        * earliest, latest: the start and end dates of the trace (HDate ordinals)
+        * labeldate: the position the label will be displayed at (HDate ordinal)
+        * text: the label text
+        
         add_trace returns a line number that the trace can be displayed on
         """
         textdelta = int(len(text) * self.daysperlabelchar/2.0)

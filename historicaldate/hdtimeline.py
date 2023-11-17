@@ -12,9 +12,17 @@ except:
 class hdTimeLine():
     '''
     Holds a timeline specification, together with line arrangement information
-    A timeline contains a list of topics, and a topic contains a list of events
+    
+    Properties:
+
+    * title (str) : timeline title
+    * topics (list of hdTopic): Topics in this timeline
     '''
-    def __init__(self, title="", d=None, jsonstr=None):
+    def __init__(self, title="", d=None):
+        """
+        * title (str): timeline title
+        * d (dict) (optional): dictionary (as created by *to_dict()*) from which to construct the timeline
+        """
         self.topics = []   # List of topics : hdTopic()
         self.title = title
         if d:
@@ -22,6 +30,9 @@ class hdTimeLine():
         return
     # ----------    
     def from_dict(self, d):
+        """
+        Populate an existing hdTimeLine object from a dictionary d (as created by *to_dict()*)
+        """
         self.title = d["title"]
         self.topics = []
         for dtopic in d["topics"]:
@@ -30,19 +41,32 @@ class hdTimeLine():
             self.topics.append(topic)
     # ----------    
     def to_dict(self):
+        """
+        Convert hdTimeLine object to a dictionary
+        """
         d = {"title":self.title,
              "topics":[topic.to_dict() for topic in self.topics]}
         return d
     # ----------    
     def add_topic_df(self, title, df):
+        """
+        Add a topic passed as Pandas DataFrame *df*
+        """
         events = df.to_dict(orient='records')
         self.topics.append(hdtopic.hdTopic(title, events))
     # ----------
     def add_topic_csv(self, title, filename, dataroot="./historicaldate-data/data"):
+        """
+        Read .csv file and add topic based on its contents.
+        """
         df = pd.read_csv(f"{dataroot}/{filename}", na_filter=False)
         self.add_topic_df(title, df)
     # ----------
     def get_date_range(self):
+        """
+        Calculate earliest and latest date in this timeline, and return them as 
+        a duple (earliest, latest) of ordinals
+        """
         topic_ranges = [topic.get_date_range() for topic in self.topics]
         mindate = min([topic_range[0] for topic_range in topic_ranges])
         maxdate = max([topic_range[1] for topic_range in topic_ranges])

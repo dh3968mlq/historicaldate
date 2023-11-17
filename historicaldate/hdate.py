@@ -37,10 +37,11 @@ class HDate():
 
         *missingasongoing* (bool, default *False*): If true, a blank string is treated as 'ongoing' or 'alive'.
 
-        *dateformat* (str): If *None* (default), date formats accepted are variants of *25 Dec 1066*
-        and *1066-12-25*. If *dateformat='dmy'* then *25/12/1066* is also accepted. 
-        If *dateformat='mdy'* then *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, 
-        but *25 Dec 1066* is not accepted
+        *dateformat* (str): takes values:
+        
+        * *None* (default): date formats accepted are variants of *25 Dec 1066* and *1066-12-25*. 
+        * *'dmy'*: *25/12/1066* is also accepted. 
+        * *'mdy'*: *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, but *25 Dec 1066* is not accepted
         
         """
         self.circa_interval_days = int(5 * 365.25)
