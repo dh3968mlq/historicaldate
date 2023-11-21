@@ -136,7 +136,7 @@ class plTimeLine():
         if "rank" in dfs.columns:
             dfs = dfs[dfs["rank"] <= max_rank]
 
-        lo = lineorganiser.LineOrganiser(daysperlabelchar=2.5 * self.initial_range_years,
+        lo = lineorganiser.LineOrganiser(daysperlabelchar=2.75 * self.initial_range_years,
                                          daysminspacing=0.5 * self.initial_range_years)
 
         def disp_set(dfset):
