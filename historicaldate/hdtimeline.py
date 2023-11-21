@@ -25,6 +25,7 @@ class hdTimeLine():
         """
         self.topics = []   # List of topics : hdTopic()
         self.title = title
+        self._maxid = 0
         if d:
             self.from_dict(d)
         return
@@ -35,10 +36,12 @@ class hdTimeLine():
         """
         self.title = d["title"]
         self.topics = []
+        self._maxid = 0
         for dtopic in d["topics"]:
             topic = hdtopic.hdTopic()
             topic.from_dict(dtopic)
             self.topics.append(topic)
+            self._maxid = max(self._maxid, topic.id)
     # ----------    
     def to_dict(self):
         """
@@ -53,7 +56,8 @@ class hdTimeLine():
         Add a topic passed as Pandas DataFrame *df*
         """
         events = df.to_dict(orient='records')
-        self.topics.append(hdtopic.hdTopic(title, events))
+        self._maxid = self._maxid + 1
+        self.topics.append(hdtopic.hdTopic(title, events, id=self._maxid))
     # ----------
     def add_topic_csv(self, title, filename, dataroot="./historicaldate-data/data"):
         """

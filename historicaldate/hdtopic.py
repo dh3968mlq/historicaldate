@@ -14,7 +14,7 @@ class hdTopic():
     * ordinals (list of dicts): dictionaries of ordinals corresponding to the dates of events in this topic
     * event_display_lines (list of int): (possible future deprectation): lines on which to display the events
     '''
-    def __init__(self, title="", events=None):
+    def __init__(self, title="", events=None, id=None):
         """
         * title (str) : topic title
         * events (list of dict): events with which to populate the topic
@@ -23,6 +23,7 @@ class hdTopic():
         self.events = []
         self.ordinals = []
         self.event_display_lines = None
+        self.id = id
         if events:
             self.events = events
             self.ordinals = [hdtimelineutils.calc_event_ordinals(event) for event in self.events]
@@ -32,6 +33,7 @@ class hdTopic():
         Populate existing hdTopic object from a dictionary d as created by *to_dict()*
         """
         self.title = d["title"]
+        self.id = d["id"]
         self.events = d["events"]
         self.ordinals = d["ordinals"]
         self.event_display_lines = d["event_display_lines"]
@@ -41,6 +43,7 @@ class hdTopic():
         Convert hdTopic to a dictionary
         """
         d = {"title": self.title,
+             "id": self.id,
              "events":self.events,
              "ordinals":self.ordinals,
              "event_display_lines":self.event_display_lines}
