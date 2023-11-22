@@ -26,6 +26,7 @@ class hdTimeLine():
         self.topics = []   # List of topics : hdTopic()
         self.title = title
         self._maxid = 0
+        self.action_applied = None  # Used to record the last operation. Not updated by methods here, but can be used by clients
         if d:
             self.from_dict(d)
         return
@@ -75,4 +76,24 @@ class hdTimeLine():
         mindate = min([topic_range[0] for topic_range in topic_ranges])
         maxdate = max([topic_range[1] for topic_range in topic_ranges])
         return mindate, maxdate
-# -------------------------------------------------------------------------------------------------------    
+    # ----------
+    def get_topic_index(self, id=None):
+        "Find the position of a topic in the list, given its id"
+        if id:
+            for index, topic in enumerate(self.topics):
+                if topic.id == id:
+                    return index
+            return None
+        else:
+            return None
+    # ----------
+    def remove_topic(self, id=None):
+        "Remove a topic, given its id. Returns True if an item is removed, False otherwise"
+        index = self.get_topic_index(id) if id else None
+
+        if index is not None:
+            self.topics.pop(index)
+            return True
+        else:
+            return False
+
