@@ -96,4 +96,18 @@ class hdTimeLine():
             return True
         else:
             return False
+    # ----------
+    def move_topic(self, id=None, indexshift=1):
+        """
+        Move a topic up or down in the list. indexshift > 0 means move down
+        """
+        index = self.get_topic_index(id) if id else None
+        if index is not None:
+            new_index = max(min(index + indexshift, len(self.topics)), 0)
+            topic = self.topics[index]
+            self.topics.pop(index)
+            self.topics.insert(new_index, topic)
+            return True
+        else:
+            return False
 
