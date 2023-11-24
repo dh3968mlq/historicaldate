@@ -57,8 +57,7 @@ class hdTimeLine():
         Add a topic passed as Pandas DataFrame *df*
         """
         events = df.to_dict(orient='records')
-        self._maxid = self._maxid + 1
-        self.topics.append(hdtopic.hdTopic(title, events, id=self._maxid))
+        self.add_topic_dict(title, events)
     # ----------
     def add_topic_csv(self, title, filename, dataroot="./historicaldate-data/data"):
         """
@@ -66,6 +65,13 @@ class hdTimeLine():
         """
         df = pd.read_csv(f"{dataroot}/{filename}", na_filter=False)
         self.add_topic_df(title, df)
+    # ----------
+    def add_topic_dict(self, title, events):
+        """
+        Add topic based on a dictionary of its events.
+        """
+        self._maxid = self._maxid + 1
+        self.topics.append(hdtopic.hdTopic(title, events, id=self._maxid))
     # ----------
     def get_date_range(self):
         """
