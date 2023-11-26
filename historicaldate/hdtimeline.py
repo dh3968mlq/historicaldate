@@ -116,4 +116,16 @@ class hdTimeLine():
             return True
         else:
             return False
+    # ----------
+    def reorder_topics(self, topic_order):
+        '''
+        topic_order is a list of topic ids, in the required order
+        '''
+        current_order = [topic.id for topic in self.topics]
 
+        # -- index_order is a list of current index positions, in the required new order
+        index_order = [current_order.index(topic_id) for topic_id in topic_order]
+
+        # -- reorder the topic list
+        topics_neworder = [self.topics[index] for index in index_order]
+        self.topics = topics_neworder
