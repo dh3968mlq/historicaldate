@@ -71,7 +71,12 @@ class plTimeLine():
 
         self.fig_config = {'scrollZoom': True}
         self.figure.update_layout(dragmode="pan", showlegend=False, 
-                    hovermode=hovermode, hoverdistance=hoverdistance)
+                    hovermode=hovermode, hoverdistance=hoverdistance,
+                    transition= {
+                        'duration': 500,
+                        'easing': 'cubic-in-out'
+                    }
+        )
         self.max_y_used = 0.0
         self.fit_xaxis()
 
@@ -214,7 +219,6 @@ class plTimeLine():
         Add a timeline trace for an event
         
         row is (for now) a Pandas Series
-        
         study_range start, study_range_end may be Python dates, ordinals or (HDate) strings
         '''        
         fig = self.figure
