@@ -11,13 +11,6 @@ Table of Contents
    
    hdate
    hdateutils
-   hdpl
-   hdplutils
-   lineorganiser
-   colorgen
-   hdtimeline
-   hdtopic
-   hdtimelineutils
 
 Indices and tables
 ==================

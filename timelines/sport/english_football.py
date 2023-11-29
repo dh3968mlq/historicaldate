@@ -6,7 +6,7 @@ dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data"
 
 import sys
 sys.path.append(hdroot)
-from historicaldate import hdpl
+from hdtimelines import pltimeline
 import pandas as pd
 import datetime
 
@@ -41,7 +41,7 @@ df_world = read_file(f"{dataroot}/data/sport/football/FIFA World Cup.csv",
 df_euros = read_file(f"{dataroot}/data/sport/football/European Championship.csv",
                    df_xref=df_colxref_national)
 
-pltl = hdpl.plTimeLine(mindate=datetime.date(1990,7,1), 
+pltl = pltimeline.plTimeLine(mindate=datetime.date(1990,7,1), 
                        maxdate=datetime.date.today() + datetime.timedelta(days=400),
                        title="English Men's Club and International Football (since 1993)")
 pltl.add_topic_from_df(df_epl, title="Top Tier: Premier League", hover_datetype='year')

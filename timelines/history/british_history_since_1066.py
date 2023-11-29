@@ -6,7 +6,7 @@ dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data"
 
 import sys
 sys.path.append(hdroot)
-from historicaldate import hdpl
+from hdtimelines import pltimeline
 import pandas as pd
 
 df1 = pd.read_csv(f"{dataroot}/data/history/europe/British Monarchs.csv",
@@ -18,7 +18,7 @@ df3 = pd.read_csv(f"{dataroot}/data/history/europe/British Prime Ministers.csv",
 
 xmode = 'date'
 xmode = 'years'
-pltl = hdpl.plTimeLine(xmode=xmode)
+pltl = pltimeline.plTimeLine(xmode=xmode)
 pltl.add_topic_from_df(df1, title="British Monarchs from 1066", showbirthanddeath=True)
 pltl.add_topic_from_df(df2,title="Events in British History")
 pltl.add_topic_from_df(df3, title="British Prime Ministers") 

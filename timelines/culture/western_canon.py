@@ -6,7 +6,7 @@ dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data"
 
 import sys
 sys.path.append(hdroot)
-from historicaldate import hdpl
+from hdtimelines import pltimeline
 import pandas as pd
 import datetime
 
@@ -19,7 +19,7 @@ df_authors = pd.read_csv(f"{dataroot}/data/culture/western_canon/Authors.csv",
 df_composers = pd.read_csv(f"{dataroot}/data/culture/western_canon/Classical Composers.csv",
                  na_filter=False)
 
-pltl = hdpl.plTimeLine(#mindate=datetime.date(1,1,1), maxdate=datetime.date(500,1,1),
+pltl = pltimeline.plTimeLine(#mindate=datetime.date(1,1,1), maxdate=datetime.date(500,1,1),
                        title="Culture: Western Canon", xmode="years")
 pltl.add_topic_from_df(df_monarchs, title="British Monarchs", showbirthanddeath=True)
 pltl.add_topic_from_df(df_playwrights, title="Playwrights", showbirthanddeath=True)

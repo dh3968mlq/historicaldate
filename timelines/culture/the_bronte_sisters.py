@@ -6,7 +6,7 @@ dataroot = "/svol1/pishare/users/pi/repos/timelines/historicaldate-data"
 
 import sys
 sys.path.append(hdroot)
-from historicaldate import hdpl
+from hdtimelines import pltimeline
 import pandas as pd
 import datetime
 
@@ -22,7 +22,7 @@ df_history = pd.read_csv(f"{dataroot}/data/history/europe/Events in British Hist
                  na_filter=False)
 
 
-pltl = hdpl.plTimeLine(mindate=datetime.date(1800,1,1), maxdate=datetime.date(1870,1,1),
+pltl = pltimeline.plTimeLine(mindate=datetime.date(1800,1,1), maxdate=datetime.date(1870,1,1),
                        title="The Brontës")
 pltl.add_topic_from_df(df_charlotte, title="Charlotte Brontë", showbirthanddeath=True)
 pltl.add_topic_from_df(df_emily,title="Emily Brontë")
