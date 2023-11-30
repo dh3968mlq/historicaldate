@@ -20,7 +20,7 @@ def to_ordinal(date_or_ordinal, delta=0, dateformat=None):
     elif type(date_or_ordinal) == int:
         return date_or_ordinal + delta
     elif type(date_or_ordinal) == str:
-        return hdate.HDate(date_or_ordinal, dateformat=dateformat).pdates["ordinal_mid"]
+        return hdate.HDate(date_or_ordinal, dateformat=dateformat).pdates["ordinal_mid"] + delta
     else:
         raise TypeError(f"date_or_ordinal must be int or datetime.date or str, not {type(date_or_ordinal)}")
 # ----
