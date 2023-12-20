@@ -53,10 +53,6 @@ A date value of 'ongoing' leads to the earliest and midpoint dates taking
 values *datetime.date.today()*, the late date being a few years in
 the future, with flags set for 'ongoing'
 
-### Imprecise dates are treated properly
-
->>>A date such as *circa 1066* leads to uncertainty, of a few years, being shown on the timeline as a thin line.
-
 ### The difference between Julian and Gregorian calendars is (as yet) ignored
 
 Python dates are used for AD (CE) timeline displays,
