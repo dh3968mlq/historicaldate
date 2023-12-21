@@ -12,7 +12,7 @@ The package provides a parser for date formats that are often used to indicate u
 *   2003
 *   circa 1483 earliest 1483
 
-The parser converts these to a *HDate()* object, which stores the earliest possible, latest possible and an approximate midpoint date corresponding to the original string. these dates are stored as:
+The parser converts these to a *HDate()* object, which stores the earliest possible, latest possible and an approximate midpoint date corresponding to the original string. These dates are stored as:
 
 1.  Ordinals. These correspond to Python *datetime* ordinals for AD dates, extended backwards to non-positive values for BC dates.
 1.  Python *datetime.date*, for AD dates only.
@@ -25,7 +25,7 @@ The parser converts these to a *HDate()* object, which stores the earliest possi
 
 ### Additional formats are also supported
 
-Specifying ***dateformat="dmy"*** (as a parameter to either the *HDate* constructor ) also allows...
+Specifying ***dateformat="dmy"*** (as a parameter to the *HDate* constructor ) also allows...
    * 25/12/1066
 
 Specifying ***dateformat="mdy"*** allows...
@@ -107,66 +107,6 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 | 'y'   | year  |
 | 'c'   | Derived from a 'circa' calculation  |
 | 'o'   | Derived from an 'ongoing' calculation  |
-
-
-## Constructor
-
-*hd = hdate.HDate(hdstr="", missingasongoing=False, dateformat=None)*
-
-| Parameter | Usage |
-| ------ | ----- |
-| hdstr : str   | String indicating the date. See description above for allowed date formats  |
-| missingasongoing: bool | Indicates if a null string is to be interpreted as indicating 'ongoing' or (equivalently) 'alive' |
-| dateformat : str | If *None*, date formats accepted are variants of *25 Dec 1066* and *1066-12-25*. If *dateformat='dmy'* then *25/12/1066* is also accepted. If *dateformat='mdy'* then *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, but *25 Dec 1066* is not accepted |
-
-
-## *hdate* utility functions
-
-In all *hdate* utility functions 
-   * The parameter *date_or_ordinal* may be passed as either a Python date (datetime.date), an ordinal (int) (which may be less than zero) or as a date string (str) in a format acceptable to HDate.
-   * The parameter *dateformat* is equivalent to the same parameter in the *HDate* constructor. See above for details.
-
-### *ord = to_ordinal(date_or_ordinal, delta=0, dateformat=None)*
-
-Converts a date or ordinal value to an ordinal. 
-
-*delta*: indicates a number of days to be added to the original date.
-
-### *pdate = to_python_date(date_or_ordinal, dateformat=None)*
-
-Converts a date or ordinal value to a python date. 
-
-Returns a *None* value if *date_or_ordinal* is BC.
-
-### *yrs = to_years(date_or_ordinal, dateformat=None)*
-
-Converts a date or ordinal to an approximate number of years (float). The returned value 0.0 corresponds to ordinal value 0, which is 31st December, 1BC.
-
-The implementation is approximate, but believed to be good enough for most timeline displays.
-
-### *syear = format_year(year, showzeroas1ad=True, adtext="AD", bctext="BC")*
-
-Formats a year (int or float) in a way suitable for display on an X-axis that is showing dates as float values corresponding to years.
-
-### *ord = years_to_ordinal(years)*
-
-Converts a year number (float) to an ordinal.
-
-Also approximate, but an exact inverse of *to_years*
-
-### *ymd = to_ymd(date_or_ordinal, dateformat=None)*
-
-Converts a date or ordinal to a named tuple containing year, month and day numbers
-
-The tuple definition is:
-```python
-YMD = namedtuple("YMD", "year month day")
-```
-
-### *ord = calc_mid_ordinal(hdstring, dateformat=None)*
-
-Returns the mid-point ordinal from a date held as a string in *HDate* format
-
 
 ## Changes
 

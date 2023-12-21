@@ -1,6 +1,8 @@
 import re
 import datetime
 
+__version__="0.0.7"
+
 try:
     import historicaldate.hdateutils as hdateutils
 except:
@@ -11,29 +13,13 @@ class HDate():
     """
     Object class for date handling including support for BC dates and uncertainty
 
-    The date is represented in the property *pdates*, a dictionary with the following entries:
-
-    * *mid*: Python date, of midpoint if date is uncertain (AD/CE dates only)
-    * *early*: Python date, earliest possible if date is uncertain (AD/CE dates only)
-    * *late*: Python date, latest possible if date is uncertain (AD/CE dates only)
-    * *ordinal_mid*: Ordinal date (int), of midpoint if date is uncertain (including BC/BCE dates)
-    * *ordinal_early*: Ordinal date (int), earliest possible if date is uncertain (including BC/BCE dates)
-    * *ordinal_late*: Ordinal date (int), latest possible if date is uncertain (including BC/BCE dates)
-    * *slmid*, *slearly*, *sllate*: 'specification level' of each of the three dates. Can take values:
-        * 'd': an exact day was specified
-        * 'm': an month (but not a day) was specified
-        * 'y': a year (but not a month) was specified
-        * 'c': 'circa' was specified, and the date is estimated
-        * 'o': The date represents 'ongoing' or 'alive'
-    
-    See also the README.md at https://github.com/dh3968mlq/historicaldate
+    The date is represented in the dictionary property *pdates*
     """
     def __init__(self, hdstr="", missingasongoing=False, dateformat=None):
         """
         Create HDate object encoding the date represented by the string *hdstr*
 
-        *hdstr* (str): the specified date in string form. See https://github.com/dh3968mlq/historicaldate 
-        for allowed formats
+        *hdstr* (str): the specified date, HDate format.
 
         *missingasongoing* (bool, default *False*): If true, a blank string is treated as 'ongoing' or 'alive'.
 
@@ -42,7 +28,6 @@ class HDate():
         * *None* (default): date formats accepted are variants of *25 Dec 1066* and *1066-12-25*. 
         * *'dmy'*: *25/12/1066* is also accepted. 
         * *'mdy'*: *12/25/1066*, *Dec 25 1066* and *1066-12-25* are accepted, but *25 Dec 1066* is not accepted
-        
         """
         self.circa_interval_days = int(5 * 365.25)
         self.match_pattern = self._create_match_pattern(dateformat)
