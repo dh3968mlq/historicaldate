@@ -3,7 +3,7 @@
 A small Python package for date handling including support for BC dates and uncertainty.
 
 It is intended for dealing with historical events. It does not support time of day, and at present takes a naive approach to 
-the difference between Julian and Gregorian calendars, since this is usually what is needed for the expected application areas.
+the difference between Julian and Gregorian calendars since this is usually what is needed for the expected application areas.
 
 The package provides a parser for date formats that are often used to indicate uncertain dates, such as
 

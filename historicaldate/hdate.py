@@ -1,7 +1,7 @@
 import re
 import datetime
 
-__version__="0.0.7"
+#__version__="0.0.7"
 
 try:
     import historicaldate.hdateutils as hdateutils
