@@ -2,20 +2,33 @@
 
 A small Python package for date handling including support for BC dates and uncertainty.
 
-It is intended for dealing with historical events. It does not support time of day, and at present takes a naive approach to 
-the difference between Julian and Gregorian calendars since this is usually what is needed for the expected application areas.
+```text
+$ pip install historicaldate
+```
 
-The package provides a parser for date formats that are often used to indicate uncertain dates, such as
+PyPI: https://pypi.org/project/historicaldate/
+
+Documentation: https://historicaldate.readthedocs.io/en/stable/
+
+The package provides a parser for date formats that are often used
+to indicate uncertain dates, such as
 
 *   circa 1989
 *   between 1920 and 1934
 *   2003
 *   circa 1483 earliest 1483
 
-The parser converts these to a *HDate()* object, which stores the earliest possible, latest possible and an approximate midpoint date corresponding to the original string. These dates are stored as:
+These string are converted to a *HDate()* object, which stores the earliest,
+latest possible and an approximate midpoint date corresponding to the 
+original string. These dates are stored as:
 
 1.  Ordinals. These correspond to Python *datetime* ordinals for AD dates, extended backwards to non-positive values for BC dates.
 1.  Python *datetime.date*, for AD dates only.
+
+The package is intended for dealing with historical events. It does not support time of day,
+and at present takes a naive approach to 
+the difference between Julian and Gregorian calendars since 
+this is usually what is needed for the expected application areas.
 
 ## Date formats
 
@@ -31,6 +44,7 @@ Specifying ***dateformat="dmy"*** (as a parameter to the *HDate* constructor ) a
 Specifying ***dateformat="mdy"*** allows...
    * 12/25/1066
    * Dec 25, 1066
+   * 1066-12-25
 
 But does not allow...
    * 25/12/1066
@@ -80,11 +94,13 @@ Objects of this class have a property *pdates*, a dictionary encoding the date i
 {'mid': datetime.date(1066, 12, 15), 'ordinal_mid': 389332, 'slmid': 'm', 
  'late': datetime.date(1066, 12, 31), 'ordinal_late': 389348, 'sllate': 'm',
  'early': datetime.date(1066, 12, 1), 'ordinal_early': 389318, 'slearly': 'm'}
+>>>
 >>>hd2 = hdate.HDate('Dec 20, 1066', dateformat="mdy")
 >>>print(hd2.pdates)
 {'mid': datetime.date(1066, 12, 20), 'ordinal_mid': 389337, 'slmid': 'd',
  'late': datetime.date(1066, 12, 20), 'ordinal_late': 389337, 'sllate': 'd',
  'early': datetime.date(1066, 12, 20), 'ordinal_early': 389337, 'slearly': 'd'}
+>>>
 >>>hd3 = hdate.HDate('385 BC')
 >>> print(hd3.pdates)
 {'mid': None, 'ordinal_mid': -140455, 'slmid': 'y', 
@@ -116,33 +132,10 @@ The package has been trimmed down to date treatment only.
 The Plotly utilities included in older versions are now at
 https://github.com/dh3968mlq/hdtimelines
 
-### New in 0.0.6
-
-*add_event_set* renamed to *add_topic_from_df*
-
 ### New in 0.0.5
 
-   * BC dates are now supported in *HDate*
-   * Ordinal dates implemented in *HDate*
+   * BC dates are now supported
+   * Ordinal dates implemented
    * *dateformat* implemented, allowing dates to be formatted as *25/12/1066* or *12/25/1066* or *Dec 25, 1066*
-   * BC dates can now be displayed on timelines (*xmode=years*)
-   * X-axis (date axis) labels moved to top 
-
-### New in 0.0.4
-
-*add_event_set()* now updates yaxes to fit the displayed data
-
-New method *plTimeLine().fit_xaxis(self, mindate=None, maxdate=None)* that fits the X axis either to the data or to a specified range of dates
-
-X axis date labels moved to top of display
-
-Study range filtering added, parameters *study_range_start* and *study_range_end* of the *add_event_set* method. Event sets lying entirely outside the study range are not displayed.
-
-Filtering on the value of a *rank* column in input data, parameter *max_rank* of the *add_event_set* method. 
-
-### New in 0.0.3
-
-   * New English Football timeline code (*english_football.py*)
-   * New *hover_datetype* parameter to *add_event_set*
-   * New *htext_end* column supported
+   
    
