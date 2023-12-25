@@ -1,5 +1,7 @@
-hdateutils.py
-=============
+hdateutils
+==========
+
+*from historicaldate import hdateutils*
 
 .. automodule:: historicaldate.hdateutils
    :members:

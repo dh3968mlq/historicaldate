@@ -4,10 +4,7 @@ import datetime
 
 sys.path.append(".")
 
-try:
-    import historicaldate.hdate as hdate
-except:
-    import historicaldate.historicaldate.hdate as hdate
+import historicaldate.hdate as hdate
 
 def compare(s,re_check=None, dcheck=None, pdcheck=None, dateformat=None, check_days=False):
     hd = hdate.HDate(s, dateformat=dateformat)

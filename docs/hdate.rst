@@ -1,5 +1,7 @@
-hdate.py
-========
+hdate
+=====
+
+*from historicaldate import hdate*
 
 .. autoclass:: historicaldate.hdate.HDate
    :members:

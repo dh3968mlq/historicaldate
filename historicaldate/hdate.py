@@ -1,12 +1,7 @@
 import re
 import datetime
 
-#__version__="0.0.7"
-
-try:
-    import historicaldate.hdateutils as hdateutils
-except:
-    import historicaldate.historicaldate.hdateutils as hdateutils
+import historicaldate.hdateutils as hdateutils
 
 # ------------------------------------------------------------------------------------------------------
 class HDate():

@@ -9,7 +9,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["description"]
-version = "0.0.7"
+version = "0.1.0"
 
 [project.urls]
 Home = "https://github.com/dh3968mlq/historicaldate"

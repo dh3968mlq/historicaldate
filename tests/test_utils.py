@@ -3,12 +3,8 @@ import random
 
 sys.path.append(".")
 
-try:
-    import historicaldate.hdate as hdate
-    import historicaldate.hdateutils as hdateutils
-except:
-    import historicaldate.historicaldate.hdate as hdate
-    import historicaldate.historicaldate.hdateutils as hdateutils
+import historicaldate.hdate as hdate
+import historicaldate.hdateutils as hdateutils
 
 def check_ordinal(ordinal):
     "Cycle ordinal -> ymd -> string -> ordinal"

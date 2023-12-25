@@ -3,10 +3,7 @@ import datetime
 
 sys.path.append(".")
 
-try:
-    import historicaldate.hdate as hdate
-except:
-    import historicaldate.historicaldate.hdate as hdate
+import historicaldate.hdate as hdate
 
 from utils_for_tests import compare
 from utils_for_tests import expect_valueerror

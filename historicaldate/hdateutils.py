@@ -1,15 +1,11 @@
 import datetime
 from collections import namedtuple
 
-try:
-    import historicaldate.hdate as hdate
-except:
-    import historicaldate.historicaldate.hdate as hdate
-
+import historicaldate.hdate as hdate
 
 def to_ordinal(date_or_ordinal, delta=0, dateformat=None):
     """
-    Takes either a python date, an (int) ordinal or an HDate format string.
+    Takes either a python date (datetime.date), an (int) ordinal or an HDate format string.
     Returns an ordinal. Optionally apply a delta (days)
 
     *dateformat* is as in the HDate() constructor
@@ -27,7 +23,7 @@ def to_ordinal(date_or_ordinal, delta=0, dateformat=None):
 # ----
 def to_python_date(date_or_ordinal, dateformat=None):
     """
-    Takes either a python date, an (int) ordinal or an HDate format string.
+    Takes either a Python date (datetime.date), an (int) ordinal or an HDate format string.
     Returns a Python date if the ordinal is >= 1 or the string represents an AD date, None otherwise.
     If the string represents an uncertain date, the mid-point value is returned
 
@@ -46,7 +42,7 @@ def to_python_date(date_or_ordinal, dateformat=None):
 # ----
 def to_years(date_or_ordinal, dateformat=None):
     """
-    Takes either a python date, an (int) ordinal or an HDate format string.
+    Takes either a python date (datetime.date), an (int) ordinal or an HDate format string.
     Returns an approximate year value as a float 
     A returned value of 0.0 corresponding to ordinal day 0, i.e. 31st December 1BC
 
@@ -84,7 +80,7 @@ def years_to_ordinal(years):
 # ----
 def to_ymd(date_or_ordinal, dateformat=None):
     """
-    Takes either a python date, an (int) ordinal or an HDate format string.
+    Takes either a python date (datetime.date), an (int) ordinal or an HDate format string.
     Returns year, month, day as a named tuple with items named 'year', 'month', 'day'
 
     *dateformat* is as in the HDate() constructor
@@ -108,7 +104,7 @@ def to_ymd(date_or_ordinal, dateformat=None):
 # ----
 def calc_mid_ordinal(hdstring, dateformat=None):
     """
-    Return the mid date from an string in HDate format, or None
+    Return the mid date ordinal from an string in HDate format, or None
 
     *dateformat* is as in the HDate() constructor
     """
