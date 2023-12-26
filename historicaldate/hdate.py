@@ -4,10 +4,7 @@ import datetime
 import utils
 utils.add_submodules_to_path()
 
-try:
-    import historicaldate.hdateutils as hdateutils
-except:
-    import historicaldate.historicaldate.hdateutils as hdateutils
+from historicaldate import hdateutils
 
 # ------------------------------------------------------------------------------------------------------
 class HDate():

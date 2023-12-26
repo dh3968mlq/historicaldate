@@ -4,10 +4,7 @@ from collections import namedtuple
 import utils
 utils.add_submodules_to_path()
 
-import utils
-utils.add_submodules_to_path()
-
-import historicaldate.hdate as hdate
+from historicaldate import hdate
 
 def to_ordinal(date_or_ordinal, delta=0, dateformat=None):
     """
