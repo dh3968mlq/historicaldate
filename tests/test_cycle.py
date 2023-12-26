@@ -1,7 +1,7 @@
 import random
 
-import utils
-utils.add_submodules_to_path()
+import sys
+sys.path.insert(0,"./historicaldate") # in case this is run when a submodule
 
 from historicaldate import hdate
 from historicaldate import hdateutils

@@ -1,5 +1,5 @@
-import utils
-utils.add_submodules_to_path()
+import sys
+sys.path.insert(0,"./historicaldate") # in case this is run when a submodule
 
 from utils_for_tests import compare
 from utils_for_tests import expect_valueerror

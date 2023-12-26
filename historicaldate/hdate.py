@@ -1,8 +1,11 @@
+import sys
 import re
 import datetime
 
-import utils
-utils.add_submodules_to_path()
+if "./historicaldate" not in sys.path:
+    sys.path.insert(0,"../historicaldate") # -- Needed for Sphinx builds, usually run in the docs subdirectory
+    sys.path.insert(0,"./historicaldate")  # -- For normall running. Add second so it will go first in the search order
+
 
 from historicaldate import hdateutils
 
