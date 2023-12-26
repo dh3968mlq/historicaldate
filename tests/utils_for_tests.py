@@ -1,10 +1,7 @@
-import sys
-import os
-import datetime
+import utils
+utils.add_submodules_to_path()
 
-sys.path.append(".")
-
-import historicaldate.hdate as hdate
+from historicaldate import hdate
 
 def compare(s,re_check=None, dcheck=None, pdcheck=None, dateformat=None, check_days=False):
     hd = hdate.HDate(s, dateformat=dateformat)

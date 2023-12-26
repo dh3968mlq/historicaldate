@@ -1,9 +1,7 @@
-import sys
 import datetime
 
-sys.path.append(".")
-
-import historicaldate.hdate as hdate
+import utils
+utils.add_submodules_to_path()
 
 from utils_for_tests import compare
 from utils_for_tests import expect_valueerror

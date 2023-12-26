@@ -1,10 +1,10 @@
-import sys
 import random
 
-sys.path.append(".")
+import utils
+utils.add_submodules_to_path()
 
-import historicaldate.hdate as hdate
-import historicaldate.hdateutils as hdateutils
+from historicaldate import hdate
+from historicaldate import hdateutils
 
 def check_ordinal(ordinal):
     "Cycle ordinal -> ymd -> string -> ordinal"

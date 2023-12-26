@@ -1,7 +1,13 @@
 import re
 import datetime
 
-import historicaldate.hdateutils as hdateutils
+import utils
+utils.add_submodules_to_path()
+
+try:
+    import historicaldate.hdateutils as hdateutils
+except:
+    import historicaldate.historicaldate.hdateutils as hdateutils
 
 # ------------------------------------------------------------------------------------------------------
 class HDate():
