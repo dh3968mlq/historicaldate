@@ -2,9 +2,9 @@ import sys
 import datetime
 from collections import namedtuple
 
+# -- Fix in case this is included as a submodule
 if "./historicaldate" not in sys.path:
-    sys.path.insert(0,"../historicaldate") # -- Needed for Sphinx builds, usually run in the docs subdirectory
-    sys.path.insert(0,"./historicaldate")  # -- For normall running. Add second so it will go first in the search order
+    sys.path.insert(0,"./historicaldate") # Put this first in list  
 
 from historicaldate import hdate
 
