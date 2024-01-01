@@ -1,1 +1,0 @@
-"A small Python package for date handling including support for BC dates and uncertainty"

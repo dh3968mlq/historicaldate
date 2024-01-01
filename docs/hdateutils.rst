@@ -1,7 +1,12 @@
 hdateutils
 ==========
 
-*from historicaldate import hdateutils*
+.. code-block:: python
+
+   import historicaldate as hdt
+   n = hdt.calc_mid_ordinal("Dec 1066")
+
+etc...
 
 .. automodule:: historicaldate.hdateutils
    :members:

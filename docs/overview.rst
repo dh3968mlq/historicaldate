@@ -137,21 +137,21 @@ Objects of this class have a property *pdates*, a dictionary encoding the date i
 
 **Usage**
 
-Examples::
+.. code-block:: python
 
-    >>>from historicaldate import hdate
-    >>>hd1 = hdate.HDate('Dec 1066')
-    >>>print(hd1.pdates)
+    import historicaldate as hdt
+    hd1 = hdt.HDate('Dec 1066')
+    print(hd1.pdates)
     {'mid': datetime.date(1066, 12, 15), 'ordinal_mid': 389332, 'slmid': 'm', 
     'late': datetime.date(1066, 12, 31), 'ordinal_late': 389348, 'sllate': 'm',
     'early': datetime.date(1066, 12, 1), 'ordinal_early': 389318, 'slearly': 'm'}
-    >>>hd2 = hdate.HDate('Dec 20, 1066', dateformat="mdy")
-    >>>print(hd2.pdates)
+    hd2 = hdt.HDate('Dec 20, 1066', dateformat="mdy")
+    print(hd2.pdates)
     {'mid': datetime.date(1066, 12, 20), 'ordinal_mid': 389337, 'slmid': 'd',
     'late': datetime.date(1066, 12, 20), 'ordinal_late': 389337, 'sllate': 'd',
     'early': datetime.date(1066, 12, 20), 'ordinal_early': 389337, 'slearly': 'd'}
-    >>>hd3 = hdate.HDate('385 BC')
-    >>> print(hd3.pdates)
+    hd3 = hdt.HDate('385 BC')
+    print(hd3.pdates)
     {'mid': None, 'ordinal_mid': -140455, 'slmid': 'y', 
     'late': None, 'ordinal_late': -140256, 'sllate': 'y', 
     'early': None, 'ordinal_early': -140621, 'slearly': 'y'}
