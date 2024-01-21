@@ -83,7 +83,7 @@ class HDate():
                             (-(?P<{prefix}postday>{day_pattern})
                             )?
                         )?
-                        (\\s+(?P<{prefix}calendar>{calendar_pattern}))?
+                        (\\s*(?P<{prefix}calendar>{calendar_pattern}))?
                 """
             elif dateformat.lower() == "mdy":
                 datepattern = f"""
@@ -98,7 +98,7 @@ class HDate():
                             (-(?P<{prefix}postday>{day_pattern})
                             )?
                         )?
-                        (\\s+(?P<{prefix}calendar>{calendar_pattern})
+                        (\\s*(?P<{prefix}calendar>{calendar_pattern})
                     )?
                 """
             else:

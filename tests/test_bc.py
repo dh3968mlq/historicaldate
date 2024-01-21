@@ -16,6 +16,14 @@ def testbc():
             pdcheck={'ordinal_early': -36332, 'ordinal_late': -36332, 'ordinal_mid': -36332,
                     'slearly': 'd', 'sllate': 'd', 'slmid': 'd'},
             check_days=True)
+    compare("12 July 100BCe",
+            pdcheck={'ordinal_early': -36332, 'ordinal_late': -36332, 'ordinal_mid': -36332,
+                    'slearly': 'd', 'sllate': 'd', 'slmid': 'd'},
+            check_days=True)
+    compare("c. 287BC",
+            pdcheck={'ordinal_early': -106487, 'ordinal_late': -102835, 'ordinal_mid': -104661,
+                    'slearly': 'c', 'sllate': 'c', 'slmid': 'c'},
+            check_days=True)
 
 def test_sandbox():
     'Put a test here if we want to run it as a one-off'
