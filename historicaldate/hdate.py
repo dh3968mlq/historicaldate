@@ -34,7 +34,7 @@ class HDate():
         self.compiled_pattern = re.compile(self.match_pattern, re.VERBOSE | re.IGNORECASE)
         self.input = hdstr
 
-        if s := (hdstr.strip() if (hdstr.strip() or not missingasongoing) else "ongoing"):
+        if s := (str(hdstr).strip() if (str(hdstr).strip() or not missingasongoing) else "ongoing"):
             srch = self.compiled_pattern.search(s)
             if srch is None:
                 raise ValueError(f"Illegal date format: {hdstr}")
