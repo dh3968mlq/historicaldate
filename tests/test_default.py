@@ -13,6 +13,7 @@ def test1():
                         {'circa':False,'ongoing':False,'midday':25,'midmon':12,'midyear':1066})
     compare("166",{'midyear': '166'})
     compare("1066",{'midyear': '1066'})
+    compare(1066,{'midyear': '1066'})
     compare("june 1066",{'midpremon': 'june', 'midyear': '1066'})
     compare("24 june 1066",{'midpreday': '24', 'midpremon': 'june', 'midyear': '1066'})
     compare("24 Jun 1066",{'midpreday': '24', 'midpremon': 'Jun', 'midyear': '1066'})
