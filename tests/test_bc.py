@@ -24,6 +24,10 @@ def testbc():
             pdcheck={'ordinal_early': -106487, 'ordinal_late': -102835, 'ordinal_mid': -104661,
                     'slearly': 'c', 'sllate': 'c', 'slmid': 'c'},
             check_days=True)
+    compare("c. 287BC",
+            pdcheck={'ordinal_early': -106487, 'ordinal_late': -102835, 'ordinal_mid': -104661,
+                    'slearly': 'c', 'sllate': 'c', 'slmid': 'c'},
+            check_days=True, dateformat="mdy")
 
 def test_sandbox():
     'Put a test here if we want to run it as a one-off'
