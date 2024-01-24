@@ -34,6 +34,12 @@ def test1():
              {'ongoing': False, 'circa':True, 'clen': '2', 'clentype': 'y', 
               'midday': 25, 'midmon': 12, 'midyear': 1066})
     compare("ongoing",{"ongoing":"ongoing"})
+    compare("Between 1 and 100",
+            pdcheck={'mid': datetime.date(50, 12, 31), 'ordinal_mid': 18262, 
+                     'late': datetime.date(100, 12, 31), 'ordinal_late': 36524, 
+                     'early': datetime.date(1, 1, 1), 'ordinal_early': 1, 
+                     'slearly': 'y', 'slmid': 'c', 'sllate': 'y'},
+            check_days=True)
 
 # -- Some pdate checks
 def test2():

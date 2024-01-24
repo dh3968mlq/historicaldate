@@ -181,18 +181,17 @@ class HDate():
         # resolve calendars
         # (1) if main is missing, copy from late
         # (2) if main is still missing, and early is ad/ce, copy from early (else error)
-        # (3) if early / late is same as main, set to none
+        # (3) if early is missing, copy from main
         if hd["midcalendar"] is None: hd["midcalendar"] = hd["latecalendar"]
         if hd["midcalendar"] is None: 
             if hd["earlycalendar"] is None:
                 pass
             elif hd["earlycalendar"].lower() in  {'bc', 'bce'}:
-                raise ValueError("If early calendar is BC/BCE, main calendar must be specified")
+                raise ValueError(f"If early calendar is BC/BCE, main calendar must be specified: {self.input}")
             else:
                 hd["midcalendar"] = hd["earlycalendar"]
-        
-        if hd["latecalendar"] == hd["midcalendar"]: hd["latecalendar"] = None
-        if hd["earlycalendar"] == hd["midcalendar"]: hd["earlycalendar"] = None
+        if hd["earlycalendar"] is None: 
+            hd["earlycalendar"] = hd["midcalendar"]
 
         return hd
     # ------------------------------------------------------------------------------------------------------
@@ -277,8 +276,6 @@ class HDate():
                         else self.max_day_in_month(year, month) if prefix=="late" \
                         else 15
 
-        isbce = self.d_parsed['midcalendar'] == 'bce'
-
         if self.d_parsed[f'{prefix}year'] is None:
             if self.d_parsed["circa"] or (prefix == "mid") or \
                         (self.d_parsed[f'midyear'] is None): # Cannot copy from mid year
@@ -288,9 +285,11 @@ class HDate():
                 year = self.d_parsed[f'midyear']
                 month = self.d_parsed[f'midmon'] if speclevel in {"m","d"} else default_month
                 day = self.d_parsed[f'midday'] if speclevel == "d" else default_day(year, month)
+                isbce = self.d_parsed['midcalendar'] == 'bce'
                 return  self._ymd_to_dfragment(year, month, day, prefix=prefix, speclevel=speclevel, isbce=isbce)
         else:    # The date has been specified
             speclevel = "y"
+            isbce = self.d_parsed[f'{prefix}calendar'] == 'bce'
             year = self.d_parsed[f'{prefix}year']
 
             if self.d_parsed[f'{prefix}mon']: speclevel = "m"
