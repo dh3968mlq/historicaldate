@@ -126,7 +126,7 @@ The dictionary members *slearly*, *slmid* and *sllate* indicate the 'specificati
 
 ## Changes
 
-### New in 0.1.0, 0.1.1
+### New in 0.1.0, 0.1.1, 0.1.2
 
 Cleaned up for PyPI release
 

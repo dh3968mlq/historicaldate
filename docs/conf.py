@@ -9,7 +9,7 @@
 project = 'historicaldate'
 copyright = '2023, David Harris'
 author = 'David Harris'
-release = '0.1.1'
+release = '0.1.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
